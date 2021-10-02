@@ -1,0 +1,16 @@
+permalink: pretty
+theme: minima
+url: "https://jonaslalin.com"
+
+defaults:
+  - scope:
+      path: ""
+      types: posts
+    values:
+      layout: post
+
+title: I, Deep Learning
+description: >-
+  Just another blog about deep learning.
+author: Jonas Lalin
+github_username: jonaslalin
