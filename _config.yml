@@ -14,6 +14,7 @@ description: >-
   Just another blog about deep learning.
 author: Jonas Lalin
 github_username: jonaslalin
+google_analytics: G-XY9F18W0CY
 
 exclude:
   - README.md
