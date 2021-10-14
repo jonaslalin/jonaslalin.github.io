@@ -1,10 +1,10 @@
 ---
-title: Why Do We Use Backpropagation?
+title: Why do we use backpropagation?
 ---
 
 To understand why it almost always is best to use backpropagation for training neural networks, we will compare the computational complexity between applying the chain rule in forward and reverse accumulation modes.
 
-## Forward and Reverse Accumulation Modes
+## Forward and reverse accumulation modes
 
 Suppose we have a function
 
@@ -98,7 +98,7 @@ $$
 
 All in all, we have been strategic about how we have defined intermediate variables. Now, we are ready to compute $$\pdv{y_1}{x_1}$$, $$\pdv{y_1}{x_2}$$, $$\pdv{y_1}{x_3}$$, $$\pdv{y_2}{x_1}$$, $$\pdv{y_2}{x_2}$$ and $$\pdv{y_2}{x_3}$$. Once again, let us start with inside-out traversal of the chain rule, i.e., forward accumulation mode.
 
-### Forward Accumulation Mode
+### Forward accumulation mode
 
 __Iteration 1:__
 
@@ -151,7 +151,7 @@ $$
 
 A third and final iteration yields $$\pdv{y_1}{x_3} = -x_1$$ and $$\pdv{y_2}{x_3} = \log(1 - x_1)$$. Before drawing any conclusion, let us work through the same example again. This time, we will traverse the chain rule outside-in.
 
-### Reverse Accumulation Mode
+### Reverse accumulation mode
 
 __Iteration 1:__
 
@@ -187,7 +187,7 @@ $$
 
 A second and final iteration concludes with $$\pdv{y_2}{x_1} = -\frac{x_3}{1 - x_1}$$, $$\pdv{y_2}{x_2} = 0$$ and $$\pdv{y_2}{x_3} = \log(1 - x_1)$$. Do you recognize any patterns?
 
-## Computational Complexity
+## Computational complexity
 
 Analyzing the pen-and-paper example, in forward accumulation mode, we needed _three iterations_ because we had _three independent variables_. On the other hand, in reverse accumulation mode, we only needed _two iterations_ because we had _two dependent variables_.
 

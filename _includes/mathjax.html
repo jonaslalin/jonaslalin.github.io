@@ -8,9 +8,12 @@
   MathJax = {
     tex: {
       macros: {
+        dv: ['\\frac{\\mathrm{d} #1}{\\mathrm{d} #2}', 2],
+        pdv: ['\\frac{\\partial #1}{\\partial #2}', 2],
         R: ['\\mathbb{R}'],
-        dv: ['\\frac{d #1}{d #2}', 2],
-        pdv: ['\\frac{\\partial #1}{\\partial #2}', 2]
+        softmax: ['\\operatorname{softmax}'],
+        T: ['\\mathrm{T}'],
+        vec: ['\\mathbf{#1}', 1],
       }
     }
   };
