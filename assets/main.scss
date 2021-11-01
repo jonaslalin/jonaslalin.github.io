@@ -1,0 +1,13 @@
+---
+---
+
+@import "minima";
+
+.overflow-wrapper {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  @extend .overflow-wrapper;
+}

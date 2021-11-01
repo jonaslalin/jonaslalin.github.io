@@ -1,10 +1,10 @@
 ---
-title: Why do we use backpropagation?
+title: How Backpropagation Broke the Speed Record
 ---
 
-To understand why it almost always is best to use backpropagation for training neural networks, we will compare the computational complexity between applying the chain rule in forward and reverse accumulation modes.
+Today, backpropagation is the workhorse of learning in neural networks. To understand how it can work far faster than earlier approaches to training, we will compare the computational complexity of applying the chain rule in forward versus reverse accumulation mode.
 
-## Forward and reverse accumulation modes
+## Forward and Reverse Accumulation Modes
 
 Suppose we have a function
 
@@ -28,7 +28,7 @@ To compute the derivative $$\dv{y}{x}$$, we can traverse the chain rule
 1. inside-out or
 2. outside-in.
 
-We will start with inside-out traversal or the so-called forward accumulation mode:
+We will start with the inside-out traversal or the so-called forward accumulation mode:
 
 $$
 \begin{aligned}
@@ -39,7 +39,7 @@ $$
 \end{aligned}
 $$
 
-By contrast, outside-in traversal means that we apply the chain rule in reverse accumulation mode, which more commonly is referred to as backpropagation:
+By contrast, the outside-in traversal means that we apply the chain rule in reverse accumulation mode, which more commonly is referred to as _backpropagation_:
 
 $$
 \begin{aligned}
@@ -56,23 +56,25 @@ $$
 \dv{y}{x} = \dv{u_3}{x} = \dv{y}{u_0} = \dv{f(u_2)}{u_2} \dv{g(u_1)}{u_1} \dv{h(u_0)}{u_0}
 $$
 
-using the same number of computations; however, this is not always the case, as we soon will find out. Moreover, we see that inside-out traversal computes the recursive relation
+using the same number of computations; however, this is not always the case, as we soon will find out.
+
+Moreover, we see that the inside-out traversal computes the recursive relation
 
 $$
 \dv{u_i}{x} = \dv{u_i}{u_{i - 1}} \dv{u_{i - 1}}{x}.
 $$
 
-On the other hand, outside-in traversal computes the recursive relation
+On the other hand, the outside-in traversal computes the recursive relation
 
 $$
 \dv{y}{u_i} = \dv{y}{u_{i + 1}} \dv{u_{i + 1}}{u_i}.
 $$
 
-Now, let us move on to a function $$f: \R^3 \to \R^2$$, where it will be easier to compare the computational complexity between applying the chain rule in forward and reverse accumulation modes.
+Now, let us move on to a function $$f: \R^3 \to \R^2$$, where it will be easier to analyze the computational complexity of the forward and reverse accumulation modes.
 
 ## $$f: \R^3 \to \R^2$$
 
-To make a good comparison, we need a function with multiple dependent and independent variables. The following function fulfills that requirement:
+To make a good comparison, we need a function with different numbers of dependent and independent variables. The following function fulfills that requirement:
 
 $$
 \begin{aligned}
@@ -96,9 +98,9 @@ u_5 & = u_0 u_3 = y_2.
 \end{aligned}
 $$
 
-All in all, we have been strategic about how we have defined intermediate variables. Now, we are ready to compute $$\pdv{y_1}{x_1}$$, $$\pdv{y_1}{x_2}$$, $$\pdv{y_1}{x_3}$$, $$\pdv{y_2}{x_1}$$, $$\pdv{y_2}{x_2}$$ and $$\pdv{y_2}{x_3}$$. Once again, let us start with inside-out traversal of the chain rule, i.e., forward accumulation mode.
+Ready, set, go, let us compute the partial derivatives $$\pdv{y_1}{x_1}$$, $$\pdv{y_1}{x_2}$$, $$\pdv{y_1}{x_3}$$, $$\pdv{y_2}{x_1}$$, $$\pdv{y_2}{x_2}$$ and $$\pdv{y_2}{x_3}$$. Once again, we start with the inside-out traversal of the chain rule, i.e., the forward accumulation mode.
 
-### Forward accumulation mode
+### The Forward Accumulation Mode
 
 __Iteration 1:__
 
@@ -115,7 +117,7 @@ $$
 \end{aligned}
 $$
 
-Note that a single pass through all intermediate variables, in forward accumulation mode, gives us both $$\pdv{y_1}{x_1} = x_2 - x_3$$ and $$\pdv{y_2}{x_1} = -\frac{x_3}{1 - x_1}$$.
+A single pass through all intermediate variables, in the forward accumulation mode, gives us $$\pdv{y_1}{x_1} = x_2 - x_3$$ and $$\pdv{y_2}{x_1} = -\frac{x_3}{1 - x_1}$$.
 
 __Iteration 2:__
 
@@ -149,9 +151,11 @@ $$
 \end{aligned}
 $$
 
-A third and final iteration yields $$\pdv{y_1}{x_3} = -x_1$$ and $$\pdv{y_2}{x_3} = \log(1 - x_1)$$. Before drawing any conclusion, let us work through the same example again. This time, we will traverse the chain rule outside-in.
+A third and final iteration yields the remaining $$\pdv{y_1}{x_3} = -x_1$$ and $$\pdv{y_2}{x_3} = \log(1 - x_1)$$.
 
-### Reverse accumulation mode
+Before drawing any conclusions, let us work through the same example again. This time around, we will apply the chain rule in reverse accumulation mode.
+
+### The Reverse Accumulation Mode
 
 __Iteration 1:__
 
@@ -162,13 +166,13 @@ $$
 \pdv{y_1}{u_3} & = \pdv{y_1}{u_5} \pdv{u_5}{u_3} = 0, \\
 \pdv{y_1}{u_2} & = \pdv{y_1}{u_3} \pdv{u_3}{u_2} = 0, \\
 \pdv{y_1}{u_1} & = \pdv{y_1}{u_4} \pdv{u_4}{u_1} = u_{-2} = x_1, \\
-\pdv{y_1}{u_0} & = \pdv{y_1}{u_1} \pdv{u_1}{u_0} + \pdv{y_1}{u_5} \pdv{u_5}{u_0} = -x_1, \\
-\pdv{y_1}{u_{-1}} & = \pdv{y_1}{u_1} \pdv{u_1}{u_{-1}} = x_1, \\
+\pdv{y_1}{u_0} & = \pdv{y_1}{u_1} \pdv{u_1}{u_0} + \pdv{y_1}{u_5} \pdv{u_5}{u_0} = -u_{-2} = -x_1, \\
+\pdv{y_1}{u_{-1}} & = \pdv{y_1}{u_1} \pdv{u_1}{u_{-1}} = u_{-2} = x_1, \\
 \pdv{y_1}{u_{-2}} & = \pdv{y_1}{u_2} \pdv{u_2}{u_{-2}} + \pdv{y_1}{u_4} \pdv{u_4}{u_{-2}} = u_1 = x_2 - x_3.
 \end{aligned}
 $$
 
-Behold the power of backpropagation! A single pass through all intermediate variables, in reverse accumulation mode, gives us $$\pdv{y_1}{x_1} = x_2 - x_3$$, $$\pdv{y_1}{x_2} = x_1$$ and $$\pdv{y_1}{x_3} = -x_1$$.
+Behold the power of backpropagation! A single pass through all intermediate variables, in the reverse accumulation mode, gives us $$\pdv{y_1}{x_1} = x_2 - x_3$$, $$\pdv{y_1}{x_2} = x_1$$ and $$\pdv{y_1}{x_3} = -x_1$$.
 
 __Iteration 2:__
 
@@ -185,15 +189,15 @@ $$
 \end{aligned}
 $$
 
-A second and final iteration concludes with $$\pdv{y_2}{x_1} = -\frac{x_3}{1 - x_1}$$, $$\pdv{y_2}{x_2} = 0$$ and $$\pdv{y_2}{x_3} = \log(1 - x_1)$$. Do you recognize any patterns?
+A second and final iteration is all we need to also know that $$\pdv{y_2}{x_1} = -\frac{x_3}{1 - x_1}$$, $$\pdv{y_2}{x_2} = 0$$ and $$\pdv{y_2}{x_3} = \log(1 - x_1)$$. Do you start to recognize any patterns?
 
-## Computational complexity
+## Computational Complexity
 
-Analyzing the pen-and-paper example, in forward accumulation mode, we needed _three iterations_ because we had _three independent variables_. On the other hand, in reverse accumulation mode, we only needed _two iterations_ because we had _two dependent variables_.
+Analyzing the pen-and-paper example, in the forward accumulation mode, we needed _three iterations_ because we had _three independent variables_. On the other hand, in the reverse accumulation mode, we only needed _two iterations_ because we had _two dependent variables_.
 
-Next, let us generalize the comparison of computational complexity to a function $$f: \R^n \to \R^m$$, where we would recognize the following patterns:
+As a matter of fact, we can generalize the comparison of computational complexity to a function $$f: \R^n \to \R^m$$, where we would be able to recognize the following patterns:
 
-1. In forward accumulation mode, we would need $$n$$ iterations to compute the derivatives of the $$m$$ dependent variables with respect to the $$n$$ independent variables.
-2. In reverse accumulation mode, we would need $$m$$ iterations to compute the derivatives of the $$m$$ dependent variables with respect to the $$n$$ independent variables.
+1. In the forward accumulation mode, we would need $$n$$ iterations to compute the derivatives of the $$m$$ dependent variables with respect to the $$n$$ independent variables.
+2. In the reverse accumulation mode, we would need $$m$$ iterations to compute the derivatives of the $$m$$ dependent variables with respect to the $$n$$ independent variables.
 
-Subsequently, since deep learning models can have trainable parameters in the millions, but usually only one or a few cost functions, we almost always work with problems where $$n \gg m$$. Now, do you understand why backpropagation is for the win? 🐌⚡️
+In closing, deep learning models may have trainable parameters in the millions, but only one cost function; hence, we always work with problems where $$n \gg m = 1$$. Now, do you understand how backpropagation broke the speed record? 🏎

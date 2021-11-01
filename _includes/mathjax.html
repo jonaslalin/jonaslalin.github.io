@@ -1,21 +1,18 @@
-<style>
-  p + mjx-container {
-    overflow-x: auto;
-    overflow-y: hidden;
-  }
-</style>
 <script>
   MathJax = {
     tex: {
       macros: {
         dv: ['\\frac{\\mathrm{d} #1}{\\mathrm{d} #2}', 2],
         pdv: ['\\frac{\\partial #1}{\\partial #2}', 2],
-        R: ['\\mathbb{R}'],
-        softmax: ['\\operatorname{softmax}'],
-        T: ['\\mathrm{T}'],
-        vec: ['\\mathbf{#1}', 1],
+        R: '\\mathbb{R}',
+        softmax: '\\operatorname{softmax}',
+        T: '\\intercal',
+        vec: ['\\mathbf{#1}', 1]
       }
+    },
+    svg: {
+      fontCache: 'global'
     }
   };
 </script>
-<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
