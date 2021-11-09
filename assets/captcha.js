@@ -31,9 +31,9 @@ var decrypt = ceasarCipher.bind(null, 'decrypt');
 
 // -----------------------------------------------------------------------------
 
-var plaintext = document.getElementById('plaintext');
 var ciphertext = '.dc3h1a3a_c29b3_a15db';
 var key = document.getElementById('key');
+var plaintext = document.getElementById('plaintext');
 
 var form = document.getElementById('captcha');
 form.addEventListener('submit', function onSubmit(event) {

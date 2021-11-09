@@ -10,4 +10,5 @@
 
 mjx-container[jax="SVG"][display="true"] {
   @extend .overflow-wrapper;
+  min-width: 0 !important;
 }

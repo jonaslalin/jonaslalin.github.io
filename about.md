@@ -13,9 +13,9 @@ Would you like to get in touch? Pass my _Completely Automated Public Turing test
 
 <form id="captcha">
 <label for="key">Key:</label>
-<input type="number" id="key" name="key" required min="0" value="3">
+<input type="number" id="key" name="key" required min="0" value="13">
 <button type="submit">Decipher</button>
 </form>
-Plaintext: `9a@0ey_0_8@z6.08_y2a.`{: #plaintext}
+Plaintext: `z43q8o1q1y3pw2qy1os42`{: #plaintext }
 
 <script src="{{ "/assets/captcha.js" | relative_url }}"></script>

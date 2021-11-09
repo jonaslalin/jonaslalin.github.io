@@ -1,17 +1,46 @@
 <script>
   MathJax = {
+    loader: {
+      load: [
+        '[tex]/mathtools'
+      ]
+    },
+    svg: {
+      fontCache: 'global'
+    },
     tex: {
       macros: {
-        dv: ['\\frac{\\mathrm{d} #1}{\\mathrm{d} #2}', 2],
-        pdv: ['\\frac{\\partial #1}{\\partial #2}', 2],
+        ceq: ['\\mathclap{\\phantom{= {}} #1}', 1],
+        diag: '\\operatorname{diag}',
+        dv: [
+          '\\mathchoice'
+          + '{\\frac{\\mathrm{d} #1}{\\mathrm{d} #2}}'
+          + '{\\mathrm{d} #1 / \\mathrm{d} #2}'
+          + '{\\mathrm{d} #1 / \\mathrm{d} #2}'
+          + '{\\mathrm{d} #1 / \\mathrm{d} #2}',
+          2
+        ],
+        jj: '\\acute{\\jmath}',
+        pdv: [
+          '\\mathchoice'
+          + '{\\frac{\\partial #1}{\\partial #2}}'
+          + '{\\partial #1 / \\partial #2}'
+          + '{\\partial #1 / \\partial #2}'
+          + '{\\partial #1 / \\partial #2}',
+          2
+        ],
+        peq: '\\mathrel{\\phantom{=}}',
         R: '\\mathbb{R}',
         softmax: '\\operatorname{softmax}',
         T: '\\intercal',
         vec: ['\\mathbf{#1}', 1]
-      }
-    },
-    svg: {
-      fontCache: 'global'
+      },
+      packages: {
+        '[+]': [
+          'mathtools'
+        ]
+      },
+      tags: 'ams'
     }
   };
 </script>
