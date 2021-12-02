@@ -30,7 +30,7 @@ To compute the derivative $$\dv{y}{x}$$, we can traverse the chain rule
 1. inside-out or
 2. outside-in.
 
-We will start with the inside-out traversal or the so-called forward accumulation mode:
+We start with the inside-out traversal of the chain rule, i.e., the forward accumulation mode:
 
 $$
 \begin{align*}
@@ -41,7 +41,7 @@ $$
 \end{align*}
 $$
 
-By contrast, the outside-in traversal means that we apply the chain rule in reverse accumulation mode, which more commonly is referred to as _backpropagation_:
+By contrast, the reverse accumulation mode performs the outside-in traversal of the chain rule, which more commonly is referred to as _backpropagation_:
 
 $$
 \begin{align*}
@@ -62,7 +62,7 @@ $$
 
 using the same number of computations; however, this is not always the case, as we soon will find out.
 
-Moreover, we see that the inside-out traversal computes the recursive relation
+Note that the forward accumulation mode computes the recurrence relation
 
 $$
 \begin{equation*}
@@ -70,7 +70,7 @@ $$
 \end{equation*}
 $$
 
-On the other hand, the outside-in traversal computes the recursive relation
+In contrast, the reverse accumulation mode computes the following recurrence relation:
 
 $$
 \begin{equation*}
@@ -82,7 +82,7 @@ Now, let us move on to a function $$f \colon \R^3 \to \R^2$$, where it will be e
 
 ## $$f \colon \R^3 \to \R^2$$
 
-To make a good comparison, we need a function with different numbers of dependent and independent variables. The following function fulfills that requirement:
+To make a good comparison, we need an example with a different number of dependent variables than independent variables. The following function fulfills that requirement:
 
 $$
 \begin{align*}
@@ -106,7 +106,7 @@ u_5 &= u_0 u_3 = y_2.
 \end{align*}
 $$
 
-Now, we are ready to compute the partial derivatives $$\pdv{y_1}{x_1}$$, $$\pdv{y_1}{x_2}$$, $$\pdv{y_1}{x_3}$$, $$\pdv{y_2}{x_1}$$, $$\pdv{y_2}{x_2}$$ and $$\pdv{y_2}{x_3}$$. Once again, we start with the inside-out traversal of the chain rule, i.e., the forward accumulation mode.
+Now, we are ready to compute the partial derivatives $$\pdv{y_1}{x_1}$$, $$\pdv{y_1}{x_2}$$, $$\pdv{y_1}{x_3}$$, $$\pdv{y_2}{x_1}$$, $$\pdv{y_2}{x_2}$$ and $$\pdv{y_2}{x_3}$$. Once again, we start with the inside-out traversal of the chain rule.
 
 ### The Forward Accumulation Mode
 
@@ -125,7 +125,7 @@ $$
 \end{align*}
 $$
 
-A single pass through all intermediate variables, in the forward accumulation mode, gives us $$\pdv{y_1}{x_1} = x_2 - x_3$$ and $$\pdv{y_2}{x_1} = -x_3 / (1 - x_1)$$.
+Computing the partial derivative of every intermediate variable once, gives us $$\pdv{y_1}{x_1} = x_2 - x_3$$ and $$\pdv{y_2}{x_1} = -x_3 / (1 - x_1)$$.
 
 __Iteration 2:__
 
@@ -161,7 +161,7 @@ $$
 
 A third and final iteration yields the remaining $$\pdv{y_1}{x_3} = -x_1$$ and $$\pdv{y_2}{x_3} = \log(1 - x_1)$$.
 
-Before drawing any conclusions, let us work through the same example again. This time around, we will apply the chain rule in reverse accumulation mode.
+Before drawing any conclusions, let us work through the same example again. This time around, we will perform the outside-in traversal of the chain rule.
 
 ### The Reverse Accumulation Mode
 
@@ -180,7 +180,7 @@ $$
 \end{align*}
 $$
 
-Behold the power of backpropagation! A single pass through all intermediate variables, in the reverse accumulation mode, gives us $$\pdv{y_1}{x_1} = x_2 - x_3$$, $$\pdv{y_1}{x_2} = x_1$$ and $$\pdv{y_1}{x_3} = -x_1$$.
+ Behold the power of backpropagation! Computing the partial derivative with respect to every intermediate variable once, gives us $$\pdv{y_1}{x_1} = x_2 - x_3$$, $$\pdv{y_1}{x_2} = x_1$$ and $$\pdv{y_1}{x_3} = -x_1$$.
 
 __Iteration 2:__
 
@@ -197,13 +197,13 @@ $$
 \end{align*}
 $$
 
-A second and final iteration is all we need to also know that $$\pdv{y_2}{x_1} = -x_3 / (1 - x_1)$$, $$\pdv{y_2}{x_2} = 0$$ and $$\pdv{y_2}{x_3} = \log(1 - x_1)$$. Do you start to recognize any patterns?
+A second and final iteration concludes with $$\pdv{y_2}{x_1} = -x_3 / (1 - x_1)$$, $$\pdv{y_2}{x_2} = 0$$ and $$\pdv{y_2}{x_3} = \log(1 - x_1)$$. Do you start to recognize any patterns?
 
 ## Computational Complexity
 
 Analyzing the pen-and-paper example, in the forward accumulation mode, we needed _three iterations_ because we had _three independent variables_. On the other hand, in the reverse accumulation mode, we only needed _two iterations_ because we had _two dependent variables_.
 
-As a matter of fact, we can generalize the comparison of computational complexity to a function $$f \colon \R^n \to \R^m$$, where we would be able to recognize the following patterns:
+As a matter of fact, we can generalize the comparison of computational complexity to a generic function $$f \colon \R^n \to \R^m$$, where we would be able to draw the following conclusions:
 
 1. In the forward accumulation mode, we would need $$n$$ iterations to compute the partial derivatives of the $$m$$ dependent variables with respect to the $$n$$ independent variables.
 2. In the reverse accumulation mode, we would need $$m$$ iterations to compute the partial derivatives of the $$m$$ dependent variables with respect to the $$n$$ independent variables.
