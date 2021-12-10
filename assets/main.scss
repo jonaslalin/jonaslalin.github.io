@@ -12,3 +12,23 @@ mjx-container[jax="SVG"][display="true"] {
   @extend .overflow-wrapper;
   min-width: 0 !important;
 }
+
+figcaption {
+  text-align: center;
+  margin-top: $spacing-unit / 2;
+}
+
+table.row-headers {
+  thead {
+    th:nth-child(1) {
+      border-bottom-color: darken($grey-color-light, 4%);
+    }
+  }
+
+  tbody {
+    th {
+      border-right-color: darken($grey-color-light, 12%);
+      border-bottom-color: darken($grey-color-light, 4%);
+    }
+  }
+}

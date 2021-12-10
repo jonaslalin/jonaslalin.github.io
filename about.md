@@ -7,7 +7,7 @@ __Hello!__
 
 My name is Jonas Lalin. I am a deep learning enthusiast from Stockholm, Sweden, and I love math. Here you can read about the mechanics of deep learning. I hope you enjoy and learn something new from reading my posts! 🧙
 
-Would you like to get in touch? Pass my _Completely Automated Public Turing test to tell Computers and Humans Apart_ by subtracting the $$6$$th prime number from
+Would you like to get in touch? Pass my completely automated public Turing test to tell computers and humans apart by subtracting the $$6$$th prime number from
 
 > the answer to the Ultimate Question of Life, the Universe, and Everything.
 

@@ -1,0 +1,86 @@
+---
+---
+
+@import "variables";
+
+.nn {
+  display: block;
+  margin: 0 auto;
+  font-size: $small-font-size;
+}
+
+.nn-node {
+  &>use {
+    fill: $background-color;
+    stroke: lighten($text-color, 18%);
+    stroke-width: 4;
+  }
+}
+
+.nn-link {
+  &>line {
+    stroke: darken($grey-color-light, 12%);
+    stroke-width: 1;
+  }
+}
+
+.nn-node-text,
+.nn-link-text {
+  &>use {
+    fill: lighten($grey-color-light, 6%);
+  }
+
+  &>text {
+    fill: lighten($text-color, 18%);
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+}
+
+#nn-node-current-layer {
+  .nn-node-2-1,
+  .nn-node-2-2 {
+    &>use {
+      stroke: darken($grey-color-light, 12%);
+    }
+  }
+
+  .nn-link-1-0-2-0,
+  .nn-link-1-1-2-0,
+  .nn-link-1-2-2-0 {
+    &>line {
+      stroke: lighten($text-color, 18%);
+    }
+  }
+
+  .nn-node-text-2-1,
+  .nn-node-text-2-2 {
+    &>text {
+      fill: darken($grey-color-light, 12%);
+    }
+  }
+}
+
+#nn-node-previous-layer {
+  .nn-node-1-0,
+  .nn-node-1-1 {
+    &>use {
+      stroke: darken($grey-color-light, 12%);
+    }
+  }
+
+  .nn-link-1-2-2-0,
+  .nn-link-1-2-2-1,
+  .nn-link-1-2-2-2 {
+    &>line {
+      stroke: lighten($text-color, 18%);
+    }
+  }
+
+  .nn-node-text-1-0,
+  .nn-node-text-1-1 {
+    &>text {
+      fill: darken($grey-color-light, 12%);
+    }
+  }
+}

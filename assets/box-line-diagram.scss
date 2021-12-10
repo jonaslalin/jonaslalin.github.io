@@ -1,0 +1,38 @@
+---
+---
+
+@import "variables";
+
+.bld {
+  display: block;
+  margin: 0 auto;
+  font-size: $small-font-size;
+}
+
+.bld-box {
+  &>use {
+    fill: $background-color;
+    stroke: lighten($text-color, 18%);
+    stroke-width: 4;
+  }
+}
+
+.bld-line {
+  &>line {
+    stroke: lighten($text-color, 18%);
+    stroke-width: 1;
+  }
+}
+
+.bld-box-text,
+.bld-line-text {
+  &>use {
+    fill: lighten($grey-color-light, 6%);
+  }
+
+  &>text {
+    fill: lighten($text-color, 18%);
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+}
