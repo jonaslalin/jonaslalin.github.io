@@ -8,9 +8,9 @@ This post is the first of a three-part series in which we set out to derive the 
 * fully-connected layers, which means that each node in one layer connects to every node in the following layer, and
 * ways to introduce nonlinearity by means of activation functions.
 
-We start with the forward propagation, which involves computing predictions and the associated cost of these predictions.
+We start with forward propagation, which involves computing predictions and the associated cost of these predictions.
 
-## The Forward Propagation
+## Forward Propagation
 
 Settling on which notations to use is tricky since we only have so many letters in the Roman alphabet. As you browse the Internet, you will likely find derivations that have used different notations than the ones we are about to introduce. However, and fortunately, there is no right or wrong here; it is just a matter of taste. In particular, the notations used in this series take inspiration from Andrew Ng's [Standard notations for Deep Learning]({% link /assets/deep-learning-notation.pdf %}){: target="_blank" }. If you make a comparison, you will find that we only change a couple of the details.
 
@@ -171,9 +171,9 @@ $$
 
 where $$\vec{Y} \in \R^{n^{[L]} \times m}$$ denotes the targets and $$f \colon \R^{2 n^{[L]}} \to \R$$ can be tailored to our needs.
 
-We are done with the forward propagation! Next up: the backward propagation, which involves computing the gradient of the cost function with respect to the weights and biases.
+We are done with forward propagation! Next up: backward propagation, also known as backpropagation, which involves computing the gradient of the cost function with respect to the weights and biases.
 
-## The Backward Propagation
+## Backward Propagation
 
 We will make heavy use of the chain rule in this section, and to understand better how it works, we first apply the chain rule to the following example:
 
@@ -348,7 +348,7 @@ where $$\pdv{J}{\vec{A}^{[l]}} \in \R^{n^{[l]} \times m}$$.
 
 On purpose, we have omitted the details of $$g_j^{[l]}(z_{1, i}^{[l]}, \dots, z_{j, i}^{[l]}, \dots, z_{n^{[l]}, i}^{[l]})$$; consequently, we cannot derive an analytic expression for $$\pdv{a_{\jj, i}^{[l]}}{z_{j, i}^{[l]}}$$, which we depend on in $$\eqref{eq:dz_scalar}$$. Since the entire second post of this series will be dedicated to activation functions, we will instead derive $$\pdv{a_{\jj, i}^{[l]}}{z_{j, i}^{[l]}}$$ there.
 
-Furthermore, according to $$\eqref{eq:dz_scalar}$$, we see that $$\pdv{J}{z_{j, i}^{[l]}}$$ also depends on $$\pdv{J}{a_{\jj, i}^{[l]}}$$. Now, it might come as a surprise, but $$\pdv{J}{a_{\jj, i}^{[l]}}$$ has already been computed when we reach the $$l$$th layer during the backward propagation. How did that happen, you may ask. The answer is that every layer paves the way for the previous layer by also computing $$\pdv{J}{a_{k, i}^{[l - 1]}}$$, which we shall do now:
+Furthermore, according to $$\eqref{eq:dz_scalar}$$, we see that $$\pdv{J}{z_{j, i}^{[l]}}$$ also depends on $$\pdv{J}{a_{\jj, i}^{[l]}}$$. Now, it might come as a surprise, but $$\pdv{J}{a_{\jj, i}^{[l]}}$$ has already been computed when we reach the $$l$$th layer during backward propagation. How did that happen, you may ask. The answer is that every layer paves the way for the previous layer by also computing $$\pdv{J}{a_{k, i}^{[l - 1]}}$$, which we shall do now:
 
 $$
 \begin{equation}
@@ -401,9 +401,9 @@ where $$\pdv{J}{\vec{A}^{[l - 1]}} \in \R^{n^{[l - 1]} \times m}$$.
 
 ## Summary
 
-The forward propagation is seeded with $$\vec{A}^{[0]} = \vec{X}$$ and evaluates a set of recurrence relations to compute the predictions $$\vec{A}^{[L]} = {\vec{\hat{Y}}}$$. We also compute the cost $$J = f(\vec{\hat{Y}}, \vec{Y}) = f(\vec{A}^{[L]}, \vec{Y})$$.
+Forward propagation is seeded with $$\vec{A}^{[0]} = \vec{X}$$ and evaluates a set of recurrence relations to compute the predictions $$\vec{A}^{[L]} = {\vec{\hat{Y}}}$$. We also compute the cost $$J = f(\vec{\hat{Y}}, \vec{Y}) = f(\vec{A}^{[L]}, \vec{Y})$$.
 
-The backward propagation, on the other hand, is seeded with $$\pdv{J}{\vec{A}^{[L]}} = \pdv{J}{\vec{\hat{Y}}}$$ and evaluates a different set of recurrence relations to compute $$\pdv{J}{\vec{W}^{[l]}}$$ and $$\pdv{J}{\vec{b}^{[l]}}$$. If not stopped prematurely, it eventually computes $$\pdv{J}{\vec{A}^{[0]}} = \pdv{J}{\vec{X}}$$, a partial derivative we usually ignore.
+Backward propagation, on the other hand, is seeded with $$\pdv{J}{\vec{A}^{[L]}} = \pdv{J}{\vec{\hat{Y}}}$$ and evaluates a different set of recurrence relations to compute $$\pdv{J}{\vec{W}^{[l]}}$$ and $$\pdv{J}{\vec{b}^{[l]}}$$. If not stopped prematurely, it eventually computes $$\pdv{J}{\vec{A}^{[0]}} = \pdv{J}{\vec{X}}$$, a partial derivative we usually ignore.
 
 Moreover, let us visualize the inputs we use and the outputs we produce during the forward and backward propagations:
 
@@ -413,7 +413,7 @@ Moreover, let us visualize the inputs we use and the outputs we produce during t
   <figcaption>Figure 3: An overview of inputs and outputs.</figcaption>
 </figure>
 
-Now, you might have noticed that we have yet to derive an analytic expression for the backward propagation seed $$\pdv{J}{\vec{A}^{[L]}} = \pdv{J}{\vec{\hat{Y}}}$$. To recap, we have deferred the derivations that concern activation functions to the second post of this series. Since the entire third post of this series will be dedicated to cost functions, we will instead address the missing derivation there.
+Now, you might have noticed that we have yet to derive an analytic expression for the backpropagation seed $$\pdv{J}{\vec{A}^{[L]}} = \pdv{J}{\vec{\hat{Y}}}$$. To recap, we have deferred the derivations that concern activation functions to the second post of this series. Since the entire third post of this series will be dedicated to cost functions, we will instead address the missing derivation there.
 
 Last but not least: congratulations! You have made it to the end (of the first post). 🏅
 
