@@ -322,7 +322,7 @@ $$
 
 where $$\pdv{J}{\vec{a}_{*, i}^{[l]}} \in \R^{n^{[l]}}$$ and $$\pdv{\vec{a}_{*, i}^{[l]}}{\vec{z}_{*, i}^{[l]}} \in \R^{n^{[l]} \times n^{[l]}}$$.
 
-We already know that
+We have already encountered
 
 $$
 \begin{equation}
