@@ -413,7 +413,7 @@ Moreover, let us visualize the inputs we use and the outputs we produce during t
   <figcaption>Figure 3: An overview of inputs and outputs.</figcaption>
 </figure>
 
-Now, you might have noticed that we have yet to derive an analytic expression for the backpropagation seed $$\pdv{J}{\vec{A}^{[L]}} = \pdv{J}{\vec{\hat{Y}}}$$. To recap, we have deferred the derivations that concern activation functions to the second post of this series. Since the entire third post of this series will be dedicated to cost functions, we will instead address the missing derivation there.
+Now, you might have noticed that we have yet to derive an analytic expression for the backpropagation seed $$\pdv{J}{\vec{A}^{[L]}} = \pdv{J}{\vec{\hat{Y}}}$$. To recap, we have deferred the derivations that concern activation functions to the second post of this series. Similarly, since the entire third post will be dedicated to cost functions, we will instead address the derivation of the backpropagation seed there.
 
 Last but not least: congratulations! You have made it to the end (of the first post). 🏅
 
