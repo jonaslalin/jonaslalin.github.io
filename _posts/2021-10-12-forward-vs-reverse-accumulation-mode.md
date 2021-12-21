@@ -2,7 +2,7 @@
 title: How Backpropagation Is Able To Reduce the Time Spent on Computing Gradients
 ---
 
-Backpropagation was originally introduced in the 1970s, but its importance was not fully appreciated until [Learning representations by back-propagating errors](https://www.nature.com/articles/323533a0){: target="_blank" } was published in 1986. With backpropagation, it became possible to use neural networks to solve problems that had previously been insoluble. Today, backpropagation is the workhorse of learning in neural networks. Without it, we would waste both time and energy. So how is backpropagation able to reduce the time spent on computing gradients? It all boils down to the computational complexity between applying the chain rule in forward versus reverse accumulation mode.
+Backpropagation was initially introduced in the 1970s, but its importance was not fully appreciated until [Learning representations by back-propagating errors](https://www.nature.com/articles/323533a0){: target="_blank" } was published in 1986. With backpropagation, it became possible to use neural networks to solve problems that had previously been insoluble. Today, backpropagation is the workhorse of learning in neural networks. Without it, we would waste both time and energy. So how is backpropagation able to reduce the time spent on computing gradients? It all boils down to the computational complexity between applying the chain rule in forward versus reverse accumulation mode.
 
 ## Forward and Reverse Accumulation Modes
 
@@ -91,7 +91,7 @@ y_2 &= x_3 \log(1 - x_1).
 \end{align*}
 $$
 
-Next, to make gradient computations as simple as possible, after decomposition, we make sure we are left with only basic arithmetic operations and elementary functions:
+Next, to make gradient computations as simple as possible, after decomposition, we make sure we are left with only straightforward arithmetic operations and elementary functions:
 
 $$
 \begin{align*}

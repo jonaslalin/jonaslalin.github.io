@@ -346,9 +346,9 @@ $$
 
 where $$\pdv{J}{\vec{A}^{[l]}} \in \R^{n^{[l]} \times m}$$.
 
-On purpose, we have omitted the details of $$g_j^{[l]}(z_{1, i}^{[l]}, \dots, z_{j, i}^{[l]}, \dots, z_{n^{[l]}, i}^{[l]})$$; consequently, we cannot derive an analytic expression for $$\pdv{a_{\jj, i}^{[l]}}{z_{j, i}^{[l]}}$$, which we depend on in $$\eqref{eq:dz_scalar}$$. Since the entire second post of this series will be dedicated to activation functions, we will instead derive $$\pdv{a_{\jj, i}^{[l]}}{z_{j, i}^{[l]}}$$ there.
+On purpose, we have omitted the details of $$g_j^{[l]}(z_{1, i}^{[l]}, \dots, z_{j, i}^{[l]}, \dots, z_{n^{[l]}, i}^{[l]})$$; consequently, we cannot derive an analytic expression for $$\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}}$$, which we depend on in $$\eqref{eq:dz_scalar}$$. However, since [the second post]({% post_url 2021-12-21-multi-layer-perceptrons-part-2 %}){: target="_blank" } of this series will be dedicated to activation functions, we will instead derive $$\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}}$$ there.
 
-Furthermore, according to $$\eqref{eq:dz_scalar}$$, we see that $$\pdv{J}{z_{j, i}^{[l]}}$$ also depends on $$\pdv{J}{a_{\jj, i}^{[l]}}$$. Now, it might come as a surprise, but $$\pdv{J}{a_{\jj, i}^{[l]}}$$ has already been computed when we reach the $$l$$th layer during backward propagation. How did that happen, you may ask. The answer is that every layer paves the way for the previous layer by also computing $$\pdv{J}{a_{k, i}^{[l - 1]}}$$, which we shall do now:
+Furthermore, according to $$\eqref{eq:dz_scalar}$$, we see that $$\pdv{J}{z_{j, i}^{[l]}}$$ also depends on $$\pdv{J}{a_{j, i}^{[l]}}$$. Now, it might come as a surprise, but $$\pdv{J}{a_{j, i}^{[l]}}$$ has already been computed when we reach the $$l$$th layer during backward propagation. How did that happen, you may ask. The answer is that every layer paves the way for the previous layer by also computing $$\pdv{J}{a_{k, i}^{[l - 1]}}$$, which we shall do now:
 
 $$
 \begin{equation}
@@ -413,7 +413,7 @@ Moreover, let us visualize the inputs we use and the outputs we produce during t
   <figcaption>Figure 3: An overview of inputs and outputs.</figcaption>
 </figure>
 
-Now, you might have noticed that we have yet to derive an analytic expression for the backpropagation seed $$\pdv{J}{\vec{A}^{[L]}} = \pdv{J}{\vec{\hat{Y}}}$$. To recap, we have deferred the derivations that concern activation functions to the second post of this series. Similarly, since the entire third post will be dedicated to cost functions, we will instead address the derivation of the backpropagation seed there.
+Now, you might have noticed that we have yet to derive an analytic expression for the backpropagation seed $$\pdv{J}{\vec{A}^{[L]}} = \pdv{J}{\vec{\hat{Y}}}$$. To recap, we have deferred the derivations that concern activation functions to [the second post]({% post_url 2021-12-21-multi-layer-perceptrons-part-2 %}){: target="_blank" } of this series. Similarly, since the third post will be dedicated to cost functions, we will instead address the derivation of the backpropagation seed there.
 
 Last but not least: congratulations! You have made it to the end (of the first post). 🏅
 
