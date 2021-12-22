@@ -56,7 +56,7 @@ $$
 \end{equation*}
 $$
 
-which we can write as
+which we can vectorize as
 
 $$
 \begin{equation}
@@ -100,7 +100,7 @@ u_4 &= \frac{1}{u_3} = a_{j, i}^{[l]}.
 \end{align*}
 $$
 
-Then, we perform the outside first traversal of the chain rule:
+Then, we perform an outside first traversal of the chain rule:
 
 $$
 \begin{align*}
@@ -275,7 +275,7 @@ Vectorization results in
 
 $$
 \begin{equation}
-\vec{A}^{[l]} = \frac{1}{\broadcast(\underbrace{\sum_{\text{axis} = 0} \exp(\vec{Z}^{[l]})}_{1 \times m \text{ vector}})} \odot \exp(\vec{Z}^{[l]}).
+\vec{A}^{[l]} = \frac{1}{\broadcast(\underbrace{\sum_{\text{axis} = 0} \exp(\vec{Z}^{[l]})}_\text{row vector})} \odot \exp(\vec{Z}^{[l]}).
 \end{equation}
 $$
 
@@ -361,7 +361,7 @@ $$
 \end{equation*}
 $$
 
-which we can write as
+which we can vectorize as
 
 {% raw %}
 $$
@@ -375,6 +375,6 @@ Let us not stop with the vectorization just yet:
 
 $$
 \begin{equation}
-\pdv{J}{\vec{Z}^{[l]}} = \vec{A}^{[l]} \odot \Bigl(\pdv{J}{\vec{A}^{[l]}} - \broadcast\bigl(\underbrace{\sum_{\text{axis} = 0} \pdv{J}{\vec{A}^{[l]}} \odot \vec{A}^{[l]}}_{1 \times m \text{ vector}}\bigr)\Bigr).
+\pdv{J}{\vec{Z}^{[l]}} = \vec{A}^{[l]} \odot \Bigl(\pdv{J}{\vec{A}^{[l]}} - \broadcast\bigl(\underbrace{\sum_{\text{axis} = 0} \pdv{J}{\vec{A}^{[l]}} \odot \vec{A}^{[l]}}_\text{row vector}\bigr)\Bigr).
 \end{equation}
 $$

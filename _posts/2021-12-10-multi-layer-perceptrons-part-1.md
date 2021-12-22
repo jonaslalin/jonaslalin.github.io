@@ -268,7 +268,7 @@ which we can write as
 $$
 \begin{align}
 \pdv{J}{\vec{W}^{[l]}} &= \sum_i \pdv{J}{\vec{z}_{*, i}^{[l]}} {\vec{a}_{*, i}^{[l - 1]}}^\T = \pdv{J}{\vec{Z}^{[l]}} {\vec{A}^{[l - 1]}}^\T, \label{eq:dW} \\
-\pdv{J}{\vec{b}^{[l]}} &= \sum_i \pdv{J}{\vec{z}_{*, i}^{[l]}} = \sum_{\text{axis} = 1} \pdv{J}{\vec{Z}^{[l]}}, \label{eq:db}
+\pdv{J}{\vec{b}^{[l]}} &= \sum_i \pdv{J}{\vec{z}_{*, i}^{[l]}} = \underbrace{\sum_{\text{axis} = 1} \pdv{J}{\vec{Z}^{[l]}}}_\text{column vector}, \label{eq:db}
 \end{align}
 $$
 
@@ -413,7 +413,7 @@ Moreover, let us visualize the inputs we use and the outputs we produce during t
   <figcaption>Figure 3: An overview of inputs and outputs.</figcaption>
 </figure>
 
-Now, you might have noticed that we have yet to derive an analytic expression for the backpropagation seed $$\pdv{J}{\vec{A}^{[L]}} = \pdv{J}{\vec{\hat{Y}}}$$. To recap, we have deferred the derivations that concern activation functions to [the second post]({% post_url 2021-12-21-multi-layer-perceptrons-part-2 %}){: target="_blank" } of this series. Similarly, since the third post will be dedicated to cost functions, we will instead address the derivation of the backpropagation seed there.
+Now, you might have noticed that we have yet to derive an analytic expression for the backpropagation seed $$\pdv{J}{\vec{A}^{[L]}} = \pdv{J}{\vec{\hat{Y}}}$$. To recap, we have deferred the derivations that concern activation functions to [the second post]({% post_url 2021-12-21-multi-layer-perceptrons-part-2 %}){: target="_blank" } of this series. Similarly, since [the third post]({% post_url 2021-12-22-multi-layer-perceptrons-part-3 %}){: target="_blank" } will be dedicated to cost functions, we will instead address the derivation of the backpropagation seed there.
 
 Last but not least: congratulations! You have made it to the end (of the first post). 🏅
 

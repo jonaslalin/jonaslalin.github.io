@@ -30,7 +30,7 @@ To compute the derivative $$\dv{y}{x}$$, we can traverse the chain rule
 1. from inside to outside, or
 2. from outside to inside.
 
-We start with the inside first traversal of the chain rule, i.e., the forward accumulation mode:
+We start with an inside first traversal of the chain rule, i.e., the forward accumulation mode:
 
 $$
 \begin{align*}
@@ -41,7 +41,7 @@ $$
 \end{align*}
 $$
 
-On the other hand, the reverse accumulation mode performs the outside first traversal of the chain rule, which more commonly is known as backpropagation:
+On the other hand, the reverse accumulation mode performs an outside first traversal of the chain rule, which more commonly is known as backpropagation:
 
 $$
 \begin{align*}
@@ -106,7 +106,7 @@ u_5 &= u_0 u_3 = y_2.
 \end{align*}
 $$
 
-Now, we are ready to compute the partial derivatives $$\pdv{y_1}{x_1}$$, $$\pdv{y_1}{x_2}$$, $$\pdv{y_1}{x_3}$$, $$\pdv{y_2}{x_1}$$, $$\pdv{y_2}{x_2}$$, and $$\pdv{y_2}{x_3}$$. Once again, we start with the inside first traversal of the chain rule.
+Now, we are ready to compute the partial derivatives $$\pdv{y_1}{x_1}$$, $$\pdv{y_1}{x_2}$$, $$\pdv{y_1}{x_3}$$, $$\pdv{y_2}{x_1}$$, $$\pdv{y_2}{x_2}$$, and $$\pdv{y_2}{x_3}$$. Once again, we start with an inside first traversal of the chain rule.
 
 ### The Forward Accumulation Mode
 
@@ -161,7 +161,7 @@ $$
 
 A third and final iteration yields the remaining $$\pdv{y_1}{x_3} = -x_1$$ and $$\pdv{y_2}{x_3} = \log(1 - x_1)$$.
 
-Before drawing any conclusions, let us work through the same example again. This time around, we will perform the outside first traversal of the chain rule.
+Before drawing any conclusions, let us work through the same example again. This time around, we will perform an outside first traversal of the chain rule.
 
 ### The Reverse Accumulation Mode
 
