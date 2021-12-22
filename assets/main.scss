@@ -13,6 +13,25 @@ mjx-container[jax="SVG"][display="true"] {
   min-width: 0 !important;
 }
 
+mjx-container[jax="SVG"] {
+  &>svg {
+    a {
+      fill: $brand-color !important;
+      stroke: $brand-color !important;
+
+      &:visited {
+        fill: darken($brand-color, 15%) !important;
+        stroke: darken($brand-color, 15%) !important;
+      }
+
+      &:hover {
+        fill: $text-color !important;
+        stroke: $text-color !important;
+      }
+    }
+  }
+}
+
 figcaption {
   text-align: center;
   margin-top: $spacing-unit / 2;
