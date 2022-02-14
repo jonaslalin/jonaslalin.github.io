@@ -1,0 +1,23 @@
+.nn { display: block; margin: 0 auto; font-size: 14px; }
+
+.nn-node > use { fill: #fdfdfd; stroke: #3f3f3f; stroke-width: 4; }
+
+.nn-link > line { stroke: #c9c9c9; stroke-width: 1; }
+
+.nn-node-text > use, .nn-link-text > use { fill: #f7f7f7; }
+
+.nn-node-text > text, .nn-link-text > text { fill: #3f3f3f; text-anchor: middle; dominant-baseline: central; }
+
+#nn-node-current-layer .nn-node-2-1 > use, #nn-node-current-layer .nn-node-2-2 > use { stroke: #c9c9c9; }
+
+#nn-node-current-layer .nn-link-1-0-2-0 > line, #nn-node-current-layer .nn-link-1-1-2-0 > line, #nn-node-current-layer .nn-link-1-2-2-0 > line { stroke: #3f3f3f; }
+
+#nn-node-current-layer .nn-node-text-2-1 > text, #nn-node-current-layer .nn-node-text-2-2 > text { fill: #c9c9c9; }
+
+#nn-node-previous-layer .nn-node-1-0 > use, #nn-node-previous-layer .nn-node-1-1 > use { stroke: #c9c9c9; }
+
+#nn-node-previous-layer .nn-link-1-2-2-0 > line, #nn-node-previous-layer .nn-link-1-2-2-1 > line, #nn-node-previous-layer .nn-link-1-2-2-2 > line { stroke: #3f3f3f; }
+
+#nn-node-previous-layer .nn-node-text-1-0 > text, #nn-node-previous-layer .nn-node-text-1-1 > text { fill: #c9c9c9; }
+
+/*# sourceMappingURL=neural-network.css.map */

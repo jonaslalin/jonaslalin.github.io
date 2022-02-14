@@ -1,0 +1,11 @@
+.bld { display: block; margin: 0 auto; font-size: 14px; }
+
+.bld-box > use { fill: #fdfdfd; stroke: #3f3f3f; stroke-width: 4; }
+
+.bld-line > line { stroke: #3f3f3f; stroke-width: 1; }
+
+.bld-box-text > use, .bld-line-text > use { fill: #f7f7f7; }
+
+.bld-box-text > text, .bld-line-text > text { fill: #3f3f3f; text-anchor: middle; dominant-baseline: central; }
+
+/*# sourceMappingURL=box-line-diagram.css.map */

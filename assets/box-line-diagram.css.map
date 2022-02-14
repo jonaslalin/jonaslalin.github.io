@@ -1,0 +1,14 @@
+{
+	"version": 3,
+	"file": "box-line-diagram.css",
+	"sources": [
+		"box-line-diagram.scss",
+		"_sass/_variables.scss"
+	],
+	"sourcesContent": [
+		"@import \"variables\";\n\n.bld {\n  display: block;\n  margin: 0 auto;\n  font-size: $small-font-size;\n}\n\n.bld-box {\n  &>use {\n    fill: $background-color;\n    stroke: lighten($text-color, 18%);\n    stroke-width: 4;\n  }\n}\n\n.bld-line {\n  &>line {\n    stroke: lighten($text-color, 18%);\n    stroke-width: 1;\n  }\n}\n\n.bld-box-text,\n.bld-line-text {\n  &>use {\n    fill: lighten($grey-color-light, 6%);\n  }\n\n  &>text {\n    fill: lighten($text-color, 18%);\n    text-anchor: middle;\n    dominant-baseline: central;\n  }\n}\n",
+		"$base-font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\" !default;\n$base-font-size:   16px !default;\n$base-font-weight: 400 !default;\n$small-font-size:  $base-font-size * 0.875 !default;\n$base-line-height: 1.5 !default;\n\n$spacing-unit:     30px !default;\n\n$text-color:       #111 !default;\n$background-color: #fdfdfd !default;\n$brand-color:      #2a7ae2 !default;\n\n$grey-color:       #828282 !default;\n$grey-color-light: lighten($grey-color, 40%) !default;\n$grey-color-dark:  darken($grey-color, 25%) !default;\n"
+	],
+	"names": [],
+	"mappings": "AAEA,AAAA,IAAI,CAAC,EACH,OAAO,EAAE,KAAK,EACd,MAAM,EAAE,MAAM,EACd,SAAS,ECFQ,IAAuB,GDGzC;;AAED,AACE,QADM,GACJ,GAAG,CAAC,EACJ,IAAI,ECDW,OAAO,EDEtB,MAAM,ECHS,OAAI,EDInB,YAAY,EAAE,CAAC,GAChB;;AAGH,AACE,SADO,GACL,IAAI,CAAC,EACL,MAAM,ECVS,OAAI,EDWnB,YAAY,EAAE,CAAC,GAChB;;AAGH,AAEE,aAFW,GAET,GAAG,EADP,cAAc,GACV,GAAG,CAAC,EACJ,IAAI,ECdW,OAAO,GDevB;;AAJH,AAME,aANW,GAMT,IAAI,EALR,cAAc,GAKV,IAAI,CAAC,EACL,IAAI,ECtBW,OAAI,EDuBnB,WAAW,EAAE,MAAM,EACnB,iBAAiB,EAAE,OAAO,GAC3B"
+}
