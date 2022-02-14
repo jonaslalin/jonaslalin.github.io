@@ -36,16 +36,18 @@ Does the node definition look intimidating to you at first glance? Do not worry.
 <div class="overflow-wrapper" markdown="1">
 | Entity | Description |
 | --- | --- |
+| $$l$$ | The current layer $$l = 1, \dots, L$$, where $$L$$ is the number of layers that have weights and biases. We use $$l = 0$$ and $$l = L$$ to denote the input and output layers. |
+| $$n^{[l]}$$ | The number of nodes in the current layer. |
+| $$n^{[l - 1]}$$ | The number of nodes in the previous layer. |
+| $$j$$ | The $$j$$th node of the current layer, $$j = 1, \dots, n^{[l]}$$. |
+| $$k$$ | The $$k$$th node of the previous layer, $$k = 1, \dots, n^{[l - 1]}$$. |
+| $$i$$ | The current training example $$i = 1, \dots, m$$, where $$m$$ is the number of training examples. |
 | $$z_{j, i}^{[l]}$$ | A weighted sum of the activations of the previous layer, shifted by a bias. |
 | $$w_{j, k}^{[l]}$$ | A weight that scales the $$k$$th activation of the previous layer. |
 | $$b_j^{[l]}$$ | A bias in the current layer. |
 | $$a_{j, i}^{[l]}$$ | An activation in the current layer. |
 | $$a_{k, i}^{[l - 1]}$$ | An activation in the previous layer. |
 | $$g_j^{[l]}$$ | An activation function $$g_j^{[l]} \colon \R^{n^{[l]}} \to \R$$ used in the current layer. |
-| $$j$$ | The $$j$$th node of the current layer, $$j = 1, \dots, n^{[l]}$$, where $$n^{[l]}$$ is the number of nodes in the current layer. |
-| $$k$$ | The $$k$$th node of the previous layer, $$k = 1, \dots, n^{[l - 1]}$$, where $$n^{[l - 1]}$$ is the number of nodes in the previous layer. |
-| $$l$$ | The current layer $$l = 1, \dots, L$$, where $$L$$ is the number of layers that have weights and biases. We use $$l = 0$$ and $$l = L$$ to denote the input and output layers. |
-| $$i$$ | The current training example $$i = 1, \dots, m$$, where $$m$$ is the number of training examples. |
 
 </div>
 
@@ -148,7 +150,7 @@ $$
 \end{align}
 $$
 
-where $$\vec{Z}^{[l]} \in \R^{n^{[l]} \times m}$$, $$\vec{A}^{[l]} \in \R^{n^{[l]} \times m}$$, and $$\vec{A}^{[l - 1]} \in \R^{n^{[l - 1]} \times m}$$.
+where $$\vec{Z}^{[l]} \in \R^{n^{[l]} \times m}$$, $$\vec{A}^{[l]} \in \R^{n^{[l]} \times m}$$, and $$\vec{A}^{[l - 1]} \in \R^{n^{[l - 1]} \times m}$$. In addition, have a look at [the NumPy documentation](https://numpy.org/doc/stable/user/basics.broadcasting.html){: target="_blank" } if you want to read a well-written explanation of broadcasting.
 
 We would also like to establish two additional notations:
 
