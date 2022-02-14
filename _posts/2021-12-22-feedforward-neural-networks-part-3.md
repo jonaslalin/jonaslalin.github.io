@@ -1,8 +1,8 @@
 ---
-title: "Multi-Layer Perceptrons in Depth, Part 3: Cost Functions"
+title: "Feedforward Neural Networks in Depth, Part 3: Cost Functions"
 ---
 
-This post is the last of a three-part series in which we set out to derive the mathematics behind multi-layer perceptrons. In short, we covered forward and backward propagations in [the first post]({% post_url 2021-12-10-multi-layer-perceptrons-part-1 %}){: target="_blank" }, and we worked on activation functions in [the second post]({% post_url 2021-12-21-multi-layer-perceptrons-part-2 %}){: target="_blank" }. Moreover, we have not yet addressed cost functions and the backpropagation seed $$\pdv{J}{\vec{A}^{[L]}} = \pdv{J}{\vec{\hat{Y}}}$$. It is time we do that.
+This post is the last of a three-part series in which we set out to derive the mathematics behind feedforward neural networks. In short, we covered forward and backward propagations in [the first post]({% post_url 2021-12-10-feedforward-neural-networks-part-1 %}){: target="_blank" }, and we worked on activation functions in [the second post]({% post_url 2021-12-21-feedforward-neural-networks-part-2 %}){: target="_blank" }. Moreover, we have not yet addressed cost functions and the backpropagation seed $$\pdv{J}{\vec{A}^{[L]}} = \pdv{J}{\vec{\hat{Y}}}$$. It is time we do that.
 
 ## Binary Classification
 

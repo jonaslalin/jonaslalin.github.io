@@ -1,8 +1,8 @@
 ---
-title: "Multi-Layer Perceptrons in Depth, Part 2: Activation Functions"
+title: "Feedforward Neural Networks in Depth, Part 2: Activation Functions"
 ---
 
-This is the second post of a three-part series in which we derive the mathematics behind multi-layer perceptrons. We worked our way through forward and backward propagations in [the first post]({% post_url 2021-12-10-multi-layer-perceptrons-part-1 %}){: target="_blank" }, but if you remember, we only mentioned activation functions in passing. In particular, we did not derive an analytic expression for $$\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}}$$ or, by extension, $$\pdv{J}{z_{j, i}^{[l]}}$$. So let us pick up the derivations where we left off.
+This is the second post of a three-part series in which we derive the mathematics behind feedforward neural networks. We worked our way through forward and backward propagations in [the first post]({% post_url 2021-12-10-feedforward-neural-networks-part-1 %}){: target="_blank" }, but if you remember, we only mentioned activation functions in passing. In particular, we did not derive an analytic expression for $$\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}}$$ or, by extension, $$\pdv{J}{z_{j, i}^{[l]}}$$. So let us pick up the derivations where we left off.
 
 ## ReLU
 

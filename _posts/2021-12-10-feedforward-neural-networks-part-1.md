@@ -1,8 +1,8 @@
 ---
-title: "Multi-Layer Perceptrons in Depth, Part 1: Forward and Backward Propagations"
+title: "Feedforward Neural Networks in Depth, Part 1: Forward and Backward Propagations"
 ---
 
-This post is the first of a three-part series in which we set out to derive the mathematics behind multi-layer perceptrons. MLPs are feedforward neural networks that have
+This post is the first of a three-part series in which we set out to derive the mathematics behind feedforward neural networks. They have
 
 * an input and an output layer with at least one hidden layer in between,
 * fully-connected layers, which means that each node in one layer connects to every node in the following layer, and
@@ -12,7 +12,7 @@ We start with forward propagation, which involves computing predictions and the 
 
 ## Forward Propagation
 
-Settling on which notations to use is tricky since we only have so many letters in the Roman alphabet. As you browse the Internet, you will likely find derivations that have used different notations than the ones we are about to introduce. However, and fortunately, there is no right or wrong here; it is just a matter of taste. In particular, the notations used in this series take inspiration from Andrew Ng's [Standard notations for Deep Learning]({% link /assets/deep-learning-notation.pdf %}){: target="_blank" }. If you make a comparison, you will find that we only change a couple of the details.
+Settling on what notations to use is tricky since we only have so many letters in the Roman alphabet. As you browse the Internet, you will likely find derivations that have used different notations than the ones we are about to introduce. However, and fortunately, there is no right or wrong here; it is just a matter of taste. In particular, the notations used in this series take inspiration from Andrew Ng's [Standard notations for Deep Learning]({% link /assets/deep-learning-notation.pdf %}){: target="_blank" }. If you make a comparison, you will find that we only change a couple of the details.
 
 Now, whatever we come up with, we have to support
 
@@ -63,7 +63,7 @@ Moreover, a node in the previous layer affects every node in the current layer, 
   <figcaption>Figure 2: A node in the previous layer.</figcaption>
 </figure>
 
-In the future, we might want to implement MLPs from scratch in, for example, Python. To take advantage of the heavily optimized versions of vector and matrix operations that come bundled with libraries such as NumPy, we need to vectorize $$\eqref{eq:z_scalar}$$ and $$\eqref{eq:a_scalar}$$.
+In the future, we might want to write an implement from scratch in, for example, Python. To take advantage of the heavily optimized versions of vector and matrix operations that come bundled with libraries such as NumPy, we need to vectorize $$\eqref{eq:z_scalar}$$ and $$\eqref{eq:a_scalar}$$.
 
 To begin with, we vectorize the nodes:
 
@@ -346,7 +346,7 @@ $$
 
 where $$\pdv{J}{\vec{A}^{[l]}} \in \R^{n^{[l]} \times m}$$.
 
-On purpose, we have omitted the details of $$g_j^{[l]}(z_{1, i}^{[l]}, \dots, z_{j, i}^{[l]}, \dots, z_{n^{[l]}, i}^{[l]})$$; consequently, we cannot derive an analytic expression for $$\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}}$$, which we depend on in $$\eqref{eq:dz_scalar}$$. However, since [the second post]({% post_url 2021-12-21-multi-layer-perceptrons-part-2 %}){: target="_blank" } of this series will be dedicated to activation functions, we will instead derive $$\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}}$$ there.
+On purpose, we have omitted the details of $$g_j^{[l]}(z_{1, i}^{[l]}, \dots, z_{j, i}^{[l]}, \dots, z_{n^{[l]}, i}^{[l]})$$; consequently, we cannot derive an analytic expression for $$\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}}$$, which we depend on in $$\eqref{eq:dz_scalar}$$. However, since [the second post]({% post_url 2021-12-21-feedforward-neural-networks-part-2 %}){: target="_blank" } of this series will be dedicated to activation functions, we will instead derive $$\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}}$$ there.
 
 Furthermore, according to $$\eqref{eq:dz_scalar}$$, we see that $$\pdv{J}{z_{j, i}^{[l]}}$$ also depends on $$\pdv{J}{a_{j, i}^{[l]}}$$. Now, it might come as a surprise, but $$\pdv{J}{a_{j, i}^{[l]}}$$ has already been computed when we reach the $$l$$th layer during backward propagation. How did that happen, you may ask. The answer is that every layer paves the way for the previous layer by also computing $$\pdv{J}{a_{k, i}^{[l - 1]}}$$, which we shall do now:
 
@@ -413,7 +413,7 @@ Moreover, let us visualize the inputs we use and the outputs we produce during t
   <figcaption>Figure 3: An overview of inputs and outputs.</figcaption>
 </figure>
 
-Now, you might have noticed that we have yet to derive an analytic expression for the backpropagation seed $$\pdv{J}{\vec{A}^{[L]}} = \pdv{J}{\vec{\hat{Y}}}$$. To recap, we have deferred the derivations that concern activation functions to [the second post]({% post_url 2021-12-21-multi-layer-perceptrons-part-2 %}){: target="_blank" } of this series. Similarly, since [the third post]({% post_url 2021-12-22-multi-layer-perceptrons-part-3 %}){: target="_blank" } will be dedicated to cost functions, we will instead address the derivation of the backpropagation seed there.
+Now, you might have noticed that we have yet to derive an analytic expression for the backpropagation seed $$\pdv{J}{\vec{A}^{[L]}} = \pdv{J}{\vec{\hat{Y}}}$$. To recap, we have deferred the derivations that concern activation functions to [the second post]({% post_url 2021-12-21-feedforward-neural-networks-part-2 %}){: target="_blank" } of this series. Similarly, since [the third post]({% post_url 2021-12-22-feedforward-neural-networks-part-3 %}){: target="_blank" } will be dedicated to cost functions, we will instead address the derivation of the backpropagation seed there.
 
 Last but not least: congratulations! You have made it to the end (of the first post). 🏅
 
