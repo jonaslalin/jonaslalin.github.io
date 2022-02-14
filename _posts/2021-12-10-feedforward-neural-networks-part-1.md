@@ -118,12 +118,12 @@ which we can write as
 
 $$
 \begin{align}
-\vec{z}_{*, i}^{[l]} &= \vec{W}^{[l]} \vec{a}_{*, i}^{[l - 1]} + \vec{b}^{[l]}, \label{eq:z} \\
-\vec{a}_{*, i}^{[l]} &= \vec{g}^{[l]}(\vec{z}_{*, i}^{[l]}), \label{eq:a}
+\vec{z}_{:, i}^{[l]} &= \vec{W}^{[l]} \vec{a}_{:, i}^{[l - 1]} + \vec{b}^{[l]}, \label{eq:z} \\
+\vec{a}_{:, i}^{[l]} &= \vec{g}^{[l]}(\vec{z}_{:, i}^{[l]}), \label{eq:a}
 \end{align}
 $$
 
-where $$\vec{z}_{*, i}^{[l]} \in \R^{n^{[l]}}$$, $$\vec{W}^{[l]} \in \R^{n^{[l]} \times n^{[l - 1]}}$$, $$\vec{b}^{[l]} \in \R^{n^{[l]}}$$, $$\vec{a}_{*, i}^{[l]} \in \R^{n^{[l]}}$$, $$\vec{a}_{*, i}^{[l - 1]} \in \R^{n^{[l - 1]}}$$, and lastly, $$\vec{g}^{[l]} \colon \R^{n^{[l]}} \to \R^{n^{[l]}}$$.
+where $$\vec{z}_{:, i}^{[l]} \in \R^{n^{[l]}}$$, $$\vec{W}^{[l]} \in \R^{n^{[l]} \times n^{[l - 1]}}$$, $$\vec{b}^{[l]} \in \R^{n^{[l]}}$$, $$\vec{a}_{:, i}^{[l]} \in \R^{n^{[l]}}$$, $$\vec{a}_{:, i}^{[l - 1]} \in \R^{n^{[l - 1]}}$$, and lastly, $$\vec{g}^{[l]} \colon \R^{n^{[l]}} \to \R^{n^{[l]}}$$. We have used a colon to clarify that $$\vec{z}_{:, i}^{[l]}$$ is the $$i$$th column of $$\vec{Z}^{[l]}$$, and so on.
 
 Next, we vectorize the training examples:
 
@@ -131,11 +131,11 @@ $$
 \begin{align}
 \vec{Z}^{[l]} &=
 \begin{bmatrix}
-\vec{z}_{*, 1}^{[l]} & \dots & \vec{z}_{*, i}^{[l]} & \dots & \vec{z}_{*, m}^{[l]}
+\vec{z}_{:, 1}^{[l]} & \dots & \vec{z}_{:, i}^{[l]} & \dots & \vec{z}_{:, m}^{[l]}
 \end{bmatrix} \label{eq:Z} \\
 &= \vec{W}^{[l]}
 \begin{bmatrix}
-\vec{a}_{*, 1}^{[l - 1]} & \dots & \vec{a}_{*, i}^{[l - 1]} & \dots & \vec{a}_{*, m}^{[l - 1]}
+\vec{a}_{:, 1}^{[l - 1]} & \dots & \vec{a}_{:, i}^{[l - 1]} & \dots & \vec{a}_{:, m}^{[l - 1]}
 \end{bmatrix} +
 \begin{bmatrix}
 \vec{b}^{[l]} & \dots & \vec{b}^{[l]} & \dots & \vec{b}^{[l]}
@@ -143,7 +143,7 @@ $$
 &= \vec{W}^{[l]} \vec{A}^{[l - 1]} + \broadcast(\vec{b}^{[l]}), \notag \\
 \vec{A}^{[l]} &=
 \begin{bmatrix}
-\vec{a}_{*, 1}^{[l]} & \dots & \vec{a}_{*, i}^{[l]} & \dots & \vec{a}_{*, m}^{[l]}
+\vec{a}_{:, 1}^{[l]} & \dots & \vec{a}_{:, i}^{[l]} & \dots & \vec{a}_{:, m}^{[l]}
 \end{bmatrix}, \label{eq:A}
 \end{align}
 $$
@@ -192,7 +192,7 @@ $$
 \end{equation}
 $$
 
-Great! If we ever get stuck trying to compute or understand some partial derivative, we can always go back to $$\eqref{eq:example_u_scalar}$$, $$\eqref{eq:example_y_scalar}$$, and $$\eqref{eq:chain_rule}$$; and hopefully, these equations will provide the clues necessary for us to move forward.
+Great! If we ever get stuck trying to compute or understand some partial derivative, we can always go back to $$\eqref{eq:example_u_scalar}$$, $$\eqref{eq:example_y_scalar}$$, and $$\eqref{eq:chain_rule}$$. Hopefully, these equations will provide the clues necessary to move forward. However, be extra careful not to confuse the notation used for the chain rule example with the notation we use elsewhere in this series. The overlap is unintentional.
 
 Now, let us concentrate on the task at hand:
 
@@ -267,22 +267,22 @@ which we can write as
 
 $$
 \begin{align}
-\pdv{J}{\vec{W}^{[l]}} &= \sum_i \pdv{J}{\vec{z}_{*, i}^{[l]}} {\vec{a}_{*, i}^{[l - 1]}}^\T = \pdv{J}{\vec{Z}^{[l]}} {\vec{A}^{[l - 1]}}^\T, \label{eq:dW} \\
-\pdv{J}{\vec{b}^{[l]}} &= \sum_i \pdv{J}{\vec{z}_{*, i}^{[l]}} = \underbrace{\sum_{\text{axis} = 1} \pdv{J}{\vec{Z}^{[l]}}}_\text{column vector}, \label{eq:db}
+\pdv{J}{\vec{W}^{[l]}} &= \sum_i \pdv{J}{\vec{z}_{:, i}^{[l]}} {\vec{a}_{:, i}^{[l - 1]}}^\T = \pdv{J}{\vec{Z}^{[l]}} {\vec{A}^{[l - 1]}}^\T, \label{eq:dW} \\
+\pdv{J}{\vec{b}^{[l]}} &= \sum_i \pdv{J}{\vec{z}_{:, i}^{[l]}} = \underbrace{\sum_{\text{axis} = 1} \pdv{J}{\vec{Z}^{[l]}}}_\text{column vector}, \label{eq:db}
 \end{align}
 $$
 
-where $$\pdv{J}{\vec{z}_{*, i}^{[l]}} \in \R^{n^{[l]}}$$, $$\pdv{J}{\vec{Z}^{[l]}} \in \R^{n^{[l]} \times m}$$, $$\pdv{J}{\vec{W}^{[l]}} \in \R^{n^{[l]} \times n^{[l - 1]}}$$, and $$\pdv{J}{\vec{b}^{[l]}} \in \R^{n^{[l]}}$$.
+where $$\pdv{J}{\vec{z}_{:, i}^{[l]}} \in \R^{n^{[l]}}$$, $$\pdv{J}{\vec{Z}^{[l]}} \in \R^{n^{[l]} \times m}$$, $$\pdv{J}{\vec{W}^{[l]}} \in \R^{n^{[l]} \times n^{[l - 1]}}$$, and $$\pdv{J}{\vec{b}^{[l]}} \in \R^{n^{[l]}}$$.
 
 Looking back at $$\eqref{eq:dw_scalar}$$ and $$\eqref{eq:db_scalar}$$, we see that the only unknown entity is $$\pdv{J}{z_{j, i}^{[l]}}$$. By applying the chain rule once again, we get
 
 $$
 \begin{equation}
-\pdv{J}{z_{j, i}^{[l]}} = \sum_\jj \pdv{J}{a_{\jj, i}^{[l]}} \pdv{a_{\jj, i}^{[l]}}{z_{j, i}^{[l]}}, \label{eq:dz_scalar}
+\pdv{J}{z_{j, i}^{[l]}} = \sum_p \pdv{J}{a_{p, i}^{[l]}} \pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}}, \label{eq:dz_scalar}
 \end{equation}
 $$
 
-where $$\jj = 1, \dots, n^{[l]}$$ (distinguishable by the acute accent).
+where $$p = 1, \dots, n^{[l]}$$.
 
 Next, we present the vectorized version:
 
@@ -316,11 +316,11 @@ which compresses into
 
 $$
 \begin{equation}
-\pdv{J}{\vec{z}_{*, i}^{[l]}} = \pdv{\vec{a}_{*, i}^{[l]}}{\vec{z}_{*, i}^{[l]}} \pdv{J}{\vec{a}_{*, i}^{[l]}}, \label{eq:dz}
+\pdv{J}{\vec{z}_{:, i}^{[l]}} = \pdv{\vec{a}_{:, i}^{[l]}}{\vec{z}_{:, i}^{[l]}} \pdv{J}{\vec{a}_{:, i}^{[l]}}, \label{eq:dz}
 \end{equation}
 $$
 
-where $$\pdv{J}{\vec{a}_{*, i}^{[l]}} \in \R^{n^{[l]}}$$ and $$\pdv{\vec{a}_{*, i}^{[l]}}{\vec{z}_{*, i}^{[l]}} \in \R^{n^{[l]} \times n^{[l]}}$$.
+where $$\pdv{J}{\vec{a}_{:, i}^{[l]}} \in \R^{n^{[l]}}$$ and $$\pdv{\vec{a}_{:, i}^{[l]}}{\vec{z}_{:, i}^{[l]}} \in \R^{n^{[l]} \times n^{[l]}}$$.
 
 We have already encountered
 
@@ -328,7 +328,7 @@ $$
 \begin{equation}
 \pdv{J}{\vec{Z}^{[l]}} =
 \begin{bmatrix}
-\dpdv{J}{\vec{z}_{*, 1}^{[l]}} & \dots & \dpdv{J}{\vec{z}_{*, i}^{[l]}} & \dots & \dpdv{J}{\vec{z}_{*, m}^{[l]}}
+\dpdv{J}{\vec{z}_{:, 1}^{[l]}} & \dots & \dpdv{J}{\vec{z}_{:, i}^{[l]}} & \dots & \dpdv{J}{\vec{z}_{:, m}^{[l]}}
 \end{bmatrix}, \label{eq:dZ}
 \end{equation}
 $$
@@ -339,7 +339,7 @@ $$
 \begin{equation}
 \pdv{J}{\vec{A}^{[l]}} =
 \begin{bmatrix}
-\dpdv{J}{\vec{a}_{*, 1}^{[l]}} & \dots & \dpdv{J}{\vec{a}_{*, i}^{[l]}} & \dots & \dpdv{J}{\vec{a}_{*, m}^{[l]}}
+\dpdv{J}{\vec{a}_{:, 1}^{[l]}} & \dots & \dpdv{J}{\vec{a}_{:, i}^{[l]}} & \dots & \dpdv{J}{\vec{a}_{:, m}^{[l]}}
 \end{bmatrix}, \label{eq:dA}
 \end{equation}
 $$

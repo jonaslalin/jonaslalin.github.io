@@ -40,7 +40,7 @@ $$
 0 &\text{otherwise,}
 \end{cases} \\
 &= I(z_{j, i}^{[l]} > 0), \notag \\
-\pdv{a_{\jj, i}^{[l]}}{z_{j, i}^{[l]}} &= 0, \quad \forall \jj \ne j.
+\pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} &= 0, \quad \forall p \ne j.
 \end{align*}
 $$
 
@@ -49,8 +49,8 @@ It follows that
 $$
 \begin{equation*}
 \begin{split}
-\pdv{J}{z_{j, i}^{[l]}} &= \sum_\jj \pdv{J}{a_{\jj, i}^{[l]}} \pdv{a_{\jj, i}^{[l]}}{z_{j, i}^{[l]}} \\
-&= \pdv{J}{a_{j, i}^{[l]}} \pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} + \sum_{\jj \ne j} \pdv{J}{a_{\jj, i}^{[l]}} \pdv{a_{\jj, i}^{[l]}}{z_{j, i}^{[l]}} \\
+\pdv{J}{z_{j, i}^{[l]}} &= \sum_p \pdv{J}{a_{p, i}^{[l]}} \pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} \\
+&= \pdv{J}{a_{j, i}^{[l]}} \pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} + \sum_{p \ne j} \pdv{J}{a_{p, i}^{[l]}} \pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} \\
 &= \pdv{J}{a_{j, i}^{[l]}} I(z_{j, i}^{[l]} > 0),
 \end{split}
 \end{equation*}
@@ -129,7 +129,7 @@ We also note that
 
 $$
 \begin{equation*}
-\pdv{a_{\jj, i}^{[l]}}{z_{j, i}^{[l]}} = 0, \quad \forall \jj \ne j.
+\pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} = 0, \quad \forall p \ne j.
 \end{equation*}
 $$
 
@@ -138,8 +138,8 @@ Consequently,
 $$
 \begin{equation*}
 \begin{split}
-\pdv{J}{z_{j, i}^{[l]}} &= \sum_\jj \pdv{J}{a_{\jj, i}^{[l]}} \pdv{a_{\jj, i}^{[l]}}{z_{j, i}^{[l]}} \\
-&= \pdv{J}{a_{j, i}^{[l]}} \pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} + \sum_{\jj \ne j} \pdv{J}{a_{\jj, i}^{[l]}} \pdv{a_{\jj, i}^{[l]}}{z_{j, i}^{[l]}} \\
+\pdv{J}{z_{j, i}^{[l]}} &= \sum_p \pdv{J}{a_{p, i}^{[l]}} \pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} \\
+&= \pdv{J}{a_{j, i}^{[l]}} \pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} + \sum_{p \ne j} \pdv{J}{a_{p, i}^{[l]}} \pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} \\
 &= \pdv{J}{a_{j, i}^{[l]}} a_{j, i}^{[l]} (1 - a_{j, i}^{[l]}).
 \end{split}
 \end{equation*}
@@ -234,7 +234,7 @@ Similiar to the sigmoid activation function, we also have
 
 $$
 \begin{equation*}
-\pdv{a_{\jj, i}^{[l]}}{z_{j, i}^{[l]}} = 0, \quad \forall \jj \ne j.
+\pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} = 0, \quad \forall p \ne j.
 \end{equation*}
 $$
 
@@ -243,8 +243,8 @@ Thus,
 $$
 \begin{equation*}
 \begin{split}
-\pdv{J}{z_{j, i}^{[l]}} &= \sum_\jj \pdv{J}{a_{\jj, i}^{[l]}} \pdv{a_{\jj, i}^{[l]}}{z_{j, i}^{[l]}} \\
-&= \pdv{J}{a_{j, i}^{[l]}} \pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} + \sum_{\jj \ne j} \pdv{J}{a_{\jj, i}^{[l]}} \pdv{a_{\jj, i}^{[l]}}{z_{j, i}^{[l]}} \\
+\pdv{J}{z_{j, i}^{[l]}} &= \sum_p \pdv{J}{a_{p, i}^{[l]}} \pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} \\
+&= \pdv{J}{a_{j, i}^{[l]}} \pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} + \sum_{p \ne j} \pdv{J}{a_{p, i}^{[l]}} \pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} \\
 &= \pdv{J}{a_{j, i}^{[l]}} (1 - a_{j, i}^{[l]} a_{j, i}^{[l]}),
 \end{split}
 \end{equation*}
@@ -266,7 +266,7 @@ $$
 \begin{equation*}
 \begin{split}
 a_{j, i}^{[l]} &= g_j^{[l]}(z_{1, i}^{[l]}, \dots, z_{j, i}^{[l]}, \dots, z_{n^{[l]}, i}^{[l]}) \\
-&= \frac{\exp(z_{j, i}^{[l]})}{\sum_\jj \exp(z_{\jj, i}^{[l]})}.
+&= \frac{\exp(z_{j, i}^{[l]})}{\sum_p \exp(z_{p, i}^{[l]})}.
 \end{split}
 \end{equation*}
 $$
@@ -284,10 +284,10 @@ To begin with, we construct a computation graph for the $$j$$th activation of th
 $$
 \begin{align*}
 u_{-1} &= z_{j, i}^{[l]}, \\
-u_{0, \jj} &= z_{\jj, i}^{[l]}, &&\forall \jj \ne j, \\
+u_{0, p} &= z_{p, i}^{[l]}, &&\forall p \ne j, \\
 u_1 &= \exp(u_{-1}), \\
-u_{2, \jj} &= \exp(u_{0, \jj}), &&\forall \jj \ne j, \\
-u_3 &= u_1 + \sum_{\jj \ne j} u_{2, \jj}, \\
+u_{2, p} &= \exp(u_{0, p}), &&\forall p \ne j, \\
+u_3 &= u_1 + \sum_{p \ne j} u_{2, p}, \\
 u_4 &= \frac{1}{u_3}, \\
 u_5 &= u_1 u_4 = a_{j, i}^{[l]}.
 \end{align*}
@@ -299,13 +299,13 @@ $$
 \begin{align*}
 \pdv{a_{j, i}^{[l]}}{u_5} &= 1, \\
 \pdv{a_{j, i}^{[l]}}{u_4} &= \pdv{a_{j, i}^{[l]}}{u_5} \pdv{u_5}{u_4} = u_1 = \exp(z_{j, i}^{[l]}), \\
-\pdv{a_{j, i}^{[l]}}{u_3} &= \pdv{a_{j, i}^{[l]}}{u_4} \pdv{u_4}{u_3} = -u_1 \frac{1}{u_3^2} = -\frac{\exp(z_{j, i}^{[l]})}{(\sum_\jj \exp(z_{\jj, i}^{[l]}))^2}, \\
+\pdv{a_{j, i}^{[l]}}{u_3} &= \pdv{a_{j, i}^{[l]}}{u_4} \pdv{u_4}{u_3} = -u_1 \frac{1}{u_3^2} = -\frac{\exp(z_{j, i}^{[l]})}{(\sum_p \exp(z_{p, i}^{[l]}))^2}, \\
 \pdv{a_{j, i}^{[l]}}{u_1} &= \pdv{a_{j, i}^{[l]}}{u_3} \pdv{u_3}{u_1} + \pdv{a_{j, i}^{[l]}}{u_5} \pdv{u_5}{u_1} \\
 &= -u_1 \frac{1}{u_3^2} + u_4 \notag \\
-&= -\frac{\exp(z_{j, i}^{[l]})}{(\sum_\jj \exp(z_{\jj, i}^{[l]}))^2} + \frac{1}{\sum_\jj \exp(z_{\jj, i}^{[l]})}, \notag \\
+&= -\frac{\exp(z_{j, i}^{[l]})}{(\sum_p \exp(z_{p, i}^{[l]}))^2} + \frac{1}{\sum_p \exp(z_{p, i}^{[l]})}, \notag \\
 \pdv{a_{j, i}^{[l]}}{u_{-1}} &= \pdv{a_{j, i}^{[l]}}{u_1} \pdv{u_1}{u_{-1}} \\
 &= \Bigl(-u_1 \frac{1}{u_3^2} + u_4\Bigr) \exp(u_{-1}) \notag \\
-&= -\frac{\exp(z_{j, i}^{[l]})^2}{(\sum_\jj \exp(z_{\jj, i}^{[l]}))^2} + \frac{\exp(z_{j, i}^{[l]})}{\sum_\jj \exp(z_{\jj, i}^{[l]})}. \notag
+&= -\frac{\exp(z_{j, i}^{[l]})^2}{(\sum_p \exp(z_{p, i}^{[l]}))^2} + \frac{\exp(z_{j, i}^{[l]})}{\sum_p \exp(z_{p, i}^{[l]})}. \notag
 \end{align*}
 $$
 
@@ -314,12 +314,12 @@ Next, we need to take into account that $$z_{j, i}^{[l]}$$ also affects other ac
 $$
 \begin{align*}
 u_{-1} &= z_{j, i}^{[l]}, \\
-u_{0, \jj} &= z_{\jj, i}^{[l]}, &&\forall \jj \ne j, \\
+u_{0, p} &= z_{p, i}^{[l]}, &&\forall p \ne j, \\
 u_1 &= \exp(u_{-1}), \\
-u_{2, \jj} &= \exp(u_{0, \jj}), &&\forall \jj \ne j, \\
-u_3 &= u_1 + \sum_{\jj \ne j} u_{2, \jj}, \\
+u_{2, p} &= \exp(u_{0, p}), &&\forall p \ne j, \\
+u_3 &= u_1 + \sum_{p \ne j} u_{2, p}, \\
 u_4 &= \frac{1}{u_3}, \\
-u_5 &= u_{2, \jj} u_4 = a_{\jj, i}^{[l]}, &&\forall \jj \ne j.
+u_5 &= u_{2, p} u_4 = a_{p, i}^{[l]}, &&\forall p \ne j.
 \end{align*}
 $$
 
@@ -327,11 +327,11 @@ Backward propagation gives us the remaining partial derivatives:
 
 $$
 \begin{align*}
-\pdv{a_{\jj, i}^{[l]}}{u_5} &= 1, \\
-\pdv{a_{\jj, i}^{[l]}}{u_4} &= \pdv{a_{\jj, i}^{[l]}}{u_5} \pdv{u_5}{u_4} = u_{2, \jj} = \exp(z_{\jj, i}^{[l]}), \\
-\pdv{a_{\jj, i}^{[l]}}{u_3} &= \pdv{a_{\jj, i}^{[l]}}{u_4} \pdv{u_4}{u_3} = -u_{2, \jj} \frac{1}{u_3^2} = -\frac{\exp(z_{\jj, i}^{[l]})}{(\sum_\jj \exp(z_{\jj, i}^{[l]}))^2}, \\
-\pdv{a_{\jj, i}^{[l]}}{u_1} &= \pdv{a_{\jj, i}^{[l]}}{u_3} \pdv{u_3}{u_1} = -u_{2, \jj} \frac{1}{u_3^2} = -\frac{\exp(z_{\jj, i}^{[l]})}{(\sum_\jj \exp(z_{\jj, i}^{[l]}))^2}, \\
-\pdv{a_{\jj, i}^{[l]}}{u_{-1}} &= \pdv{a_{\jj, i}^{[l]}}{u_1} \pdv{u_1}{u_{-1}} = -u_{2, \jj} \frac{1}{u_3^2} \exp(u_{-1}) = -\frac{\exp(z_{\jj, i}^{[l]}) \exp(z_{j, i}^{[l]})}{(\sum_\jj \exp(z_{\jj, i}^{[l]}))^2}.
+\pdv{a_{p, i}^{[l]}}{u_5} &= 1, \\
+\pdv{a_{p, i}^{[l]}}{u_4} &= \pdv{a_{p, i}^{[l]}}{u_5} \pdv{u_5}{u_4} = u_{2, p} = \exp(z_{p, i}^{[l]}), \\
+\pdv{a_{p, i}^{[l]}}{u_3} &= \pdv{a_{p, i}^{[l]}}{u_4} \pdv{u_4}{u_3} = -u_{2, p} \frac{1}{u_3^2} = -\frac{\exp(z_{p, i}^{[l]})}{(\sum_p \exp(z_{p, i}^{[l]}))^2}, \\
+\pdv{a_{p, i}^{[l]}}{u_1} &= \pdv{a_{p, i}^{[l]}}{u_3} \pdv{u_3}{u_1} = -u_{2, p} \frac{1}{u_3^2} = -\frac{\exp(z_{p, i}^{[l]})}{(\sum_p \exp(z_{p, i}^{[l]}))^2}, \\
+\pdv{a_{p, i}^{[l]}}{u_{-1}} &= \pdv{a_{p, i}^{[l]}}{u_1} \pdv{u_1}{u_{-1}} = -u_{2, p} \frac{1}{u_3^2} \exp(u_{-1}) = -\frac{\exp(z_{p, i}^{[l]}) \exp(z_{j, i}^{[l]})}{(\sum_p \exp(z_{p, i}^{[l]}))^2}.
 \end{align*}
 $$
 
@@ -339,10 +339,10 @@ We now know that
 
 $$
 \begin{align*}
-\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} &= -\frac{\exp(z_{j, i}^{[l]})^2}{(\sum_\jj \exp(z_{\jj, i}^{[l]}))^2} + \frac{\exp(z_{j, i}^{[l]})}{\sum_\jj \exp(z_{\jj, i}^{[l]})} \\
+\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} &= -\frac{\exp(z_{j, i}^{[l]})^2}{(\sum_p \exp(z_{p, i}^{[l]}))^2} + \frac{\exp(z_{j, i}^{[l]})}{\sum_p \exp(z_{p, i}^{[l]})} \\
 &= a_{j, i}^{[l]} (1 - a_{j, i}^{[l]}), \notag \\
-\pdv{a_{\jj, i}^{[l]}}{z_{j, i}^{[l]}} &= -\frac{\exp(z_{\jj, i}^{[l]}) \exp(z_{j, i}^{[l]})}{(\sum_\jj \exp(z_{\jj, i}^{[l]}))^2} \\
-&= -a_{\jj, i}^{[l]} a_{j, i}^{[l]}, \quad \forall \jj \ne j. \notag
+\pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} &= -\frac{\exp(z_{p, i}^{[l]}) \exp(z_{j, i}^{[l]})}{(\sum_p \exp(z_{p, i}^{[l]}))^2} \\
+&= -a_{p, i}^{[l]} a_{j, i}^{[l]}, \quad \forall p \ne j. \notag
 \end{align*}
 $$
 
@@ -351,12 +351,12 @@ Hence,
 $$
 \begin{equation*}
 \begin{split}
-\pdv{J}{z_{j, i}^{[l]}} &= \sum_\jj \pdv{J}{a_{\jj, i}^{[l]}} \pdv{a_{\jj, i}^{[l]}}{z_{j, i}^{[l]}} \\
-&= \pdv{J}{a_{j, i}^{[l]}} \pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} + \sum_{\jj \ne j} \pdv{J}{a_{\jj, i}^{[l]}} \pdv{a_{\jj, i}^{[l]}}{z_{j, i}^{[l]}} \\
-&= \pdv{J}{a_{j, i}^{[l]}} a_{j, i}^{[l]} (1 - a_{j, i}^{[l]}) - \sum_{\jj \ne j} \pdv{J}{a_{\jj, i}^{[l]}} a_{\jj, i}^{[l]} a_{j, i}^{[l]} \\
-&= a_{j, i}^{[l]} \Bigl(\pdv{J}{a_{j, i}^{[l]}} (1 - a_{j, i}^{[l]}) - \sum_{\jj \ne j} \pdv{J}{a_{\jj, i}^{[l]}} a_{\jj, i}^{[l]}\Bigr) \\
-&= a_{j, i}^{[l]} \Bigl(\pdv{J}{a_{j, i}^{[l]}} (1 - a_{j, i}^{[l]}) - \sum_\jj \pdv{J}{a_{\jj, i}^{[l]}} a_{\jj, i}^{[l]} + \pdv{J}{a_{j, i}^{[l]}} a_{j, i}^{[l]}\Bigr) \\
-&= a_{j, i}^{[l]} \Bigl(\pdv{J}{a_{j, i}^{[l]}} - \sum_\jj \pdv{J}{a_{\jj, i}^{[l]}} a_{\jj, i}^{[l]}\Bigr),
+\pdv{J}{z_{j, i}^{[l]}} &= \sum_p \pdv{J}{a_{p, i}^{[l]}} \pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} \\
+&= \pdv{J}{a_{j, i}^{[l]}} \pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} + \sum_{p \ne j} \pdv{J}{a_{p, i}^{[l]}} \pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} \\
+&= \pdv{J}{a_{j, i}^{[l]}} a_{j, i}^{[l]} (1 - a_{j, i}^{[l]}) - \sum_{p \ne j} \pdv{J}{a_{p, i}^{[l]}} a_{p, i}^{[l]} a_{j, i}^{[l]} \\
+&= a_{j, i}^{[l]} \Bigl(\pdv{J}{a_{j, i}^{[l]}} (1 - a_{j, i}^{[l]}) - \sum_{p \ne j} \pdv{J}{a_{p, i}^{[l]}} a_{p, i}^{[l]}\Bigr) \\
+&= a_{j, i}^{[l]} \Bigl(\pdv{J}{a_{j, i}^{[l]}} (1 - a_{j, i}^{[l]}) - \sum_p \pdv{J}{a_{p, i}^{[l]}} a_{p, i}^{[l]} + \pdv{J}{a_{j, i}^{[l]}} a_{j, i}^{[l]}\Bigr) \\
+&= a_{j, i}^{[l]} \Bigl(\pdv{J}{a_{j, i}^{[l]}} - \sum_p \pdv{J}{a_{p, i}^{[l]}} a_{p, i}^{[l]}\Bigr),
 \end{split}
 \end{equation*}
 $$
@@ -366,7 +366,7 @@ which we can vectorize as
 {% raw %}
 $$
 \begin{equation*}
-\pdv{J}{\vec{z}_{*, i}^{[l]}} = \vec{a}_{*, i}^{[l]} \odot \Bigl(\pdv{J}{\vec{a}_{*, i}^{[l]}} - \underbrace{{\vec{a}_{*, i}^{[l]}}^\T \pdv{J}{\vec{a}_{*, i}^{[l]}}}_{\text{scalar}}\Bigr).
+\pdv{J}{\vec{z}_{:, i}^{[l]}} = \vec{a}_{:, i}^{[l]} \odot \Bigl(\pdv{J}{\vec{a}_{:, i}^{[l]}} - \underbrace{{\vec{a}_{:, i}^{[l]}}^\T \pdv{J}{\vec{a}_{:, i}^{[l]}}}_{\text{scalar}}\Bigr).
 \end{equation*}
 $$
 {% endraw %}

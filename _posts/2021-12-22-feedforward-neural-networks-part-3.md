@@ -162,15 +162,15 @@ Furthermore, since the output layer uses the softmax activation function, we get
 $$
 \begin{equation*}
 \begin{split}
-\pdv{J}{z_{j, i}^{[L]}} &= a_{j, i}^{[L]} \Bigl(\pdv{J}{a_{j, i}^{[L]}} - \sum_\jj \pdv{J}{a_{\jj, i}^{[L]}} a_{\jj, i}^{[L]}\Bigr) \\
-&= a_{j, i}^{[L]} \Bigl(-\frac{1}{m} \frac{y_{j, i}}{a_{j, i}^{[L]}} + \sum_\jj \frac{1}{m} \frac{y_{\jj, i}}{a_{\jj, i}^{[L]}} a_{\jj, i}^{[L]}\Bigr) \\
-&= \frac{1}{m} \Bigl(-y_{j, i} + a_{j, i}^{[L]} \underbrace{\sum_\jj y_{\jj, i}}_{\mathclap{\sum \text{probabilities} = 1}}\Bigr) \\
+\pdv{J}{z_{j, i}^{[L]}} &= a_{j, i}^{[L]} \Bigl(\pdv{J}{a_{j, i}^{[L]}} - \sum_p \pdv{J}{a_{p, i}^{[L]}} a_{p, i}^{[L]}\Bigr) \\
+&= a_{j, i}^{[L]} \Bigl(-\frac{1}{m} \frac{y_{j, i}}{a_{j, i}^{[L]}} + \sum_p \frac{1}{m} \frac{y_{p, i}}{a_{p, i}^{[L]}} a_{p, i}^{[L]}\Bigr) \\
+&= \frac{1}{m} \Bigl(-y_{j, i} + a_{j, i}^{[L]} \underbrace{\sum_p y_{p, i}}_{\mathclap{\sum \text{probabilities} = 1}}\Bigr) \\
 &= \frac{1}{m} (a_{j, i}^{[L]} - y_{j, i}).
 \end{split}
 \end{equation*}
 $$
 
-Note that $$\jj = 1, \dots, n^{[L]}$$ (distinguishable by the acute accent).
+Note that $$p = 1, \dots, n^{[L]}$$.
 
 To conclude,
 
