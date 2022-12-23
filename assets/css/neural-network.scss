@@ -1,7 +1,11 @@
 ---
 ---
 
-@import "variables";
+@import
+  "minima/skins/{{ site.minima.skin | default: 'classic' }}";
+
+$base-font-size:   16px !default;
+$small-font-size:  $base-font-size * 0.875 !default;
 
 .nn {
   display: block;
@@ -12,14 +16,14 @@
 .nn-node {
   &>use {
     fill: $background-color;
-    stroke: lighten($text-color, 18%);
+    stroke: $table-text-color;
     stroke-width: 4;
   }
 }
 
 .nn-link {
   &>line {
-    stroke: darken($grey-color-light, 12%);
+    stroke: lighten($brand-color, 23%);
     stroke-width: 1;
   }
 }
@@ -27,11 +31,11 @@
 .nn-node-text,
 .nn-link-text {
   &>use {
-    fill: lighten($grey-color-light, 6%);
+    fill: lighten($brand-color, 46%);
   }
 
   &>text {
-    fill: lighten($text-color, 18%);
+    fill: $table-text-color;
     text-anchor: middle;
     dominant-baseline: central;
   }
@@ -41,7 +45,7 @@
   .nn-node-2-1,
   .nn-node-2-2 {
     &>use {
-      stroke: darken($grey-color-light, 12%);
+      stroke: lighten($brand-color, 23%);
     }
   }
 
@@ -49,14 +53,14 @@
   .nn-link-1-1-2-0,
   .nn-link-1-2-2-0 {
     &>line {
-      stroke: lighten($text-color, 18%);
+      stroke: $table-text-color;
     }
   }
 
   .nn-node-text-2-1,
   .nn-node-text-2-2 {
     &>text {
-      fill: darken($grey-color-light, 12%);
+      fill: lighten($brand-color, 23%);
     }
   }
 }
@@ -65,7 +69,7 @@
   .nn-node-1-0,
   .nn-node-1-1 {
     &>use {
-      stroke: darken($grey-color-light, 12%);
+      stroke: lighten($brand-color, 23%);
     }
   }
 
@@ -73,14 +77,14 @@
   .nn-link-1-2-2-1,
   .nn-link-1-2-2-2 {
     &>line {
-      stroke: lighten($text-color, 18%);
+      stroke: $table-text-color;
     }
   }
 
   .nn-node-text-1-0,
   .nn-node-text-1-1 {
     &>text {
-      fill: darken($grey-color-light, 12%);
+      fill: lighten($brand-color, 23%);
     }
   }
 }

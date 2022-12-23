@@ -1,20 +1,26 @@
-permalink: pretty
-theme: minima
-url: "https://jonaslalin.com"
-
+exclude:
+  - README.md
 defaults:
   - scope:
       path: ""
-      types: posts
+      type: posts
     values:
       layout: post
-
-exclude:
-  - README.md
+permalink: pretty
+sass:
+  verbose: true
+theme: minima
+url: "https://jonaslalin.com"
 
 title: I, Deep Learning
 description: Yet another blog about deep learning.
-author: Jonas Lalin
-github_username: jonaslalin
-linkedin_username: jonaslalin
+author:
+  name: Jonas Lalin
+  email: ""
+minima:
+  social_links:
+    - platform: github
+      user_url: "https://github.com/jonaslalin"
+    - platform: linkedin
+      user_url: "https://www.linkedin.com/in/jonaslalin/"
 google_analytics: G-XY9F18W0CY

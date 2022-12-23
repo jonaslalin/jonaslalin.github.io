@@ -1,7 +1,11 @@
 ---
 ---
 
-@import "variables";
+@import
+  "minima/skins/{{ site.minima.skin | default: 'classic' }}";
+
+$base-font-size:   16px !default;
+$small-font-size:  $base-font-size * 0.875 !default;
 
 .bld {
   display: block;
@@ -12,14 +16,14 @@
 .bld-box {
   &>use {
     fill: $background-color;
-    stroke: lighten($text-color, 18%);
+    stroke: $table-text-color;
     stroke-width: 4;
   }
 }
 
 .bld-line {
   &>line {
-    stroke: lighten($text-color, 18%);
+    stroke: $table-text-color;
     stroke-width: 1;
   }
 }
@@ -27,11 +31,11 @@
 .bld-box-text,
 .bld-line-text {
   &>use {
-    fill: lighten($grey-color-light, 6%);
+    fill: lighten($brand-color, 46%);
   }
 
   &>text {
-    fill: lighten($text-color, 18%);
+    fill: $table-text-color;
     text-anchor: middle;
     dominant-baseline: central;
   }

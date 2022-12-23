@@ -1,0 +1,40 @@
+---
+---
+
+@import
+  "minima/skins/{{ site.minima.skin | default: 'classic' }}",
+  "minima/initialize";
+
+.overflow-wrapper {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  @extend .overflow-wrapper;
+  min-width: 0 !important;
+}
+
+mjx-container[jax="SVG"] {
+  &>svg {
+    a {
+      fill: $link-base-color !important;
+      stroke: $link-base-color !important;
+
+      &:visited {
+        fill: $link-visited-color !important;
+        stroke: $link-visited-color !important;
+      }
+
+      &:hover {
+        fill: $link-hover-color !important;
+        stroke: $link-hover-color !important;
+      }
+    }
+  }
+}
+
+figcaption {
+  text-align: center;
+  margin-top: calc($spacing-unit / 2);
+}

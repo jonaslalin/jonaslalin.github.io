@@ -423,8 +423,8 @@ Last but not least: congratulations! You have made it to the end (of the first p
 {%- include neural-network-svg.html -%}
 {%- include box-line-diagram-svg.html -%}
 
-<link rel="stylesheet" href="{{ "/assets/neural-network.css" | relative_url }}">
-<link rel="stylesheet" href="{{ "/assets/box-line-diagram.css" | relative_url }}">
+<link rel="stylesheet" href="{{ "/assets/css/neural-network.css" | relative_url }}">
+<link rel="stylesheet" href="{{ "/assets/css/box-line-diagram.css" | relative_url }}">
 
 <script>
   var nnThreeToThree =
