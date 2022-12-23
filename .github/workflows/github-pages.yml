@@ -1,4 +1,4 @@
-name: Build and deploy Jekyll site to GitHub Pages
+name: Build and Deploy to Github Pages
 on:
   push:
     branches:
@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses:  helaili/jekyll-action@v2
+    - uses: jeffreytse/jekyll-deploy-action@v0.4.0
       with:
+        provider: github
         token: ${{ secrets.GITHUB_TOKEN }}
-        target_branch: gh-pages
