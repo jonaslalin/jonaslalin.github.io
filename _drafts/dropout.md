@@ -219,71 +219,71 @@ $$
 \begin{align}
 \pdv{\J}{\vec{A}^{[l]}} &=
 \begin{bmatrix}
-\pdv{\J}{a_{1, 1}^{[l]}} &\dots &\pdv{\J}{a_{1, k}^{[l]}} &\dots &\pdv{\J}{a_{1, n^{[l]}}^{[l]}} \\
+\dpdv{\J}{a_{1, 1}^{[l]}} &\dots &\dpdv{\J}{a_{1, k}^{[l]}} &\dots &\dpdv{\J}{a_{1, n^{[l]}}^{[l]}} \\
 \vdots &\ddots &\vdots &\ddots &\vdots \\
-\pdv{\J}{a_{i, 1}^{[l]}} &\dots &\pdv{\J}{a_{i, k}^{[l]}} &\dots &\pdv{\J}{a_{i, n^{[l]}}^{[l]}} \\
+\dpdv{\J}{a_{i, 1}^{[l]}} &\dots &\dpdv{\J}{a_{i, k}^{[l]}} &\dots &\dpdv{\J}{a_{i, n^{[l]}}^{[l]}} \\
 \vdots &\ddots &\vdots &\ddots &\vdots \\
-\pdv{\J}{a_{m, 1}^{[l]}} &\dots &\pdv{\J}{a_{m, k}^{[l]}} &\dots &\pdv{\J}{a_{m, n^{[l]}}^{[l]}}
+\dpdv{\J}{a_{m, 1}^{[l]}} &\dots &\dpdv{\J}{a_{m, k}^{[l]}} &\dots &\dpdv{\J}{a_{m, n^{[l]}}^{[l]}}
 \end{bmatrix}, \\
 \pdv{\J}{\vec{\tilde{A}}^{[l]}} &=
 \begin{bmatrix}
-\pdv{\J}{\tilde{a}_{1, 1}^{[l]}} &\dots &\pdv{\J}{\tilde{a}_{1, k}^{[l]}} &\dots &\pdv{\J}{\tilde{a}_{1, n^{[l]}}^{[l]}} \\
+\dpdv{\J}{\tilde{a}_{1, 1}^{[l]}} &\dots &\dpdv{\J}{\tilde{a}_{1, k}^{[l]}} &\dots &\dpdv{\J}{\tilde{a}_{1, n^{[l]}}^{[l]}} \\
 \vdots &\ddots &\vdots &\ddots &\vdots \\
-\pdv{\J}{\tilde{a}_{i, 1}^{[l]}} &\dots &\pdv{\J}{\tilde{a}_{i, k}^{[l]}} &\dots &\pdv{\J}{\tilde{a}_{i, n^{[l]}}^{[l]}} \\
+\dpdv{\J}{\tilde{a}_{i, 1}^{[l]}} &\dots &\dpdv{\J}{\tilde{a}_{i, k}^{[l]}} &\dots &\dpdv{\J}{\tilde{a}_{i, n^{[l]}}^{[l]}} \\
 \vdots &\ddots &\vdots &\ddots &\vdots \\
-\pdv{\J}{\tilde{a}_{m, 1}^{[l]}} &\dots &\pdv{\J}{\tilde{a}_{m, k}^{[l]}} &\dots &\pdv{\J}{\tilde{a}_{m, n^{[l]}}^{[l]}}
+\dpdv{\J}{\tilde{a}_{m, 1}^{[l]}} &\dots &\dpdv{\J}{\tilde{a}_{m, k}^{[l]}} &\dots &\dpdv{\J}{\tilde{a}_{m, n^{[l]}}^{[l]}}
 \end{bmatrix}, \\
 \pdv{\J}{\vec{z}_i^{[l + 1]}} &=
 \begin{bmatrix}
-\pdv{\J}{z_{i, 1}^{[l + 1]}} &\dots &\pdv{\J}{z_{i, j}^{[l + 1]}} &\dots &\pdv{\J}{z_{i, n^{[l + 1]}}^{[l + 1]}}
+\dpdv{\J}{z_{i, 1}^{[l + 1]}} &\dots &\dpdv{\J}{z_{i, j}^{[l + 1]}} &\dots &\dpdv{\J}{z_{i, n^{[l + 1]}}^{[l + 1]}}
 \end{bmatrix}, \\
 \pdv{\J}{\vec{Z}^{[l + 1]}} &=
 \begin{bmatrix}
-\pdv{\J}{\vec{z}_1^{[l + 1]}} \\
+\dpdv{\J}{\vec{z}_1^{[l + 1]}} \\
 \vdots \\
-\pdv{\J}{\vec{z}_i^{[l + 1]}} \\
+\dpdv{\J}{\vec{z}_i^{[l + 1]}} \\
 \vdots \\
-\pdv{\J}{\vec{z}_m^{[l + 1]}}
+\dpdv{\J}{\vec{z}_m^{[l + 1]}}
 \end{bmatrix} \\
 &=
 \begin{bmatrix}
-\pdv{\J}{z_{1, 1}^{[l + 1]}} &\dots &\pdv{\J}{z_{1, j}^{[l + 1]}} &\dots &\pdv{\J}{z_{1, n^{[l + 1]}}^{[l + 1]}} \\
+\dpdv{\J}{z_{1, 1}^{[l + 1]}} &\dots &\dpdv{\J}{z_{1, j}^{[l + 1]}} &\dots &\dpdv{\J}{z_{1, n^{[l + 1]}}^{[l + 1]}} \\
 \vdots &\ddots &\vdots &\ddots &\vdots \\
-\pdv{\J}{z_{i, 1}^{[l + 1]}} &\dots &\pdv{\J}{z_{i, j}^{[l + 1]}} &\dots &\pdv{\J}{z_{i, n^{[l + 1]}}^{[l + 1]}} \\
+\dpdv{\J}{z_{i, 1}^{[l + 1]}} &\dots &\dpdv{\J}{z_{i, j}^{[l + 1]}} &\dots &\dpdv{\J}{z_{i, n^{[l + 1]}}^{[l + 1]}} \\
 \vdots &\ddots &\vdots &\ddots &\vdots \\
-\pdv{\J}{z_{m, 1}^{[l + 1]}} &\dots &\pdv{\J}{z_{m, j}^{[l + 1]}} &\dots &\pdv{\J}{z_{m, n^{[l + 1]}}^{[l + 1]}}
+\dpdv{\J}{z_{m, 1}^{[l + 1]}} &\dots &\dpdv{\J}{z_{m, j}^{[l + 1]}} &\dots &\dpdv{\J}{z_{m, n^{[l + 1]}}^{[l + 1]}}
 \end{bmatrix}, \notag \\
 \pdv{\J}{\vec{W}^{[l + 1]}} &=
 \begin{bmatrix}
-\pdv{\J}{w_{1, 1}^{[l + 1]}} &\dots &\pdv{\J}{w_{1, j}^{[l + 1]}} &\dots &\pdv{\J}{w_{1, n^{[l + 1]}}^{[l + 1]}} \\
+\dpdv{\J}{w_{1, 1}^{[l + 1]}} &\dots &\dpdv{\J}{w_{1, j}^{[l + 1]}} &\dots &\dpdv{\J}{w_{1, n^{[l + 1]}}^{[l + 1]}} \\
 \vdots &\ddots &\vdots &\ddots &\vdots \\
-\pdv{\J}{w_{k, 1}^{[l + 1]}} &\dots &\pdv{\J}{w_{k, j}^{[l + 1]}} &\dots &\pdv{\J}{w_{k, n^{[l + 1]}}^{[l + 1]}} \\
+\dpdv{\J}{w_{k, 1}^{[l + 1]}} &\dots &\dpdv{\J}{w_{k, j}^{[l + 1]}} &\dots &\dpdv{\J}{w_{k, n^{[l + 1]}}^{[l + 1]}} \\
 \vdots &\ddots &\vdots &\ddots &\vdots \\
-\pdv{\J}{w_{n^{[l]}, 1}^{[l + 1]}} &\dots &\pdv{\J}{w_{n^{[l]}, j}^{[l + 1]}} &\dots &\pdv{\J}{w_{n^{[l]}, n^{[l + 1]}}^{[l + 1]}}
+\dpdv{\J}{w_{n^{[l]}, 1}^{[l + 1]}} &\dots &\dpdv{\J}{w_{n^{[l]}, j}^{[l + 1]}} &\dots &\dpdv{\J}{w_{n^{[l]}, n^{[l + 1]}}^{[l + 1]}}
 \end{bmatrix}, \\
 \pdv{\J}{\vec{b}^{[l + 1]}} &=
 \begin{bmatrix}
-\pdv{\J}{b_1^{[l + 1]}} &\dots &\pdv{\J}{b_j^{[l + 1]}} &\dots &\pdv{\J}{b_{n^{[l + 1]}}^{[l + 1]}}
+\dpdv{\J}{b_1^{[l + 1]}} &\dots &\dpdv{\J}{b_j^{[l + 1]}} &\dots &\dpdv{\J}{b_{n^{[l + 1]}}^{[l + 1]}}
 \end{bmatrix}, \\
 \pdv{\J}{\vec{a}_i^{[l + 1]}} &=
 \begin{bmatrix}
-\pdv{\J}{a_{i, 1}^{[l + 1]}} &\dots &\pdv{\J}{a_{i, j}^{[l + 1]}} &\dots &\pdv{\J}{a_{i, n^{[l + 1]}}^{[l + 1]}}
+\dpdv{\J}{a_{i, 1}^{[l + 1]}} &\dots &\dpdv{\J}{a_{i, j}^{[l + 1]}} &\dots &\dpdv{\J}{a_{i, n^{[l + 1]}}^{[l + 1]}}
 \end{bmatrix}, \\
 \pdv{\J}{\vec{A}^{[l + 1]}} &=
 \begin{bmatrix}
-\pdv{\J}{\vec{a}_1^{[l + 1]}} \\
+\dpdv{\J}{\vec{a}_1^{[l + 1]}} \\
 \vdots \\
-\pdv{\J}{\vec{a}_i^{[l + 1]}} \\
+\dpdv{\J}{\vec{a}_i^{[l + 1]}} \\
 \vdots \\
-\pdv{\J}{\vec{a}_m^{[l + 1]}}
+\dpdv{\J}{\vec{a}_m^{[l + 1]}}
 \end{bmatrix} \\
 &=
 \begin{bmatrix}
-\pdv{\J}{a_{1, 1}^{[l + 1]}} &\dots &\pdv{\J}{a_{1, j}^{[l + 1]}} &\dots &\pdv{\J}{a_{1, n^{[l + 1]}}^{[l + 1]}} \\
+\dpdv{\J}{a_{1, 1}^{[l + 1]}} &\dots &\dpdv{\J}{a_{1, j}^{[l + 1]}} &\dots &\dpdv{\J}{a_{1, n^{[l + 1]}}^{[l + 1]}} \\
 \vdots &\ddots &\vdots &\ddots &\vdots \\
-\pdv{\J}{a_{i, 1}^{[l + 1]}} &\dots &\pdv{\J}{a_{i, j}^{[l + 1]}} &\dots &\pdv{\J}{a_{i, n^{[l + 1]}}^{[l + 1]}} \\
+\dpdv{\J}{a_{i, 1}^{[l + 1]}} &\dots &\dpdv{\J}{a_{i, j}^{[l + 1]}} &\dots &\dpdv{\J}{a_{i, n^{[l + 1]}}^{[l + 1]}} \\
 \vdots &\ddots &\vdots &\ddots &\vdots \\
-\pdv{\J}{a_{m, 1}^{[l + 1]}} &\dots &\pdv{\J}{a_{m, j}^{[l + 1]}} &\dots &\pdv{\J}{a_{m, n^{[l + 1]}}^{[l + 1]}}
+\dpdv{\J}{a_{m, 1}^{[l + 1]}} &\dots &\dpdv{\J}{a_{m, j}^{[l + 1]}} &\dots &\dpdv{\J}{a_{m, n^{[l + 1]}}^{[l + 1]}}
 \end{bmatrix}. \notag
 \end{align}
 $$
@@ -293,19 +293,19 @@ $$
 \begin{split}
 \pdv{\J}{\vec{z}_i^{[l + 1]}} &=
 \begin{bmatrix}
-\pdv{\J}{z_{i, 1}^{[l + 1]}} &\dots &\pdv{\J}{z_{i, j}^{[l + 1]}} &\dots &\pdv{\J}{z_{i, n^{[l + 1]}}^{[l + 1]}}
+\dpdv{\J}{z_{i, 1}^{[l + 1]}} &\dots &\dpdv{\J}{z_{i, j}^{[l + 1]}} &\dots &\dpdv{\J}{z_{i, n^{[l + 1]}}^{[l + 1]}}
 \end{bmatrix} \\
 &=
 \begin{bmatrix}
-\pdv{\J}{a_{i, 1}^{[l + 1]}} &\dots &\pdv{\J}{a_{i, j}^{[l + 1]}} &\dots &\pdv{\J}{a_{i, n^{[l + 1]}}^{[l + 1]}}
+\dpdv{\J}{a_{i, 1}^{[l + 1]}} &\dots &\dpdv{\J}{a_{i, j}^{[l + 1]}} &\dots &\dpdv{\J}{a_{i, n^{[l + 1]}}^{[l + 1]}}
 \end{bmatrix} \\
 &\peq {} \cdot
 \begin{bmatrix}
-\pdv{a_{i, 1}^{[l + 1]}}{z_{i, 1}^{[l + 1]}} &\dots &\pdv{a_{i, 1}^{[l + 1]}}{z_{i, j}^{[l + 1]}} &\dots &\pdv{a_{i, 1}^{[l + 1]}}{z_{i, n^{[l + 1]}}^{[l + 1]}} \\
+\dpdv{a_{i, 1}^{[l + 1]}}{z_{i, 1}^{[l + 1]}} &\dots &\dpdv{a_{i, 1}^{[l + 1]}}{z_{i, j}^{[l + 1]}} &\dots &\dpdv{a_{i, 1}^{[l + 1]}}{z_{i, n^{[l + 1]}}^{[l + 1]}} \\
 \vdots &\ddots &\vdots &\ddots &\vdots \\
-\pdv{a_{i, j}^{[l + 1]}}{z_{i, 1}^{[l + 1]}} &\dots &\pdv{a_{i, j}^{[l + 1]}}{z_{i, j}^{[l + 1]}} &\dots &\pdv{a_{i, j}^{[l + 1]}}{z_{i, n^{[l + 1]}}^{[l + 1]}} \\
+\dpdv{a_{i, j}^{[l + 1]}}{z_{i, 1}^{[l + 1]}} &\dots &\dpdv{a_{i, j}^{[l + 1]}}{z_{i, j}^{[l + 1]}} &\dots &\dpdv{a_{i, j}^{[l + 1]}}{z_{i, n^{[l + 1]}}^{[l + 1]}} \\
 \vdots &\ddots &\vdots &\ddots &\vdots \\
-\pdv{a_{i, n^{[l + 1]}}^{[l + 1]}}{z_{i, 1}^{[l + 1]}} &\dots &\pdv{a_{i, n^{[l + 1]}}^{[l + 1]}}{z_{i, j}^{[l + 1]}} &\dots &\pdv{a_{i, n^{[l + 1]}}^{[l + 1]}}{z_{i, n^{[l + 1]}}^{[l + 1]}}
+\dpdv{a_{i, n^{[l + 1]}}^{[l + 1]}}{z_{i, 1}^{[l + 1]}} &\dots &\dpdv{a_{i, n^{[l + 1]}}^{[l + 1]}}{z_{i, j}^{[l + 1]}} &\dots &\dpdv{a_{i, n^{[l + 1]}}^{[l + 1]}}{z_{i, n^{[l + 1]}}^{[l + 1]}}
 \end{bmatrix} \\
 &= \pdv{\J}{\vec{a}_i^{[l + 1]}} \pdv{\vec{a}_i^{[l + 1]}}{\vec{z}_i^{[l + 1]}}.
 \end{split}
@@ -320,11 +320,11 @@ $$
 \pdv{\J}{\vec{z}_i^{[l + 1]}} &= \pdv{\J}{\vec{a}_i^{[l + 1]}} \pdv{\vec{a}_i^{[l + 1]}}{\vec{z}_i^{[l + 1]}}, \\
 \pdv{\J}{\vec{Z}^{[l + 1]}} &=
 \begin{bmatrix}
-\pdv{\J}{\vec{z}_1^{[l + 1]}} \\
+\dpdv{\J}{\vec{z}_1^{[l + 1]}} \\
 \vdots \\
-\pdv{\J}{\vec{z}_i^{[l + 1]}} \\
+\dpdv{\J}{\vec{z}_i^{[l + 1]}} \\
 \vdots \\
-\pdv{\J}{\vec{z}_m^{[l + 1]}}
+\dpdv{\J}{\vec{z}_m^{[l + 1]}}
 \end{bmatrix}, \\
 \pdv{\J}{\vec{W}^{[l + 1]}} &= {\vec{\tilde{A}}^{[l]}}^\T \pdv{\J}{\vec{Z}^{[l + 1]}}, \\
 \pdv{\J}{\vec{b}^{[l + 1]}} &= \sum_{i = 1}^m \pdv{\J}{\vec{z}_i^{[l + 1]}}, \\
