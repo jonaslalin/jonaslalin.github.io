@@ -217,22 +217,26 @@ $$
 
 $$
 \begin{align}
-\pdv{\J}{\vec{A}^{[l]}} &=
+\pdv{\J}{\vec{a}_i^{[l + 1]}} &=
 \begin{bmatrix}
-\dpdv{\J}{a_{1, 1}^{[l]}} &\dots &\dpdv{\J}{a_{1, k}^{[l]}} &\dots &\dpdv{\J}{a_{1, n^{[l]}}^{[l]}} \\
-\vdots &\ddots &\vdots &\ddots &\vdots \\
-\dpdv{\J}{a_{i, 1}^{[l]}} &\dots &\dpdv{\J}{a_{i, k}^{[l]}} &\dots &\dpdv{\J}{a_{i, n^{[l]}}^{[l]}} \\
-\vdots &\ddots &\vdots &\ddots &\vdots \\
-\dpdv{\J}{a_{m, 1}^{[l]}} &\dots &\dpdv{\J}{a_{m, k}^{[l]}} &\dots &\dpdv{\J}{a_{m, n^{[l]}}^{[l]}}
+\dpdv{\J}{a_{i, 1}^{[l + 1]}} &\dots &\dpdv{\J}{a_{i, j}^{[l + 1]}} &\dots &\dpdv{\J}{a_{i, n^{[l + 1]}}^{[l + 1]}}
 \end{bmatrix}, \\
-\pdv{\J}{\vec{\tilde{A}}^{[l]}} &=
+\pdv{\J}{\vec{A}^{[l + 1]}} &=
 \begin{bmatrix}
-\dpdv{\J}{\tilde{a}_{1, 1}^{[l]}} &\dots &\dpdv{\J}{\tilde{a}_{1, k}^{[l]}} &\dots &\dpdv{\J}{\tilde{a}_{1, n^{[l]}}^{[l]}} \\
+\dpdv{\J}{\vec{a}_1^{[l + 1]}} \\
+\vdots \\
+\dpdv{\J}{\vec{a}_i^{[l + 1]}} \\
+\vdots \\
+\dpdv{\J}{\vec{a}_m^{[l + 1]}}
+\end{bmatrix} \\
+&=
+\begin{bmatrix}
+\dpdv{\J}{a_{1, 1}^{[l + 1]}} &\dots &\dpdv{\J}{a_{1, j}^{[l + 1]}} &\dots &\dpdv{\J}{a_{1, n^{[l + 1]}}^{[l + 1]}} \\
 \vdots &\ddots &\vdots &\ddots &\vdots \\
-\dpdv{\J}{\tilde{a}_{i, 1}^{[l]}} &\dots &\dpdv{\J}{\tilde{a}_{i, k}^{[l]}} &\dots &\dpdv{\J}{\tilde{a}_{i, n^{[l]}}^{[l]}} \\
+\dpdv{\J}{a_{i, 1}^{[l + 1]}} &\dots &\dpdv{\J}{a_{i, j}^{[l + 1]}} &\dots &\dpdv{\J}{a_{i, n^{[l + 1]}}^{[l + 1]}} \\
 \vdots &\ddots &\vdots &\ddots &\vdots \\
-\dpdv{\J}{\tilde{a}_{m, 1}^{[l]}} &\dots &\dpdv{\J}{\tilde{a}_{m, k}^{[l]}} &\dots &\dpdv{\J}{\tilde{a}_{m, n^{[l]}}^{[l]}}
-\end{bmatrix}, \\
+\dpdv{\J}{a_{m, 1}^{[l + 1]}} &\dots &\dpdv{\J}{a_{m, j}^{[l + 1]}} &\dots &\dpdv{\J}{a_{m, n^{[l + 1]}}^{[l + 1]}}
+\end{bmatrix}, \notag \\
 \pdv{\J}{\vec{z}_i^{[l + 1]}} &=
 \begin{bmatrix}
 \dpdv{\J}{z_{i, 1}^{[l + 1]}} &\dots &\dpdv{\J}{z_{i, j}^{[l + 1]}} &\dots &\dpdv{\J}{z_{i, n^{[l + 1]}}^{[l + 1]}}
@@ -265,26 +269,22 @@ $$
 \begin{bmatrix}
 \dpdv{\J}{b_1^{[l + 1]}} &\dots &\dpdv{\J}{b_j^{[l + 1]}} &\dots &\dpdv{\J}{b_{n^{[l + 1]}}^{[l + 1]}}
 \end{bmatrix}, \\
-\pdv{\J}{\vec{a}_i^{[l + 1]}} &=
+\pdv{\J}{\vec{\tilde{A}}^{[l]}} &=
 \begin{bmatrix}
-\dpdv{\J}{a_{i, 1}^{[l + 1]}} &\dots &\dpdv{\J}{a_{i, j}^{[l + 1]}} &\dots &\dpdv{\J}{a_{i, n^{[l + 1]}}^{[l + 1]}}
+\dpdv{\J}{\tilde{a}_{1, 1}^{[l]}} &\dots &\dpdv{\J}{\tilde{a}_{1, k}^{[l]}} &\dots &\dpdv{\J}{\tilde{a}_{1, n^{[l]}}^{[l]}} \\
+\vdots &\ddots &\vdots &\ddots &\vdots \\
+\dpdv{\J}{\tilde{a}_{i, 1}^{[l]}} &\dots &\dpdv{\J}{\tilde{a}_{i, k}^{[l]}} &\dots &\dpdv{\J}{\tilde{a}_{i, n^{[l]}}^{[l]}} \\
+\vdots &\ddots &\vdots &\ddots &\vdots \\
+\dpdv{\J}{\tilde{a}_{m, 1}^{[l]}} &\dots &\dpdv{\J}{\tilde{a}_{m, k}^{[l]}} &\dots &\dpdv{\J}{\tilde{a}_{m, n^{[l]}}^{[l]}}
 \end{bmatrix}, \\
-\pdv{\J}{\vec{A}^{[l + 1]}} &=
+\pdv{\J}{\vec{A}^{[l]}} &=
 \begin{bmatrix}
-\dpdv{\J}{\vec{a}_1^{[l + 1]}} \\
-\vdots \\
-\dpdv{\J}{\vec{a}_i^{[l + 1]}} \\
-\vdots \\
-\dpdv{\J}{\vec{a}_m^{[l + 1]}}
-\end{bmatrix} \\
-&=
-\begin{bmatrix}
-\dpdv{\J}{a_{1, 1}^{[l + 1]}} &\dots &\dpdv{\J}{a_{1, j}^{[l + 1]}} &\dots &\dpdv{\J}{a_{1, n^{[l + 1]}}^{[l + 1]}} \\
+\dpdv{\J}{a_{1, 1}^{[l]}} &\dots &\dpdv{\J}{a_{1, k}^{[l]}} &\dots &\dpdv{\J}{a_{1, n^{[l]}}^{[l]}} \\
 \vdots &\ddots &\vdots &\ddots &\vdots \\
-\dpdv{\J}{a_{i, 1}^{[l + 1]}} &\dots &\dpdv{\J}{a_{i, j}^{[l + 1]}} &\dots &\dpdv{\J}{a_{i, n^{[l + 1]}}^{[l + 1]}} \\
+\dpdv{\J}{a_{i, 1}^{[l]}} &\dots &\dpdv{\J}{a_{i, k}^{[l]}} &\dots &\dpdv{\J}{a_{i, n^{[l]}}^{[l]}} \\
 \vdots &\ddots &\vdots &\ddots &\vdots \\
-\dpdv{\J}{a_{m, 1}^{[l + 1]}} &\dots &\dpdv{\J}{a_{m, j}^{[l + 1]}} &\dots &\dpdv{\J}{a_{m, n^{[l + 1]}}^{[l + 1]}}
-\end{bmatrix}. \notag
+\dpdv{\J}{a_{m, 1}^{[l]}} &\dots &\dpdv{\J}{a_{m, k}^{[l]}} &\dots &\dpdv{\J}{a_{m, n^{[l]}}^{[l]}}
+\end{bmatrix}.
 \end{align}
 $$
 
