@@ -1,5 +1,5 @@
 ---
-title: Dropout with L2 Regularization
+title: Dropout and L2 Regularization
 ---
 
 ## Forward Propagation
