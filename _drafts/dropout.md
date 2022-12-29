@@ -182,15 +182,24 @@ z_{1, j}^{[l + 1]} &= \sum_{k = 1}^{n^{[l]}} w_{k, j}^{[l + 1]} \tilde{a}_{1, k}
 &\vdotswithin{=} \notag \\
 z_{i, j}^{[l + 1]} &= \sum_{k = 1}^{n^{[l]}} w_{k, j}^{[l + 1]} \tilde{a}_{i, k}^{[l]} + b_j^{[l + 1]}, \\
 &\vdotswithin{=} \notag \\
-z_{m, j}^{[l + 1]} &= \sum_{k = 1}^{n^{[l]}} w_{k, j}^{[l + 1]} \tilde{a}_{m, k}^{[l]} + b_j^{[l + 1]};
+z_{m, j}^{[l + 1]} &= \sum_{k = 1}^{n^{[l]}} w_{k, j}^{[l + 1]} \tilde{a}_{m, k}^{[l]} + b_j^{[l + 1]}.
 \end{align}
+$$
+
+In addition, $$w_{k, j}^{[l + 1]}$$ also affects $$f_{\text{complexity}}$$, since
+
+$$
+\begin{equation}
+f_{\text{complexity}} = \frac{\lambda}{2} \sum_{l = 0}^{L - 1} \sum_{k = 1}^{n^{[l]}} \sum_{j = 1}^{n^{[l + 1]}} (w_{k, j}^{[l + 1]})^2;
+\end{equation}
 $$
 
 hence,
 
 $$
 \begin{align}
-\pdv{\J}{w_{k, j}^{[l + 1]}} &= \sum_{i = 1}^m \pdv{\J}{z_{i, j}^{[l + 1]}} \pdv{z_{i, j}^{[l + 1]}}{w_{k, j}^{[l + 1]}} = \sum_{i = 1}^m \pdv{\J}{z_{i, j}^{[l + 1]}} \tilde{a}_{i, k}^{[l]}, \\
+\pdv{\J}{w_{k, j}^{[l + 1]}} &= \sum_{i = 1}^m \pdv{\J}{z_{i, j}^{[l + 1]}} \pdv{z_{i, j}^{[l + 1]}}{w_{k, j}^{[l + 1]}} + \pdv{f_{\text{complexity}}}{w_{k, j}^{[l + 1]}} \\
+&= \sum_{i = 1}^m \pdv{\J}{z_{i, j}^{[l + 1]}} \tilde{a}_{i, k}^{[l]} + \lambda w_{k, j}^{[l + 1]}, \notag \\
 \pdv{\J}{b_j^{[l + 1]}} &= \sum_{i = 1}^m \pdv{\J}{z_{i, j}^{[l + 1]}} \pdv{z_{i, j}^{[l + 1]}}{b_j^{[l + 1]}} = \sum_{i = 1}^m \pdv{\J}{z_{i, j}^{[l + 1]}}.
 \end{align}
 $$
@@ -237,7 +246,7 @@ $$
 \begin{align}
 \pdv{\J}{a_{i, j}^{[l + 1]}} &= \text{?}, \\
 \pdv{\J}{z_{i, j}^{[l + 1]}} &= \sum_{\jj = 1}^{n^{[l + 1]}} \pdv{\J}{a_{i, \jj}^{[l + 1]}} \pdv{a_{i, \jj}^{[l + 1]}}{z_{i, j}^{[l + 1]}}, \\
-\pdv{\J}{w_{k, j}^{[l + 1]}} &= \sum_{i = 1}^m \pdv{\J}{z_{i, j}^{[l + 1]}} \tilde{a}_{i, k}^{[l]}, \\
+\pdv{\J}{w_{k, j}^{[l + 1]}} &= \sum_{i = 1}^m \pdv{\J}{z_{i, j}^{[l + 1]}} \tilde{a}_{i, k}^{[l]} + \lambda w_{k, j}^{[l + 1]}, \\
 \pdv{\J}{b_j^{[l + 1]}} &= \sum_{i = 1}^m \pdv{\J}{z_{i, j}^{[l + 1]}}, \\
 \pdv{\J}{\tilde{a}_{i, k}^{[l]}} &= \sum_{j = 1}^{n^{[l + 1]}} \pdv{\J}{z_{i, j}^{[l + 1]}} w_{k, j}^{[l + 1]}, \\
 \pdv{\J}{a_{i, k}^{[l]}} &= \pdv{\J}{\tilde{a}_{i, k}^{[l]}} r_{i, k}^{[l]} \frac{1}{p_k^{[l]}}.
@@ -355,7 +364,7 @@ $$
 \vdots \\
 \dpdv{\J}{\vec{z}_m^{[l + 1]}}
 \end{bmatrix}, \\
-\pdv{\J}{\vec{W}^{[l + 1]}} &= {\vec{\tilde{A}}^{[l]}}^\T \pdv{\J}{\vec{Z}^{[l + 1]}}, \\
+\pdv{\J}{\vec{W}^{[l + 1]}} &= {\vec{\tilde{A}}^{[l]}}^\T \pdv{\J}{\vec{Z}^{[l + 1]}} + \lambda \vec{W}^{[l + 1]}, \\
 \pdv{\J}{\vec{b}^{[l + 1]}} &= \sum_{i = 1}^m \pdv{\J}{\vec{z}_i^{[l + 1]}}, \\
 \pdv{\J}{\vec{\tilde{A}}^{[l]}} &= \pdv{\J}{\vec{Z}^{[l + 1]}} {\vec{W}^{[l + 1]}}^\T, \\
 \pdv{\J}{\vec{A}^{[l]}} &= \pdv{\J}{\vec{\tilde{A}}^{[l]}} \odot \vec{R}^{[l]} \odot \frac{1}{\broadcast(\vec{p}^{[l]})}.
