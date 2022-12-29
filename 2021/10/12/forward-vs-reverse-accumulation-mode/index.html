@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>How Backpropagation Is Able To Reduce the Time Spent on Computing Gradients | I, Deep Learning</title>
+<meta name="generator" content="Jekyll v4.3.1" />
+<meta property="og:title" content="How Backpropagation Is Able To Reduce the Time Spent on Computing Gradients" />
+<meta name="author" content="Jonas Lalin" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Backpropagation was initially introduced in the 1970s, but its importance was not fully appreciated until Learning representations by back-propagating errors was published in 1986. With backpropagation, it became possible to use neural networks to solve problems that had previously been insoluble. Today, backpropagation is the workhorse of learning in neural networks. Without it, we would waste both time and energy. So how is backpropagation able to reduce the time spent on computing gradients? It all boils down to the computational complexity between applying the chain rule in forward versus reverse accumulation mode." />
+<meta property="og:description" content="Backpropagation was initially introduced in the 1970s, but its importance was not fully appreciated until Learning representations by back-propagating errors was published in 1986. With backpropagation, it became possible to use neural networks to solve problems that had previously been insoluble. Today, backpropagation is the workhorse of learning in neural networks. Without it, we would waste both time and energy. So how is backpropagation able to reduce the time spent on computing gradients? It all boils down to the computational complexity between applying the chain rule in forward versus reverse accumulation mode." />
+<link rel="canonical" href="https://jonaslalin.com/2021/10/12/forward-vs-reverse-accumulation-mode/" />
+<meta property="og:url" content="https://jonaslalin.com/2021/10/12/forward-vs-reverse-accumulation-mode/" />
+<meta property="og:site_name" content="I, Deep Learning" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-10-12T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="How Backpropagation Is Able To Reduce the Time Spent on Computing Gradients" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Jonas Lalin"},"dateModified":"2021-10-12T00:00:00+00:00","datePublished":"2021-10-12T00:00:00+00:00","description":"Backpropagation was initially introduced in the 1970s, but its importance was not fully appreciated until Learning representations by back-propagating errors was published in 1986. With backpropagation, it became possible to use neural networks to solve problems that had previously been insoluble. Today, backpropagation is the workhorse of learning in neural networks. Without it, we would waste both time and energy. So how is backpropagation able to reduce the time spent on computing gradients? It all boils down to the computational complexity between applying the chain rule in forward versus reverse accumulation mode.","headline":"How Backpropagation Is Able To Reduce the Time Spent on Computing Gradients","mainEntityOfPage":{"@type":"WebPage","@id":"https://jonaslalin.com/2021/10/12/forward-vs-reverse-accumulation-mode/"},"url":"https://jonaslalin.com/2021/10/12/forward-vs-reverse-accumulation-mode/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://jonaslalin.com/feed.xml" title="I, Deep Learning" /><script async src="https://www.googletagmanager.com/gtag/js?id=G-XY9F18W0CY"></script>
+<script>
+  window['ga-disable-G-XY9F18W0CY'] = window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1";
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){window.dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-XY9F18W0CY');
+</script>
+<script>
+  MathJax = {
+    loader: {
+      load: [
+        '[tex]/mathtools'
+      ]
+    },
+    svg: {
+      fontCache: 'global'
+    },
+    tex: {
+      macros: {
+        bernoulli: '\\operatorname{Bernoulli}',
+        broadcast: '\\operatorname{broadcast}',
+        ddv: ['\\displaystyle \\dv{#1}{#2}', 2],
+        dpdv: ['\\displaystyle \\pdv{#1}{#2}', 2],
+        dv: [
+          '\\mathchoice'
+          + '{\\frac{\\mathrm{d} #1}{\\mathrm{d} #2}}'
+          + '{\\mathrm{d} #1 / \\mathrm{d} #2}'
+          + '{\\mathrm{d} #1 / \\mathrm{d} #2}'
+          + '{\\mathrm{d} #1 / \\mathrm{d} #2}',
+          2
+        ],
+        J: '\\mathcal{J}',
+        jj: '\\tilde{\\jmath}',
+        pdv: [
+          '\\mathchoice'
+          + '{\\frac{\\partial #1}{\\partial #2}}'
+          + '{\\partial #1 / \\partial #2}'
+          + '{\\partial #1 / \\partial #2}'
+          + '{\\partial #1 / \\partial #2}',
+          2
+        ],
+        peq: '\\mathrel{\\phantom{=}}',
+        pplus: '\\mathbin{\\phantom{+}}',
+        R: '\\mathbb{R}',
+        T: '\\intercal',
+        vec: ['\\mathbf{#1}', 1]
+      },
+      packages: {
+        '[+]': [
+          'mathtools'
+        ]
+      },
+      tags: 'ams'
+    }
+  };
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">I, Deep Learning</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">How Backpropagation Is Able To Reduce the Time Spent on Computing Gradients</h1>
+    <p class="post-meta"><time class="dt-published" datetime="2021-10-12T00:00:00+00:00" itemprop="datePublished">
+        Oct 12, 2021
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>Backpropagation was initially introduced in the 1970s, but its importance was not fully appreciated until <a href="https://www.nature.com/articles/323533a0" target="_blank">Learning representations by back-propagating errors</a> was published in 1986. With backpropagation, it became possible to use neural networks to solve problems that had previously been insoluble. Today, backpropagation is the workhorse of learning in neural networks. Without it, we would waste both time and energy. So how is backpropagation able to reduce the time spent on computing gradients? It all boils down to the computational complexity between applying the chain rule in forward versus reverse accumulation mode.</p>
+
+<h2 id="forward-and-reverse-accumulation-modes">Forward and Reverse Accumulation Modes</h2>
+
+<p>Suppose we have a function</p>
+
+\[\begin{equation*}
+y = f(g(h(x))).
+\end{equation*}\]
+
+<p>Let us decompose the function with the help of intermediate variables:</p>
+
+\[\begin{align*}
+u_0 &amp;= x, \\
+u_1 &amp;= h(u_0), \\
+u_2 &amp;= g(u_1), \\
+u_3 &amp;= f(u_2) = y.
+\end{align*}\]
+
+<p>To compute the derivative \(\dv{y}{x}\), we can traverse the chain rule</p>
+
+<ol>
+  <li>from inside to outside, or</li>
+  <li>from outside to inside.</li>
+</ol>
+
+<p>We start with an inside first traversal of the chain rule, i.e., the forward accumulation mode:</p>
+
+\[\begin{align*}
+\dv{u_0}{x} &amp;= 1, \\
+\dv{u_1}{x} &amp;= \dv{u_1}{u_0} \dv{u_0}{x} = \dv{h(u_0)}{u_0}, \\
+\dv{u_2}{x} &amp;= \dv{u_2}{u_1} \dv{u_1}{x} = \dv{g(u_1)}{u_1} \dv{h(u_0)}{u_0}, \\
+\dv{u_3}{x} &amp;= \dv{u_3}{u_2} \dv{u_2}{x} = \dv{f(u_2)}{u_2} \dv{g(u_1)}{u_1} \dv{h(u_0)}{u_0}.
+\end{align*}\]
+
+<p>On the other hand, the reverse accumulation mode performs an outside first traversal of the chain rule, which more commonly is known as backpropagation:</p>
+
+\[\begin{align*}
+\dv{y}{u_3} &amp;= 1, \\
+\dv{y}{u_2} &amp;= \dv{y}{u_3} \dv{u_3}{u_2} = \dv{f(u_2)}{u_2}, \\
+\dv{y}{u_1} &amp;= \dv{y}{u_2} \dv{u_2}{u_1} = \dv{f(u_2)}{u_2} \dv{g(u_1)}{u_1}, \\
+\dv{y}{u_0} &amp;= \dv{y}{u_1} \dv{u_1}{u_0} = \dv{f(u_2)}{u_2} \dv{g(u_1)}{u_1} \dv{h(u_0)}{u_0}.
+\end{align*}\]
+
+<p>Both methods reach</p>
+
+\[\begin{equation*}
+\dv{y}{x} = \dv{u_3}{x} = \dv{y}{u_0} = \dv{f(u_2)}{u_2} \dv{g(u_1)}{u_1} \dv{h(u_0)}{u_0},
+\end{equation*}\]
+
+<p>using the same number of computations; however, this is not always the case, as we soon will find out.</p>
+
+<p>Note that the forward accumulation mode computes the recurrence relation</p>
+
+\[\begin{equation*}
+\dv{u_i}{x} = \dv{u_i}{u_{i - 1}} \dv{u_{i - 1}}{x}.
+\end{equation*}\]
+
+<p>In contrast, the reverse accumulation mode computes the recurrence relation</p>
+
+\[\begin{equation*}
+\dv{y}{u_i} = \dv{y}{u_{i + 1}} \dv{u_{i + 1}}{u_i}.
+\end{equation*}\]
+
+<p>Now, let us move on to a function \(f \colon \R^3 \to \R^2\), where it will be easier to analyze the computational complexity of the forward and reverse accumulation modes.</p>
+
+<h2 id="example">Example</h2>
+
+<p>To make a good comparison, we need an example with a different number of dependent variables than independent variables. The following function fulfills that requirement:</p>
+
+\[\begin{align*}
+y_1 &amp;= x_1 (x_2 - x_3), \\
+y_2 &amp;= x_3 \log(1 - x_1).
+\end{align*}\]
+
+<p>Next, to make gradient computations as simple as possible, after decomposition, we make sure we are left with only straightforward arithmetic operations and elementary functions:</p>
+
+\[\begin{align*}
+u_{-2} &amp;= x_1, \\
+u_{-1} &amp;= x_2, \\
+u_0 &amp;= x_3, \\
+u_1 &amp;= u_{-1} - u_0, \\
+u_2 &amp;= 1 - u_{-2}, \\
+u_3 &amp;= \log(u_2), \\
+u_4 &amp;= u_{-2} u_1 = y_1, \\
+u_5 &amp;= u_0 u_3 = y_2.
+\end{align*}\]
+
+<p>Now, we are ready to compute the partial derivatives \(\pdv{y_1}{x_1}\), \(\pdv{y_1}{x_2}\), \(\pdv{y_1}{x_3}\), \(\pdv{y_2}{x_1}\), \(\pdv{y_2}{x_2}\), and \(\pdv{y_2}{x_3}\). Once again, we start with an inside first traversal of the chain rule.</p>
+
+<h3 id="the-forward-accumulation-mode">The Forward Accumulation Mode</h3>
+
+<p><strong>Iteration 1:</strong></p>
+
+\[\begin{align*}
+\pdv{u_{-2}}{x_1} &amp;= 1, \\
+\pdv{u_{-1}}{x_1} &amp;= 0, \\
+\pdv{u_0}{x_1} &amp;= 0, \\
+\pdv{u_1}{x_1} &amp;= \pdv{u_1}{u_{-1}} \pdv{u_{-1}}{x_1} + \pdv{u_1}{u_0} \pdv{u_0}{x_1} = 0, \\
+\pdv{u_2}{x_1} &amp;= \pdv{u_2}{u_{-2}} \pdv{u_{-2}}{x_1} = -1, \\
+\pdv{u_3}{x_1} &amp;= \pdv{u_3}{u_2} \pdv{u_2}{x_1} = -\frac{1}{u_2} = -\frac{1}{1 - x_1}, \\
+\pdv{u_4}{x_1} &amp;= \pdv{u_4}{u_{-2}} \pdv{u_{-2}}{x_1} + \pdv{u_4}{u_1} \pdv{u_1}{x_1} = u_1 = x_2 - x_3, \\
+\pdv{u_5}{x_1} &amp;= \pdv{u_5}{u_0} \pdv{u_0}{x_1} + \pdv{u_5}{u_3} \pdv{u_3}{x_1} = -u_0 \frac{1}{u_2} = -\frac{x_3}{1 - x_1}.
+\end{align*}\]
+
+<p>Computing the partial derivative of every intermediate variable once gives us \(\pdv{y_1}{x_1} = x_2 - x_3\) and \(\pdv{y_2}{x_1} = -x_3 / (1 - x_1)\).</p>
+
+<p><strong>Iteration 2:</strong></p>
+
+\[\begin{align*}
+\pdv{u_{-2}}{x_2} &amp;= 0, \\
+\pdv{u_{-1}}{x_2} &amp;= 1, \\
+\pdv{u_0}{x_2} &amp;= 0, \\
+\pdv{u_1}{x_2} &amp;= \pdv{u_1}{u_{-1}} \pdv{u_{-1}}{x_2} + \pdv{u_1}{u_0} \pdv{u_0}{x_2} = 1, \\
+\pdv{u_2}{x_2} &amp;= \pdv{u_2}{u_{-2}} \pdv{u_{-2}}{x_2} = 0, \\
+\pdv{u_3}{x_2} &amp;= \pdv{u_3}{u_2} \pdv{u_2}{x_2} = 0, \\
+\pdv{u_4}{x_2} &amp;= \pdv{u_4}{u_{-2}} \pdv{u_{-2}}{x_2} + \pdv{u_4}{u_1} \pdv{u_1}{x_2} = u_{-2} = x_1, \\
+\pdv{u_5}{x_2} &amp;= \pdv{u_5}{u_0} \pdv{u_0}{x_2} + \pdv{u_5}{u_3} \pdv{u_3}{x_2} = 0.
+\end{align*}\]
+
+<p>After a second iteration, we also know that \(\pdv{y_1}{x_2} = x_1\) and \(\pdv{y_2}{x_2} = 0\).</p>
+
+<p><strong>Iteraton 3:</strong></p>
+
+\[\begin{align*}
+\pdv{u_{-2}}{x_3} &amp;= 0, \\
+\pdv{u_{-1}}{x_3} &amp;= 0, \\
+\pdv{u_0}{x_3} &amp;= 1, \\
+\pdv{u_1}{x_3} &amp;= \pdv{u_1}{u_{-1}} \pdv{u_{-1}}{x_3} + \pdv{u_1}{u_0} \pdv{u_0}{x_3} = -1, \\
+\pdv{u_2}{x_3} &amp;= \pdv{u_2}{u_{-2}} \pdv{u_{-2}}{x_3} = 0, \\
+\pdv{u_3}{x_3} &amp;= \pdv{u_3}{u_2} \pdv{u_2}{x_3} = 0, \\
+\pdv{u_4}{x_3} &amp;= \pdv{u_4}{u_{-2}} \pdv{u_{-2}}{x_3} + \pdv{u_4}{u_1} \pdv{u_1}{x_3} = -u_{-2} = -x_1, \\
+\pdv{u_5}{x_3} &amp;= \pdv{u_5}{u_0} \pdv{u_0}{x_3} + \pdv{u_5}{u_3} \pdv{u_3}{x_3} = u_3 = \log(1 - x_1).
+\end{align*}\]
+
+<p>A third and final iteration yields the remaining \(\pdv{y_1}{x_3} = -x_1\) and \(\pdv{y_2}{x_3} = \log(1 - x_1)\).</p>
+
+<p>Before drawing any conclusions, let us work through the same example again. This time around, we will perform an outside first traversal of the chain rule.</p>
+
+<h3 id="the-reverse-accumulation-mode">The Reverse Accumulation Mode</h3>
+
+<p><strong>Iteration 1:</strong></p>
+
+\[\begin{align*}
+\pdv{y_1}{u_5} &amp;= 0, \\
+\pdv{y_1}{u_4} &amp;= 1, \\
+\pdv{y_1}{u_3} &amp;= \pdv{y_1}{u_5} \pdv{u_5}{u_3} = 0, \\
+\pdv{y_1}{u_2} &amp;= \pdv{y_1}{u_3} \pdv{u_3}{u_2} = 0, \\
+\pdv{y_1}{u_1} &amp;= \pdv{y_1}{u_4} \pdv{u_4}{u_1} = u_{-2} = x_1, \\
+\pdv{y_1}{u_0} &amp;= \pdv{y_1}{u_1} \pdv{u_1}{u_0} + \pdv{y_1}{u_5} \pdv{u_5}{u_0} = -u_{-2} = -x_1, \\
+\pdv{y_1}{u_{-1}} &amp;= \pdv{y_1}{u_1} \pdv{u_1}{u_{-1}} = u_{-2} = x_1, \\
+\pdv{y_1}{u_{-2}} &amp;= \pdv{y_1}{u_2} \pdv{u_2}{u_{-2}} + \pdv{y_1}{u_4} \pdv{u_4}{u_{-2}} = u_1 = x_2 - x_3.
+\end{align*}\]
+
+<p>Behold the power of backpropagation! Computing the partial derivative with respect to every intermediate variable once gives us \(\pdv{y_1}{x_1} = x_2 - x_3\), \(\pdv{y_1}{x_2} = x_1\), and \(\pdv{y_1}{x_3} = -x_1\).</p>
+
+<p><strong>Iteration 2:</strong></p>
+
+\[\begin{align*}
+\pdv{y_2}{u_5} &amp;= 1, \\
+\pdv{y_2}{u_4} &amp;= 0, \\
+\pdv{y_2}{u_3} &amp;= \pdv{y_2}{u_5} \pdv{u_5}{u_3} = u_0 = x_3, \\
+\pdv{y_2}{u_2} &amp;= \pdv{y_2}{u_3} \pdv{u_3}{u_2} = u_0 \frac{1}{u_2} = x_3 \frac{1}{1 - x_1}, \\
+\pdv{y_2}{u_1} &amp;= \pdv{y_2}{u_4} \pdv{u_4}{u_1} = 0, \\
+\pdv{y_2}{u_0} &amp;= \pdv{y_2}{u_1} \pdv{u_1}{u_0} + \pdv{y_2}{u_5} \pdv{u_5}{u_0} = u_3 = \log(1 - x_1), \\
+\pdv{y_2}{u_{-1}} &amp;= \pdv{y_2}{u_1} \pdv{u_1}{u_{-1}} = 0, \\
+\pdv{y_2}{u_{-2}} &amp;= \pdv{y_2}{u_2} \pdv{u_2}{u_{-2}} + \pdv{y_2}{u_4} \pdv{u_4}{u_{-2}} = -u_0 \frac{1}{u_2} = -\frac{x_3}{1 - x_1}.
+\end{align*}\]
+
+<p>A second and final iteration concludes with \(\pdv{y_2}{x_1} = -x_3 / (1 - x_1)\), \(\pdv{y_2}{x_2} = 0\), and \(\pdv{y_2}{x_3} = \log(1 - x_1)\). Do you start to recognize any patterns?</p>
+
+<h2 id="computational-complexity">Computational Complexity</h2>
+
+<p>Analyzing the pen-and-paper example, in the forward accumulation mode, we needed <em>three iterations</em> because we had <em>three independent variables</em>. On the other hand, in the reverse accumulation mode, we only needed <em>two iterations</em> because we had <em>two dependent variables</em>.</p>
+
+<p>As a matter of fact, we can generalize the comparison of computational complexity to a generic function \(f \colon \R^n \to \R^m\), where we would be able to draw the following conclusions:</p>
+
+<ol>
+  <li>In the forward accumulation mode, we would need \(n\) iterations to compute the partial derivatives of the \(m\) dependent variables with respect to the \(n\) independent variables.</li>
+  <li>In the reverse accumulation mode, we would need \(m\) iterations to compute the partial derivatives of the \(m\) dependent variables with respect to the \(n\) independent variables.</li>
+</ol>
+
+<p>In closing, deep learning models may very well have trainable parameters in the millions but always only one cost function; hence, we always work with problems where \(n \gg m = 1\), which is where backpropagation excels. Now, do you understand how backpropagation is able to reduce the time spent on computing gradients? 🏎</p>
+
+  </div><a class="u-url" href="/2021/10/12/forward-vs-reverse-accumulation-mode/" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="https://jonaslalin.com/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+        <ul class="contact-list">
+          <li class="p-name">Jonas Lalin</li>
+          <li><a class="u-email" href="mailto:"></a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <p>Yet another blog about deep learning.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li>
+  <a rel="me" href="https://github.com/jonaslalin" target="_blank" title="github">
+    <svg class="svg-icon grey">
+      <use xlink:href="/assets/minima-social-icons.svg#github"></use>
+    </svg>
+  </a>
+</li>
+<li>
+  <a rel="me" href="https://www.linkedin.com/in/jonaslalin/" target="_blank" title="linkedin">
+    <svg class="svg-icon grey">
+      <use xlink:href="/assets/minima-social-icons.svg#linkedin"></use>
+    </svg>
+  </a>
+</li>
+</ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

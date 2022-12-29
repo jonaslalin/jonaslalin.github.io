@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Feedforward Neural Networks in Depth, Part 3: Cost Functions | I, Deep Learning</title>
+<meta name="generator" content="Jekyll v4.3.1" />
+<meta property="og:title" content="Feedforward Neural Networks in Depth, Part 3: Cost Functions" />
+<meta name="author" content="Jonas Lalin" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="This post is the last of a three-part series in which we set out to derive the mathematics behind feedforward neural networks. In short, we covered forward and backward propagations in the first post, and we worked on activation functions in the second post. Moreover, we have not yet addressed cost functions and the backpropagation seed \(\pdv{J}{\vec{A}^{[L]}} = \pdv{J}{\vec{\hat{Y}}}\). It is time we do that." />
+<meta property="og:description" content="This post is the last of a three-part series in which we set out to derive the mathematics behind feedforward neural networks. In short, we covered forward and backward propagations in the first post, and we worked on activation functions in the second post. Moreover, we have not yet addressed cost functions and the backpropagation seed \(\pdv{J}{\vec{A}^{[L]}} = \pdv{J}{\vec{\hat{Y}}}\). It is time we do that." />
+<link rel="canonical" href="https://jonaslalin.com/2021/12/22/feedforward-neural-networks-part-3/" />
+<meta property="og:url" content="https://jonaslalin.com/2021/12/22/feedforward-neural-networks-part-3/" />
+<meta property="og:site_name" content="I, Deep Learning" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-12-22T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Feedforward Neural Networks in Depth, Part 3: Cost Functions" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Jonas Lalin"},"dateModified":"2021-12-22T00:00:00+00:00","datePublished":"2021-12-22T00:00:00+00:00","description":"This post is the last of a three-part series in which we set out to derive the mathematics behind feedforward neural networks. In short, we covered forward and backward propagations in the first post, and we worked on activation functions in the second post. Moreover, we have not yet addressed cost functions and the backpropagation seed \\(\\pdv{J}{\\vec{A}^{[L]}} = \\pdv{J}{\\vec{\\hat{Y}}}\\). It is time we do that.","headline":"Feedforward Neural Networks in Depth, Part 3: Cost Functions","mainEntityOfPage":{"@type":"WebPage","@id":"https://jonaslalin.com/2021/12/22/feedforward-neural-networks-part-3/"},"url":"https://jonaslalin.com/2021/12/22/feedforward-neural-networks-part-3/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://jonaslalin.com/feed.xml" title="I, Deep Learning" /><script async src="https://www.googletagmanager.com/gtag/js?id=G-XY9F18W0CY"></script>
+<script>
+  window['ga-disable-G-XY9F18W0CY'] = window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1";
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){window.dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-XY9F18W0CY');
+</script>
+<script>
+  MathJax = {
+    loader: {
+      load: [
+        '[tex]/mathtools'
+      ]
+    },
+    svg: {
+      fontCache: 'global'
+    },
+    tex: {
+      macros: {
+        bernoulli: '\\operatorname{Bernoulli}',
+        broadcast: '\\operatorname{broadcast}',
+        ddv: ['\\displaystyle \\dv{#1}{#2}', 2],
+        dpdv: ['\\displaystyle \\pdv{#1}{#2}', 2],
+        dv: [
+          '\\mathchoice'
+          + '{\\frac{\\mathrm{d} #1}{\\mathrm{d} #2}}'
+          + '{\\mathrm{d} #1 / \\mathrm{d} #2}'
+          + '{\\mathrm{d} #1 / \\mathrm{d} #2}'
+          + '{\\mathrm{d} #1 / \\mathrm{d} #2}',
+          2
+        ],
+        J: '\\mathcal{J}',
+        jj: '\\tilde{\\jmath}',
+        pdv: [
+          '\\mathchoice'
+          + '{\\frac{\\partial #1}{\\partial #2}}'
+          + '{\\partial #1 / \\partial #2}'
+          + '{\\partial #1 / \\partial #2}'
+          + '{\\partial #1 / \\partial #2}',
+          2
+        ],
+        peq: '\\mathrel{\\phantom{=}}',
+        pplus: '\\mathbin{\\phantom{+}}',
+        R: '\\mathbb{R}',
+        T: '\\intercal',
+        vec: ['\\mathbf{#1}', 1]
+      },
+      packages: {
+        '[+]': [
+          'mathtools'
+        ]
+      },
+      tags: 'ams'
+    }
+  };
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">I, Deep Learning</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Feedforward Neural Networks in Depth, Part 3: Cost Functions</h1>
+    <p class="post-meta"><time class="dt-published" datetime="2021-12-22T00:00:00+00:00" itemprop="datePublished">
+        Dec 22, 2021
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>This post is the last of a three-part series in which we set out to derive the mathematics behind feedforward neural networks. In short, we covered forward and backward propagations in <a href="/2021/12/10/feedforward-neural-networks-part-1/" target="_blank">the first post</a>, and we worked on activation functions in <a href="/2021/12/21/feedforward-neural-networks-part-2/" target="_blank">the second post</a>. Moreover, we have not yet addressed cost functions and the backpropagation seed \(\pdv{J}{\vec{A}^{[L]}} = \pdv{J}{\vec{\hat{Y}}}\). It is time we do that.</p>
+
+<h2 id="binary-classification">Binary Classification</h2>
+
+<p>In binary classification, the cost function is given by</p>
+
+\[\begin{equation*}
+\begin{split}
+J &amp;= f(\vec{\hat{Y}}, \vec{Y}) = f(\vec{A}^{[L]}, \vec{Y}) \\
+&amp;= -\frac{1}{m} \sum_i (y_i \log(\hat{y}_i) + (1 - y_i) \log(1 - \hat{y}_i)) \\
+&amp;= -\frac{1}{m} \sum_i (y_i \log(a_i^{[L]}) + (1 - y_i) \log(1 - a_i^{[L]})),
+\end{split}
+\end{equation*}\]
+
+<p>which we can write as</p>
+
+\[\begin{equation}
+J = -\frac{1}{m} \underbrace{\sum_{\text{axis} = 1} (\vec{Y} \odot \log(\vec{A}^{[L]}) + (1 - \vec{Y}) \odot \log(1 - \vec{A}^{[L]}))}_\text{scalar}.
+\end{equation}\]
+
+<p>Next, we construct a computation graph:</p>
+
+\[\begin{align*}
+u_{0, i} &amp;= a_i^{[L]}, \\
+u_{1, i} &amp;= 1 - u_{0, i}, \\
+u_{2, i} &amp;= \log(u_{0, i}), \\
+u_{3, i} &amp;= \log(u_{1, i}), \\
+u_{4, i} &amp;= y_i u_{2, i} + (1 - y_i) u_{3, i}, \\
+u_5 &amp;= -\frac{1}{m} \sum_i u_{4, i} = J.
+\end{align*}\]
+
+<p>Derivative computations are now as simple as they get:</p>
+
+\[\begin{align*}
+\pdv{J}{u_5} &amp;= 1, \\
+\pdv{J}{u_{4, i}} &amp;= \pdv{J}{u_5} \pdv{u_5}{u_{4, i}} = -\frac{1}{m}, \\
+\pdv{J}{u_{3, i}} &amp;= \pdv{J}{u_{4, i}} \pdv{u_{4, i}}{u_{3, i}} = -\frac{1}{m} (1 - y_i), \\
+\pdv{J}{u_{2, i}} &amp;= \pdv{J}{u_{4, i}} \pdv{u_{4, i}}{u_{2, i}} = -\frac{1}{m} y_i, \\
+\pdv{J}{u_{1, i}} &amp;= \pdv{J}{u_{3, i}} \pdv{u_{3, i}}{u_{1, i}} = -\frac{1}{m} (1 - y_i) \frac{1}{u_{1, i}} = -\frac{1}{m} \frac{1 - y_i}{1 - a_i^{[L]}}, \\
+\pdv{J}{u_{0, i}} &amp;= \pdv{J}{u_{1, i}} \pdv{u_{1, i}}{u_{0, i}} + \pdv{J}{u_{2, i}} \pdv{u_{2, i}}{u_{0, i}} \\
+&amp;= \frac{1}{m} (1 - y_i) \frac{1}{u_{1, i}} - \frac{1}{m} y_i \frac{1}{u_{0, i}} \notag \\
+&amp;= \frac{1}{m} \Bigl(\frac{1 - y_i}{1 - a_i^{[L]}} - \frac{y_i}{a_i^{[L]}}\Bigr). \notag
+\end{align*}\]
+
+<p>Thus,</p>
+
+\[\begin{equation*}
+\pdv{J}{a_i^{[L]}} = \frac{1}{m} \Bigl(\frac{1 - y_i}{1 - a_i^{[L]}} - \frac{y_i}{a_i^{[L]}}\Bigr),
+\end{equation*}\]
+
+<p>which implies that</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{A}^{[L]}} = \frac{1}{m} \Bigl(\frac{1}{1 - \vec{A}^{[L]}} \odot (1 - \vec{Y}) - \frac{1}{\vec{A}^{[L]}} \odot \vec{Y}\Bigr).
+\end{equation}\]
+
+<p>In addition, since the sigmoid activation function is used in the output layer, we get</p>
+
+\[\begin{equation*}
+\begin{split}
+\pdv{J}{z_i^{[L]}} &amp;= \pdv{J}{a_i^{[L]}} a_i^{[L]} (1 - a_i^{[L]}) \\
+&amp;= \frac{1}{m} \Bigl(\frac{1 - y_i}{1 - a_i^{[L]}} - \frac{y_i}{a_i^{[L]}}\Bigr) a_i^{[L]} (1 - a_i^{[L]}) \\
+&amp;= \frac{1}{m} ((1 - y_i) a_i^{[L]} - y_i (1 - a_i^{[L]})) \\
+&amp;= \frac{1}{m} (a_i^{[L]} - y_i).
+\end{split}
+\end{equation*}\]
+
+<p>In other words,</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{Z}^{[L]}} = \frac{1}{m} (\vec{A}^{[L]} - \vec{Y}).
+\end{equation}\]
+
+<p>Note that both \(\pdv{J}{\vec{Z}^{[L]}} \in \R^{1 \times m}\) and \(\pdv{J}{\vec{A}^{[L]}} \in \R^{1 \times m}\), because \(n^{[L]} = 1\) in this case.</p>
+
+<h2 id="multiclass-classification">Multiclass Classification</h2>
+
+<p>In multiclass classification, the cost function is instead given by</p>
+
+\[\begin{equation*}
+\begin{split}
+J &amp;= f(\vec{\hat{Y}}, \vec{Y}) = f(\vec{A}^{[L]}, \vec{Y}) \\
+&amp;= -\frac{1}{m} \sum_i \sum_j y_{j, i} \log(\hat{y}_{j, i}) \\
+&amp;= -\frac{1}{m} \sum_i \sum_j y_{j, i} \log(a_{j, i}^{[L]}),
+\end{split}
+\end{equation*}\]
+
+<p>where \(j = 1, \dots, n^{[L]}\).</p>
+
+<p>We can vectorize the cost expression:</p>
+
+\[\begin{equation}
+J = -\frac{1}{m} \underbrace{\sum_{\substack{\text{axis} = 0 \\ \text{axis} = 1}} \vec{Y} \odot \log(\vec{A}^{[L]})}_\text{scalar}.
+\end{equation}\]
+
+<p>Next, let us introduce intermediate variables:</p>
+
+\[\begin{align*}
+u_{0, j, i} &amp;= a_{j, i}^{[L]}, \\
+u_{1, j, i} &amp;= \log(u_{0, j, i}), \\
+u_{2, j, i} &amp;= y_{j, i} u_{1, j, i}, \\
+u_{3, i} &amp;= \sum_j u_{2, j, i}, \\
+u_4 &amp;= -\frac{1}{m} \sum_i u_{3, i} = J.
+\end{align*}\]
+
+<p>With the computation graph in place, we can perform backward propagation:</p>
+
+\[\begin{align*}
+\pdv{J}{u_4} &amp;= 1, \\
+\pdv{J}{u_{3, i}} &amp;= \pdv{J}{u_4} \pdv{u_4}{u_{3, i}} = -\frac{1}{m}, \\
+\pdv{J}{u_{2, j, i}} &amp;= \pdv{J}{u_{3, i}} \pdv{u_{3, i}}{u_{2, j, i}} = -\frac{1}{m}, \\
+\pdv{J}{u_{1, j, i}} &amp;= \pdv{J}{u_{2, j, i}} \pdv{u_{2, j, i}}{u_{1, j, i}} = -\frac{1}{m} y_{j, i}, \\
+\pdv{J}{u_{0, j, i}} &amp;= \pdv{J}{u_{1, j, i}} \pdv{u_{1, j, i}}{u_{0, j, i}} = -\frac{1}{m} y_{j, i} \frac{1}{u_{0, j, i}} = -\frac{1}{m} \frac{y_{j, i}}{a_{j, i}^{[L]}}.
+\end{align*}\]
+
+<p>Hence,</p>
+
+\[\begin{equation*}
+\pdv{J}{a_{j, i}^{[L]}} = -\frac{1}{m} \frac{y_{j, i}}{a_{j, i}^{[L]}}.
+\end{equation*}\]
+
+<p>Vectorization is trivial:</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{A}^{[L]}} = -\frac{1}{m} \frac{1}{\vec{A}^{[L]}} \odot \vec{Y}.
+\end{equation}\]
+
+<p>Furthermore, since the output layer uses the softmax activation function, we get</p>
+
+\[\begin{equation*}
+\begin{split}
+\pdv{J}{z_{j, i}^{[L]}} &amp;= a_{j, i}^{[L]} \Bigl(\pdv{J}{a_{j, i}^{[L]}} - \sum_p \pdv{J}{a_{p, i}^{[L]}} a_{p, i}^{[L]}\Bigr) \\
+&amp;= a_{j, i}^{[L]} \Bigl(-\frac{1}{m} \frac{y_{j, i}}{a_{j, i}^{[L]}} + \sum_p \frac{1}{m} \frac{y_{p, i}}{a_{p, i}^{[L]}} a_{p, i}^{[L]}\Bigr) \\
+&amp;= \frac{1}{m} \Bigl(-y_{j, i} + a_{j, i}^{[L]} \underbrace{\sum_p y_{p, i}}_{\mathclap{\sum \text{probabilities} = 1}}\Bigr) \\
+&amp;= \frac{1}{m} (a_{j, i}^{[L]} - y_{j, i}).
+\end{split}
+\end{equation*}\]
+
+<p>Note that \(p = 1, \dots, n^{[L]}\).</p>
+
+<p>To conclude,</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{Z}^{[L]}} = \frac{1}{m} (\vec{A}^{[L]} - \vec{Y}).
+\end{equation}\]
+
+<h2 id="multi-label-classification">Multi-Label Classification</h2>
+
+<p>We can view multi-label classification as \(j\) binary classification problems:</p>
+
+\[\begin{equation*}
+\begin{split}
+J &amp;= f(\vec{\hat{Y}}, \vec{Y}) = f(\vec{A}^{[L]}, \vec{Y}) \\
+&amp;= \sum_j \Bigl(-\frac{1}{m} \sum_i (y_{j, i} \log(\hat{y}_{j, i}) + (1 - y_{j, i}) \log(1 - \hat{y}_{j, i}))\Bigr) \\
+&amp;= \sum_j \Bigl(-\frac{1}{m} \sum_i (y_{j, i} \log(a_{j, i}^{[L]}) + (1 - y_{j, i}) \log(1 - a_{j, i}^{[L]}))\Bigr),
+\end{split}
+\end{equation*}\]
+
+<p>where once again \(j = 1, \dots, n^{[L]}\).</p>
+
+<p>Vectorization gives</p>
+
+\[\begin{equation}
+J = -\frac{1}{m} \underbrace{\sum_{\substack{\text{axis} = 1 \\ \text{axis} = 0}} (\vec{Y} \odot \log(\vec{A}^{[L]}) + (1 - \vec{Y}) \odot \log(1 - \vec{A}^{[L]}))}_\text{scalar}.
+\end{equation}\]
+
+<p>It is no coincidence that the following computation graph resembles the one we constructed for binary classification:</p>
+
+\[\begin{align*}
+u_{0, j, i} &amp;= a_{j, i}^{[L]}, \\
+u_{1, j, i} &amp;= 1 - u_{0, j, i}, \\
+u_{2, j, i} &amp;= \log(u_{0, j, i}), \\
+u_{3, j, i} &amp;= \log(u_{1, j, i}), \\
+u_{4, j, i} &amp;= y_{j, i} u_{2, j, i} + (1 - y_{j, i}) u_{3, j, i}, \\
+u_{5, j} &amp;= -\frac{1}{m} \sum_i u_{4, j, i}, \\
+u_6 &amp;= \sum_j u_{5, j} = J.
+\end{align*}\]
+
+<p>Next, we compute the partial derivatives:</p>
+
+\[\begin{align*}
+\pdv{J}{u_6} &amp;= 1, \\
+\pdv{J}{u_{5, j}} &amp;= \pdv{J}{u_6} \pdv{u_6}{u_{5, j}} = 1, \\
+\pdv{J}{u_{4, j, i}} &amp;= \pdv{J}{u_{5, j}} \pdv{u_{5, j}}{u_{4, j, i}} = -\frac{1}{m}, \\
+\pdv{J}{u_{3, j, i}} &amp;= \pdv{J}{u_{4, j, i}} \pdv{u_{4, j, i}}{u_{3, j, i}} = -\frac{1}{m} (1 - y_{j, i}), \\
+\pdv{J}{u_{2, j, i}} &amp;= \pdv{J}{u_{4, j, i}} \pdv{u_{4, j, i}}{u_{2, j, i}} = -\frac{1}{m} y_{j, i}, \\
+\pdv{J}{u_{1, j, i}} &amp;= \pdv{J}{u_{3, j, i}} \pdv{u_{3, j, i}}{u_{1, j, i}} = -\frac{1}{m} (1 - y_{j, i}) \frac{1}{u_{1, j, i}} = -\frac{1}{m} \frac{1 - y_{j, i}}{1 - a_{j, i}^{[L]}}, \\
+\pdv{J}{u_{0, j, i}} &amp;= \pdv{J}{u_{1, j, i}} \pdv{u_{1, j, i}}{u_{0, j, i}} + \pdv{J}{u_{2, j, i}} \pdv{u_{2, j, i}}{u_{0, j, i}} \\
+&amp;= \frac{1}{m} (1 - y_{j, i}) \frac{1}{u_{1, j, i}} - \frac{1}{m} y_{j, i} \frac{1}{u_{0, j, i}} \notag \\
+&amp;= \frac{1}{m} \Bigl(\frac{1 - y_{j, i}}{1 - a_{j, i}^{[L]}} - \frac{y_{j, i}}{a_{j, i}^{[L]}}\Bigr). \notag
+\end{align*}\]
+
+<p>Simply put, we have</p>
+
+\[\begin{equation*}
+\pdv{J}{a_{j, i}^{[L]}} = \frac{1}{m} \Bigl(\frac{1 - y_{j, i}}{1 - a_{j, i}^{[L]}} - \frac{y_{j, i}}{a_{j, i}^{[L]}}\Bigr),
+\end{equation*}\]
+
+<p>and</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{A}^{[L]}} = \frac{1}{m} \Bigl(\frac{1}{1 - \vec{A}^{[L]}} \odot (1 - \vec{Y}) - \frac{1}{\vec{A}^{[L]}} \odot \vec{Y}\Bigr).
+\end{equation}\]
+
+<p>Bearing in mind that we view multi-label classification as \(j\) binary classification problems, we also know that the output layer uses the sigmoid activation function. As a result,</p>
+
+\[\begin{equation*}
+\begin{split}
+\pdv{J}{z_{j, i}^{[L]}} &amp;= \pdv{J}{a_{j, i}^{[L]}} a_{j, i}^{[L]} (1 - a_{j, i}^{[L]}) \\
+&amp;= \frac{1}{m} \Bigl(\frac{1 - y_{j, i}}{1 - a_{j, i}^{[L]}} - \frac{y_{j, i}}{a_{j, i}^{[L]}}\Bigr) a_{j, i}^{[L]} (1 - a_{j, i}^{[L]}) \\
+&amp;= \frac{1}{m} ((1 - y_{j, i}) a_{j, i}^{[L]} - y_{j, i} (1 - a_{j, i}^{[L]})) \\
+&amp;= \frac{1}{m} (a_{j, i}^{[L]} - y_{j, i}),
+\end{split}
+\end{equation*}\]
+
+<p>which we can vectorize as</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{Z}^{[L]}} = \frac{1}{m} (\vec{A}^{[L]} - \vec{Y}).
+\end{equation}\]
+
+  </div><a class="u-url" href="/2021/12/22/feedforward-neural-networks-part-3/" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="https://jonaslalin.com/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+        <ul class="contact-list">
+          <li class="p-name">Jonas Lalin</li>
+          <li><a class="u-email" href="mailto:"></a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <p>Yet another blog about deep learning.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li>
+  <a rel="me" href="https://github.com/jonaslalin" target="_blank" title="github">
+    <svg class="svg-icon grey">
+      <use xlink:href="/assets/minima-social-icons.svg#github"></use>
+    </svg>
+  </a>
+</li>
+<li>
+  <a rel="me" href="https://www.linkedin.com/in/jonaslalin/" target="_blank" title="linkedin">
+    <svg class="svg-icon grey">
+      <use xlink:href="/assets/minima-social-icons.svg#linkedin"></use>
+    </svg>
+  </a>
+</li>
+</ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

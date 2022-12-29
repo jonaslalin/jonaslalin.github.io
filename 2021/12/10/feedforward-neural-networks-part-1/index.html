@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Feedforward Neural Networks in Depth, Part 1: Forward and Backward Propagations | I, Deep Learning</title>
+<meta name="generator" content="Jekyll v4.3.1" />
+<meta property="og:title" content="Feedforward Neural Networks in Depth, Part 1: Forward and Backward Propagations" />
+<meta name="author" content="Jonas Lalin" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="This post is the first of a three-part series in which we set out to derive the mathematics behind feedforward neural networks. They have" />
+<meta property="og:description" content="This post is the first of a three-part series in which we set out to derive the mathematics behind feedforward neural networks. They have" />
+<link rel="canonical" href="https://jonaslalin.com/2021/12/10/feedforward-neural-networks-part-1/" />
+<meta property="og:url" content="https://jonaslalin.com/2021/12/10/feedforward-neural-networks-part-1/" />
+<meta property="og:site_name" content="I, Deep Learning" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-12-10T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Feedforward Neural Networks in Depth, Part 1: Forward and Backward Propagations" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Jonas Lalin"},"dateModified":"2021-12-10T00:00:00+00:00","datePublished":"2021-12-10T00:00:00+00:00","description":"This post is the first of a three-part series in which we set out to derive the mathematics behind feedforward neural networks. They have","headline":"Feedforward Neural Networks in Depth, Part 1: Forward and Backward Propagations","mainEntityOfPage":{"@type":"WebPage","@id":"https://jonaslalin.com/2021/12/10/feedforward-neural-networks-part-1/"},"url":"https://jonaslalin.com/2021/12/10/feedforward-neural-networks-part-1/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://jonaslalin.com/feed.xml" title="I, Deep Learning" /><script async src="https://www.googletagmanager.com/gtag/js?id=G-XY9F18W0CY"></script>
+<script>
+  window['ga-disable-G-XY9F18W0CY'] = window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1";
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){window.dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-XY9F18W0CY');
+</script>
+<script>
+  MathJax = {
+    loader: {
+      load: [
+        '[tex]/mathtools'
+      ]
+    },
+    svg: {
+      fontCache: 'global'
+    },
+    tex: {
+      macros: {
+        bernoulli: '\\operatorname{Bernoulli}',
+        broadcast: '\\operatorname{broadcast}',
+        ddv: ['\\displaystyle \\dv{#1}{#2}', 2],
+        dpdv: ['\\displaystyle \\pdv{#1}{#2}', 2],
+        dv: [
+          '\\mathchoice'
+          + '{\\frac{\\mathrm{d} #1}{\\mathrm{d} #2}}'
+          + '{\\mathrm{d} #1 / \\mathrm{d} #2}'
+          + '{\\mathrm{d} #1 / \\mathrm{d} #2}'
+          + '{\\mathrm{d} #1 / \\mathrm{d} #2}',
+          2
+        ],
+        J: '\\mathcal{J}',
+        jj: '\\tilde{\\jmath}',
+        pdv: [
+          '\\mathchoice'
+          + '{\\frac{\\partial #1}{\\partial #2}}'
+          + '{\\partial #1 / \\partial #2}'
+          + '{\\partial #1 / \\partial #2}'
+          + '{\\partial #1 / \\partial #2}',
+          2
+        ],
+        peq: '\\mathrel{\\phantom{=}}',
+        pplus: '\\mathbin{\\phantom{+}}',
+        R: '\\mathbb{R}',
+        T: '\\intercal',
+        vec: ['\\mathbf{#1}', 1]
+      },
+      packages: {
+        '[+]': [
+          'mathtools'
+        ]
+      },
+      tags: 'ams'
+    }
+  };
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">I, Deep Learning</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Feedforward Neural Networks in Depth, Part 1: Forward and Backward Propagations</h1>
+    <p class="post-meta"><time class="dt-published" datetime="2021-12-10T00:00:00+00:00" itemprop="datePublished">
+        Dec 10, 2021
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>This post is the first of a three-part series in which we set out to derive the mathematics behind feedforward neural networks. They have</p>
+
+<ul>
+  <li>an input and an output layer with at least one hidden layer in between,</li>
+  <li>fully-connected layers, which means that each node in one layer connects to every node in the following layer, and</li>
+  <li>ways to introduce nonlinearity by means of activation functions.</li>
+</ul>
+
+<p>We start with forward propagation, which involves computing predictions and the associated cost of these predictions.</p>
+
+<h2 id="forward-propagation">Forward Propagation</h2>
+
+<p>Settling on what notations to use is tricky since we only have so many letters in the Roman alphabet. As you browse the Internet, you will likely find derivations that have used different notations than the ones we are about to introduce. However, and fortunately, there is no right or wrong here; it is just a matter of taste. In particular, the notations used in this series take inspiration from Andrew Ng’s <a href="/assets/deep-learning-notation.pdf" target="_blank">Standard notations for Deep Learning</a>. If you make a comparison, you will find that we only change a couple of the details.</p>
+
+<p>Now, whatever we come up with, we have to support</p>
+
+<ul>
+  <li>multiple layers,</li>
+  <li>several nodes in each layer,</li>
+  <li>various activation functions,</li>
+  <li>various types of cost functions, and</li>
+  <li>mini-batches of training examples.</li>
+</ul>
+
+<p>As a result, our definition of a node ends up introducing a fairly large number of notations:</p>
+
+\[\begin{align}
+z_{j, i}^{[l]} &amp;= \sum_k w_{j, k}^{[l]} a_{k, i}^{[l - 1]} + b_j^{[l]}, \label{eq:z_scalar} \\
+a_{j, i}^{[l]} &amp;= g_j^{[l]}(z_{1, i}^{[l]}, \dots, z_{j, i}^{[l]}, \dots, z_{n^{[l]}, i}^{[l]}). \label{eq:a_scalar}
+\end{align}\]
+
+<p>Does the node definition look intimidating to you at first glance? Do not worry. Hopefully, it will make more sense once we have explained the notations, which we shall do next:</p>
+
+<div class="overflow-wrapper">
+  <table>
+    <thead>
+      <tr>
+        <th>Entity</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>\(l\)</td>
+        <td>The current layer \(l = 1, \dots, L\), where \(L\) is the number of layers that have weights and biases. We use \(l = 0\) and \(l = L\) to denote the input and output layers.</td>
+      </tr>
+      <tr>
+        <td>\(n^{[l]}\)</td>
+        <td>The number of nodes in the current layer.</td>
+      </tr>
+      <tr>
+        <td>\(n^{[l - 1]}\)</td>
+        <td>The number of nodes in the previous layer.</td>
+      </tr>
+      <tr>
+        <td>\(j\)</td>
+        <td>The \(j\)th node of the current layer, \(j = 1, \dots, n^{[l]}\).</td>
+      </tr>
+      <tr>
+        <td>\(k\)</td>
+        <td>The \(k\)th node of the previous layer, \(k = 1, \dots, n^{[l - 1]}\).</td>
+      </tr>
+      <tr>
+        <td>\(i\)</td>
+        <td>The current training example \(i = 1, \dots, m\), where \(m\) is the number of training examples.</td>
+      </tr>
+      <tr>
+        <td>\(z_{j, i}^{[l]}\)</td>
+        <td>A weighted sum of the activations of the previous layer, shifted by a bias.</td>
+      </tr>
+      <tr>
+        <td>\(w_{j, k}^{[l]}\)</td>
+        <td>A weight that scales the \(k\)th activation of the previous layer.</td>
+      </tr>
+      <tr>
+        <td>\(b_j^{[l]}\)</td>
+        <td>A bias in the current layer.</td>
+      </tr>
+      <tr>
+        <td>\(a_{j, i}^{[l]}\)</td>
+        <td>An activation in the current layer.</td>
+      </tr>
+      <tr>
+        <td>\(a_{k, i}^{[l - 1]}\)</td>
+        <td>An activation in the previous layer.</td>
+      </tr>
+      <tr>
+        <td>\(g_j^{[l]}\)</td>
+        <td>An activation function \(g_j^{[l]} \colon \R^{n^{[l]}} \to \R\) used in the current layer.</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<p>To put it concisely, a node in the current layer depends on every node in the previous layer, and the following visualization can help us see that more clearly:</p>
+
+<figure class="overflow-wrapper">
+  <svg id="nn-node-current-layer" class="nn" width="480" height="360" viewBox="240 0 480 360"></svg>
+  <figcaption>Figure 1: A node in the current layer.</figcaption>
+</figure>
+
+<p>Moreover, a node in the previous layer affects every node in the current layer, and with a change in highlighting, we will also be able to see that more clearly:</p>
+
+<figure class="overflow-wrapper">
+  <svg id="nn-node-previous-layer" class="nn" width="480" height="360" viewBox="240 0 480 360"></svg>
+  <figcaption>Figure 2: A node in the previous layer.</figcaption>
+</figure>
+
+<p>In the future, we might want to write an implement from scratch in, for example, Python. To take advantage of the heavily optimized versions of vector and matrix operations that come bundled with libraries such as NumPy, we need to vectorize \(\eqref{eq:z_scalar}\) and \(\eqref{eq:a_scalar}\).</p>
+
+<p>To begin with, we vectorize the nodes:</p>
+
+\[\begin{align*}
+\begin{bmatrix}
+z_{1, i}^{[l]} \\
+\vdots \\
+z_{j, i}^{[l]} \\
+\vdots \\
+z_{n^{[l]}, i}^{[l]}
+\end{bmatrix} &amp;=
+\begin{bmatrix}
+w_{1, 1}^{[l]} &amp; \dots &amp; w_{1, k}^{[l]} &amp; \dots &amp; w_{1, n^{[l - 1]}}^{[l]} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+w_{j, 1}^{[l]} &amp; \dots &amp; w_{j, k}^{[l]} &amp; \dots &amp; w_{j, n^{[l - 1]}}^{[l]} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+w_{n^{[l]}, 1}^{[l]} &amp; \dots &amp; w_{n^{[l]}, k}^{[l]} &amp; \dots &amp; w_{n^{[l]}, n^{[l - 1]}}^{[l]}
+\end{bmatrix}
+\begin{bmatrix}
+a_{1, i}^{[l - 1]} \\
+\vdots \\
+a_{k, i}^{[l - 1]} \\
+\vdots \\
+a_{n^{[l - 1]}, i}^{[l - 1]}
+\end{bmatrix} +
+\begin{bmatrix}
+b_1^{[l]} \\
+\vdots \\
+b_j^{[l]} \\
+\vdots \\
+b_{n^{[l]}}^{[l]}
+\end{bmatrix}, \\
+\begin{bmatrix}
+a_{1, i}^{[l]} \\
+\vdots \\
+a_{j, i}^{[l]} \\
+\vdots \\
+a_{n^{[l]}, i}^{[l]}
+\end{bmatrix} &amp;=
+\begin{bmatrix}
+g_1^{[l]}(z_{1, i}^{[l]}, \dots, z_{j, i}^{[l]}, \dots, z_{n^{[l]}, i}^{[l]}) \\
+\vdots \\
+g_j^{[l]}(z_{1, i}^{[l]}, \dots, z_{j, i}^{[l]}, \dots, z_{n^{[l]}, i}^{[l]}) \\
+\vdots \\
+g_{n^{[l]}}^{[l]}(z_{1, i}^{[l]}, \dots, z_{j, i}^{[l]}, \dots, z_{n^{[l]}, i}^{[l]}) \\
+\end{bmatrix},
+\end{align*}\]
+
+<p>which we can write as</p>
+
+\[\begin{align}
+\vec{z}_{:, i}^{[l]} &amp;= \vec{W}^{[l]} \vec{a}_{:, i}^{[l - 1]} + \vec{b}^{[l]}, \label{eq:z} \\
+\vec{a}_{:, i}^{[l]} &amp;= \vec{g}^{[l]}(\vec{z}_{:, i}^{[l]}), \label{eq:a}
+\end{align}\]
+
+<p>where \(\vec{z}_{:, i}^{[l]} \in \R^{n^{[l]}}\), \(\vec{W}^{[l]} \in \R^{n^{[l]} \times n^{[l - 1]}}\), \(\vec{b}^{[l]} \in \R^{n^{[l]}}\), \(\vec{a}_{:, i}^{[l]} \in \R^{n^{[l]}}\), \(\vec{a}_{:, i}^{[l - 1]} \in \R^{n^{[l - 1]}}\), and lastly, \(\vec{g}^{[l]} \colon \R^{n^{[l]}} \to \R^{n^{[l]}}\). We have used a colon to clarify that \(\vec{z}_{:, i}^{[l]}\) is the \(i\)th column of \(\vec{Z}^{[l]}\), and so on.</p>
+
+<p>Next, we vectorize the training examples:</p>
+
+\[\begin{align}
+\vec{Z}^{[l]} &amp;=
+\begin{bmatrix}
+\vec{z}_{:, 1}^{[l]} &amp; \dots &amp; \vec{z}_{:, i}^{[l]} &amp; \dots &amp; \vec{z}_{:, m}^{[l]}
+\end{bmatrix} \label{eq:Z} \\
+&amp;= \vec{W}^{[l]}
+\begin{bmatrix}
+\vec{a}_{:, 1}^{[l - 1]} &amp; \dots &amp; \vec{a}_{:, i}^{[l - 1]} &amp; \dots &amp; \vec{a}_{:, m}^{[l - 1]}
+\end{bmatrix} +
+\begin{bmatrix}
+\vec{b}^{[l]} &amp; \dots &amp; \vec{b}^{[l]} &amp; \dots &amp; \vec{b}^{[l]}
+\end{bmatrix} \notag \\
+&amp;= \vec{W}^{[l]} \vec{A}^{[l - 1]} + \broadcast(\vec{b}^{[l]}), \notag \\
+\vec{A}^{[l]} &amp;=
+\begin{bmatrix}
+\vec{a}_{:, 1}^{[l]} &amp; \dots &amp; \vec{a}_{:, i}^{[l]} &amp; \dots &amp; \vec{a}_{:, m}^{[l]}
+\end{bmatrix}, \label{eq:A}
+\end{align}\]
+
+<p>where \(\vec{Z}^{[l]} \in \R^{n^{[l]} \times m}\), \(\vec{A}^{[l]} \in \R^{n^{[l]} \times m}\), and \(\vec{A}^{[l - 1]} \in \R^{n^{[l - 1]} \times m}\). In addition, have a look at <a href="https://numpy.org/doc/stable/user/basics.broadcasting.html" target="_blank">the NumPy documentation</a> if you want to read a well-written explanation of broadcasting.</p>
+
+<p>We would also like to establish two additional notations:</p>
+
+\[\begin{align}
+\vec{A}^{[0]} &amp;= \vec{X}, \label{eq:A_zero} \\
+\vec{A}^{[L]} &amp;= \vec{\hat{Y}}, \label{eq:A_L}
+\end{align}\]
+
+<p>where \(\vec{X} \in \R^{n^{[0]} \times m}\) denotes the inputs and \(\vec{\hat{Y}} \in \R^{n^{[L]} \times m}\) denotes the predictions/outputs.</p>
+
+<p>Finally, we are ready to define the cost function:</p>
+
+\[\begin{equation}
+J = f(\vec{\hat{Y}}, \vec{Y}) = f(\vec{A}^{[L]}, \vec{Y}), \label{eq:J}
+\end{equation}\]
+
+<p>where \(\vec{Y} \in \R^{n^{[L]} \times m}\) denotes the targets and \(f \colon \R^{2 n^{[L]}} \to \R\) can be tailored to our needs.</p>
+
+<p>We are done with forward propagation! Next up: backward propagation, also known as backpropagation, which involves computing the gradient of the cost function with respect to the weights and biases.</p>
+
+<h2 id="backward-propagation">Backward Propagation</h2>
+
+<p>We will make heavy use of the chain rule in this section, and to understand better how it works, we first apply the chain rule to the following example:</p>
+
+\[\begin{align}
+u_i &amp;= g_i(x_1, \dots, x_j, \dots, x_n), \label{eq:example_u_scalar} \\
+y_k &amp;= f_k(u_1, \dots, u_i, \dots, u_m). \label{eq:example_y_scalar}
+\end{align}\]
+
+<p>Note that \(x_j\) may affect \(u_1, \dots, u_i, \dots, u_m\), and \(y_k\) may depend on \(u_1, \dots, u_i, \dots, u_m\); thus,</p>
+
+\[\begin{equation}
+\pdv{y_k}{x_j} = \sum_i \pdv{y_k}{u_i} \pdv{u_i}{x_j}. \label{eq:chain_rule}
+\end{equation}\]
+
+<p>Great! If we ever get stuck trying to compute or understand some partial derivative, we can always go back to \(\eqref{eq:example_u_scalar}\), \(\eqref{eq:example_y_scalar}\), and \(\eqref{eq:chain_rule}\). Hopefully, these equations will provide the clues necessary to move forward. However, be extra careful not to confuse the notation used for the chain rule example with the notation we use elsewhere in this series. The overlap is unintentional.</p>
+
+<p>Now, let us concentrate on the task at hand:</p>
+
+\[\begin{align}
+\pdv{J}{w_{j, k}^{[l]}} &amp;= \sum_i \pdv{J}{z_{j, i}^{[l]}} \pdv{z_{j, i}^{[l]}}{w_{j, k}^{[l]}} = \sum_i \pdv{J}{z_{j, i}^{[l]}} a_{k, i}^{[l - 1]}, \label{eq:dw_scalar} \\
+\pdv{J}{b_j^{[l]}} &amp;= \sum_i \pdv{J}{z_{j, i}^{[l]}} \pdv{z_{j, i}^{[l]}}{b_j^{[l]}} = \sum_i \pdv{J}{z_{j, i}^{[l]}}. \label{eq:db_scalar}
+\end{align}\]
+
+<p>Vectorization results in</p>
+
+\[\begin{align*}
+&amp;
+\begin{bmatrix}
+\dpdv{J}{w_{1, 1}^{[l]}} &amp; \dots &amp; \dpdv{J}{w_{1, k}^{[l]}} &amp; \dots &amp; \dpdv{J}{w_{1, n^{[l - 1]}}^{[l]}} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+\dpdv{J}{w_{j, 1}^{[l]}} &amp; \dots &amp; \dpdv{J}{w_{j, k}^{[l]}} &amp; \dots &amp; \dpdv{J}{w_{j, n^{[l - 1]}}^{[l]}} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+\dpdv{J}{w_{n^{[l]}, 1}^{[l]}} &amp; \dots &amp; \dpdv{J}{w_{n^{[l]}, k}^{[l]}} &amp; \dots &amp; \dpdv{J}{w_{n^{[l]}, n^{[l - 1]}}^{[l]}}
+\end{bmatrix} \\
+&amp;=
+\begin{bmatrix}
+\dpdv{J}{z_{1, 1}^{[l]}} &amp; \dots &amp; \dpdv{J}{z_{1, i}^{[l]}} &amp; \dots &amp; \dpdv{J}{z_{1, m}^{[l]}} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+\dpdv{J}{z_{j, 1}^{[l]}} &amp; \dots &amp; \dpdv{J}{z_{j, i}^{[l]}} &amp; \dots &amp; \dpdv{J}{z_{j, m}^{[l]}} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+\dpdv{J}{z_{n^{[l]}, 1}^{[l]}} &amp; \dots &amp; \dpdv{J}{z_{n^{[l]}, i}^{[l]}} &amp; \dots &amp; \dpdv{J}{z_{n^{[l]}, m}^{[l]}}
+\end{bmatrix} \notag \\
+&amp;\peq{} \cdot
+\begin{bmatrix}
+a_{1, 1}^{[l - 1]} &amp; \dots &amp; a_{k, 1}^{[l - 1]} &amp; \dots &amp; a_{n^{[l - 1]}, 1}^{[l - 1]} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+a_{1, i}^{[l - 1]} &amp; \dots &amp; a_{k, i}^{[l - 1]} &amp; \dots &amp; a_{n^{[l - 1]}, i}^{[l - 1]} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+a_{1, m}^{[l - 1]} &amp; \dots &amp; a_{k, m}^{[l - 1]} &amp; \dots &amp; a_{n^{[l - 1]}, m}^{[l - 1]}
+\end{bmatrix}, \notag \\
+&amp;
+\begin{bmatrix}
+\dpdv{J}{b_1^{[l]}} \\
+\vdots \\
+\dpdv{J}{b_j^{[l]}} \\
+\vdots \\
+\dpdv{J}{b_{n^{[l]}}^{[l]}}
+\end{bmatrix} =
+\begin{bmatrix}
+\dpdv{J}{z_{1, 1}^{[l]}} \\
+\vdots \\
+\dpdv{J}{z_{j, 1}^{[l]}} \\
+\vdots \\
+\dpdv{J}{z_{n^{[l]}, 1}^{[l]}}
+\end{bmatrix} + \dots +
+\begin{bmatrix}
+\dpdv{J}{z_{1, i}^{[l]}} \\
+\vdots \\
+\dpdv{J}{z_{j, i}^{[l]}} \\
+\vdots \\
+\dpdv{J}{z_{n^{[l]}, i}^{[l]}}
+\end{bmatrix} + \dots +
+\begin{bmatrix}
+\dpdv{J}{z_{1, m}^{[l]}} \\
+\vdots \\
+\dpdv{J}{z_{j, m}^{[l]}} \\
+\vdots \\
+\dpdv{J}{z_{n^{[l]}, m}^{[l]}}
+\end{bmatrix},
+\end{align*}\]
+
+<p>which we can write as</p>
+
+\[\begin{align}
+\pdv{J}{\vec{W}^{[l]}} &amp;= \sum_i \pdv{J}{\vec{z}_{:, i}^{[l]}} {\vec{a}_{:, i}^{[l - 1]}}^\T = \pdv{J}{\vec{Z}^{[l]}} {\vec{A}^{[l - 1]}}^\T, \label{eq:dW} \\
+\pdv{J}{\vec{b}^{[l]}} &amp;= \sum_i \pdv{J}{\vec{z}_{:, i}^{[l]}} = \underbrace{\sum_{\text{axis} = 1} \pdv{J}{\vec{Z}^{[l]}}}_\text{column vector}, \label{eq:db}
+\end{align}\]
+
+<p>where \(\pdv{J}{\vec{z}_{:, i}^{[l]}} \in \R^{n^{[l]}}\), \(\pdv{J}{\vec{Z}^{[l]}} \in \R^{n^{[l]} \times m}\), \(\pdv{J}{\vec{W}^{[l]}} \in \R^{n^{[l]} \times n^{[l - 1]}}\), and \(\pdv{J}{\vec{b}^{[l]}} \in \R^{n^{[l]}}\).</p>
+
+<p>Looking back at \(\eqref{eq:dw_scalar}\) and \(\eqref{eq:db_scalar}\), we see that the only unknown entity is \(\pdv{J}{z_{j, i}^{[l]}}\). By applying the chain rule once again, we get</p>
+
+\[\begin{equation}
+\pdv{J}{z_{j, i}^{[l]}} = \sum_p \pdv{J}{a_{p, i}^{[l]}} \pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}}, \label{eq:dz_scalar}
+\end{equation}\]
+
+<p>where \(p = 1, \dots, n^{[l]}\).</p>
+
+<p>Next, we present the vectorized version:</p>
+
+\[\begin{equation*}
+\begin{bmatrix}
+\dpdv{J}{z_{1, i}^{[l]}} \\
+\vdots \\
+\dpdv{J}{z_{j, i}^{[l]}} \\
+\vdots \\
+\dpdv{J}{z_{n^{[l]}, i}^{[l]}}
+\end{bmatrix} =
+\begin{bmatrix}
+\dpdv{a_{1, i}^{[l]}}{z_{1, i}^{[l]}} &amp; \dots &amp; \dpdv{a_{j, i}^{[l]}}{z_{1, i}^{[l]}} &amp; \dots &amp; \dpdv{a_{n^{[l]}, i}^{[l]}}{z_{1, i}^{[l]}} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+\dpdv{a_{1, i}^{[l]}}{z_{j, i}^{[l]}} &amp; \dots &amp; \dpdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} &amp; \dots &amp; \dpdv{a_{n^{[l]}, i}^{[l]}}{z_{j, i}^{[l]}} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+\dpdv{a_{1, i}^{[l]}}{z_{n^{[l]}, i}^{[l]}} &amp; \dots &amp; \dpdv{a_{j, i}^{[l]}}{z_{n^{[l]}, i}^{[l]}} &amp; \dots &amp; \dpdv{a_{n^{[l]}, i}^{[l]}}{z_{n^{[l]}, i}^{[l]}}
+\end{bmatrix}
+\begin{bmatrix}
+\dpdv{J}{a_{1, i}^{[l]}} \\
+\vdots \\
+\dpdv{J}{a_{j, i}^{[l]}} \\
+\vdots \\
+\dpdv{J}{a_{n^{[l]}, i}^{[l]}}
+\end{bmatrix},
+\end{equation*}\]
+
+<p>which compresses into</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{z}_{:, i}^{[l]}} = \pdv{\vec{a}_{:, i}^{[l]}}{\vec{z}_{:, i}^{[l]}} \pdv{J}{\vec{a}_{:, i}^{[l]}}, \label{eq:dz}
+\end{equation}\]
+
+<p>where \(\pdv{J}{\vec{a}_{:, i}^{[l]}} \in \R^{n^{[l]}}\) and \(\pdv{\vec{a}_{:, i}^{[l]}}{\vec{z}_{:, i}^{[l]}} \in \R^{n^{[l]} \times n^{[l]}}\).</p>
+
+<p>We have already encountered</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{Z}^{[l]}} =
+\begin{bmatrix}
+\dpdv{J}{\vec{z}_{:, 1}^{[l]}} &amp; \dots &amp; \dpdv{J}{\vec{z}_{:, i}^{[l]}} &amp; \dots &amp; \dpdv{J}{\vec{z}_{:, m}^{[l]}}
+\end{bmatrix}, \label{eq:dZ}
+\end{equation}\]
+
+<p>and for the sake of completeness, we also clarify that</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{A}^{[l]}} =
+\begin{bmatrix}
+\dpdv{J}{\vec{a}_{:, 1}^{[l]}} &amp; \dots &amp; \dpdv{J}{\vec{a}_{:, i}^{[l]}} &amp; \dots &amp; \dpdv{J}{\vec{a}_{:, m}^{[l]}}
+\end{bmatrix}, \label{eq:dA}
+\end{equation}\]
+
+<p>where \(\pdv{J}{\vec{A}^{[l]}} \in \R^{n^{[l]} \times m}\).</p>
+
+<p>On purpose, we have omitted the details of \(g_j^{[l]}(z_{1, i}^{[l]}, \dots, z_{j, i}^{[l]}, \dots, z_{n^{[l]}, i}^{[l]})\); consequently, we cannot derive an analytic expression for \(\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}}\), which we depend on in \(\eqref{eq:dz_scalar}\). However, since <a href="/2021/12/21/feedforward-neural-networks-part-2/" target="_blank">the second post</a> of this series will be dedicated to activation functions, we will instead derive \(\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}}\) there.</p>
+
+<p>Furthermore, according to \(\eqref{eq:dz_scalar}\), we see that \(\pdv{J}{z_{j, i}^{[l]}}\) also depends on \(\pdv{J}{a_{j, i}^{[l]}}\). Now, it might come as a surprise, but \(\pdv{J}{a_{j, i}^{[l]}}\) has already been computed when we reach the \(l\)th layer during backward propagation. How did that happen, you may ask. The answer is that every layer paves the way for the previous layer by also computing \(\pdv{J}{a_{k, i}^{[l - 1]}}\), which we shall do now:</p>
+
+\[\begin{equation}
+\pdv{J}{a_{k, i}^{[l - 1]}} = \sum_j \pdv{J}{z_{j, i}^{[l]}} \pdv{z_{j, i}^{[l]}}{a_{k, i}^{[l - 1]}} = \sum_j \pdv{J}{z_{j, i}^{[l]}} w_{j, k}^{[l]}. \label{eq:da_prev_scalar}
+\end{equation}\]
+
+<p>As usual, our next step is vectorization:</p>
+
+\[\begin{equation*}
+\begin{split}
+&amp;
+\begin{bmatrix}
+\dpdv{J}{a_{1, 1}^{[l - 1]}} &amp; \dots &amp; \dpdv{J}{a_{1, i}^{[l - 1]}} &amp; \dots &amp; \dpdv{J}{a_{1, m}^{[l - 1]}} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+\dpdv{J}{a_{k, 1}^{[l - 1]}} &amp; \dots &amp; \dpdv{J}{a_{k, i}^{[l - 1]}} &amp; \dots &amp; \dpdv{J}{a_{k, m}^{[l - 1]}} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+\dpdv{J}{a_{n^{[l - 1]}, 1}^{[l - 1]}} &amp; \dots &amp; \dpdv{J}{a_{n^{[l - 1]}, i}^{[l - 1]}} &amp; \dots &amp; \dpdv{J}{a_{n^{[l - 1]}, m}^{[l - 1]}}
+\end{bmatrix} \\
+&amp;=
+\begin{bmatrix}
+w_{1, 1}^{[l]} &amp; \dots &amp; w_{j, 1}^{[l]} &amp; \dots &amp; w_{n^{[l]}, 1}^{[l]} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+w_{1, k}^{[l]} &amp; \dots &amp; w_{j, k}^{[l]} &amp; \dots &amp; w_{n^{[l]}, k}^{[l]} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+w_{1, n^{[l - 1]}}^{[l]} &amp; \dots &amp; w_{j, n^{[l - 1]}}^{[l]} &amp; \dots &amp; w_{n^{[l]}, n^{[l - 1]}}^{[l]}
+\end{bmatrix} \\
+&amp;\peq{} \cdot
+\begin{bmatrix}
+\dpdv{J}{z_{1, 1}^{[l]}} &amp; \dots &amp; \dpdv{J}{z_{1, i}^{[l]}} &amp; \dots &amp; \dpdv{J}{z_{1, m}^{[l]}} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+\dpdv{J}{z_{j, 1}^{[l]}} &amp; \dots &amp; \dpdv{J}{z_{j, i}^{[l]}} &amp; \dots &amp; \dpdv{J}{z_{j, m}^{[l]}} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+\dpdv{J}{z_{n^{[l]}, 1}^{[l]}} &amp; \dots &amp; \dpdv{J}{z_{n^{[l]}, i}^{[l]}} &amp; \dots &amp; \dpdv{J}{z_{n^{[l]}, m}^{[l]}}
+\end{bmatrix},
+\end{split}
+\end{equation*}\]
+
+<p>which we can write as</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{A}^{[l - 1]}} = {\vec{W}^{[l]}}^\T \pdv{J}{\vec{Z}^{[l]}}, \label{eq:dA_prev}
+\end{equation}\]
+
+<p>where \(\pdv{J}{\vec{A}^{[l - 1]}} \in \R^{n^{[l - 1]} \times m}\).</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>Forward propagation is seeded with \(\vec{A}^{[0]} = \vec{X}\) and evaluates a set of recurrence relations to compute the predictions \(\vec{A}^{[L]} = {\vec{\hat{Y}}}\). We also compute the cost \(J = f(\vec{\hat{Y}}, \vec{Y}) = f(\vec{A}^{[L]}, \vec{Y})\).</p>
+
+<p>Backward propagation, on the other hand, is seeded with \(\pdv{J}{\vec{A}^{[L]}} = \pdv{J}{\vec{\hat{Y}}}\) and evaluates a different set of recurrence relations to compute \(\pdv{J}{\vec{W}^{[l]}}\) and \(\pdv{J}{\vec{b}^{[l]}}\). If not stopped prematurely, it eventually computes \(\pdv{J}{\vec{A}^{[0]}} = \pdv{J}{\vec{X}}\), a partial derivative we usually ignore.</p>
+
+<p>Moreover, let us visualize the inputs we use and the outputs we produce during the forward and backward propagations:</p>
+
+<figure class="overflow-wrapper">
+  <svg id="bld-forward-propagation" class="bld" width="480" height="360"></svg>
+  <svg id="bld-backward-propagation" class="bld" width="480" height="255"></svg>
+  <figcaption>Figure 3: An overview of inputs and outputs.</figcaption>
+</figure>
+
+<p>Now, you might have noticed that we have yet to derive an analytic expression for the backpropagation seed \(\pdv{J}{\vec{A}^{[L]}} = \pdv{J}{\vec{\hat{Y}}}\). To recap, we have deferred the derivations that concern activation functions to <a href="/2021/12/21/feedforward-neural-networks-part-2/" target="_blank">the second post</a> of this series. Similarly, since <a href="/2021/12/22/feedforward-neural-networks-part-3/" target="_blank">the third post</a> will be dedicated to cost functions, we will instead address the derivation of the backpropagation seed there.</p>
+
+<p>Last but not least: congratulations! You have made it to the end (of the first post). 🏅<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/neural-network-svg@2/neural-network.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/neural-network-svg@2/neural-network-d3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/box-line-diagram-svg@1/box-line-diagram.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/box-line-diagram-svg@1/box-line-diagram-d3.js"></script></p>
+<link rel="stylesheet" href="/assets/css/neural-network.css" />
+
+<link rel="stylesheet" href="/assets/css/box-line-diagram.css" />
+
+<script>
+  var nnThreeToThree =
+    nn.buildNeuralNetworkWithCoordinates(
+      [3, 3, 3, 3],  // nNodesPerLayer
+      960,           // width
+      360,           // height
+      30             // nodeRadius
+    );
+
+  nn.drawNeuralNetwork(
+    'nn-node-current-layer',  // svgId
+    'nn',                     // cssPrefix
+    nnThreeToThree            // neuralNetworkWithCoordinates
+  );
+
+  nn.drawNeuralNetwork(
+    'nn-node-previous-layer',  // svgId
+    'nn',                      // cssPrefix
+    nnThreeToThree             // neuralNetworkWithCoordinates
+  );
+
+  var nnTextOptions = new nn.TextOptions(
+    108,  // width
+    30,   // height
+    0.5   // position
+  );
+
+  var nnNodeTexts = [
+    new nn.NodeText(1, 0, 'a_{k - 2, i}^[l - 1]'),
+    new nn.NodeText(1, 1, 'a_{k - 1, i}^[l - 1]'),
+    new nn.NodeText(1, 2, 'a_{k, i}^[l - 1]'),
+    new nn.NodeText(2, 0, 'a_{j, i}^[l]'),
+    new nn.NodeText(2, 1, 'a_{j + 1, i}^[l]'),
+    new nn.NodeText(2, 2, 'a_{j + 2, i}^[l]')
+  ];
+
+  nn.annotateNeuralNetwork(
+    'nn-node-current-layer',  // svgId
+    'nn',                     // cssPrefix
+    nnThreeToThree,           // neuralNetworkWithCoordinates
+    nnNodeTexts,              // nodeTexts
+    // linkTexts
+    [
+      new nn.LinkText(1, 0, 2, 0, 'w_{j, k - 2}^[l]'),
+      new nn.LinkText(1, 1, 2, 0, 'w_{j, k - 1}^[l]'),
+      new nn.LinkText(1, 2, 2, 0, 'w_{j, k}^[l]')
+    ],
+    nnTextOptions  // textOptions
+  );
+
+  nn.annotateNeuralNetwork(
+    'nn-node-previous-layer',  // svgId
+    'nn',                      // cssPrefix
+    nnThreeToThree,            // neuralNetworkWithCoordinates
+    nnNodeTexts,               // nodeTexts
+    // linkTexts
+    [
+      new nn.LinkText(1, 2, 2, 0, 'w_{j, k}^[l]'),
+      new nn.LinkText(1, 2, 2, 1, 'w_{j + 1, k}^[l]'),
+      new nn.LinkText(1, 2, 2, 2, 'w_{j + 2, k}^[l]')
+    ],
+    nnTextOptions  // textOptions
+  );
+</script>
+
+<script>
+  var bldForwardPropagation =
+    bld.buildBoxLineDiagramWithCoordinates(
+      new bld.BoxLineDiagram(
+        new bld.Box(
+          200,  // width
+          150,  // height
+          50,   // padding
+          // texts
+          [
+            'Z^[l]'
+          ]
+        ),
+        [
+          new bld.Line(bld.PLACEMENT_LEFT  , bld.ARROWHEAD_END, 'A^[l - 1]'),
+          new bld.Line(bld.PLACEMENT_RIGHT , bld.ARROWHEAD_END, 'A^[l]'),
+          new bld.Line(bld.PLACEMENT_TOP   , bld.ARROWHEAD_END, 'W^[l]'),
+          new bld.Line(bld.PLACEMENT_TOP   , bld.ARROWHEAD_END, 'b^[l]'),
+          new bld.Line(bld.PLACEMENT_BOTTOM, bld.ARROWHEAD_END, 'cache^[l]')
+        ]
+      ),
+      480,  // width
+      360   // height
+    );
+
+  var bldBackwardPropagation =
+    bld.buildBoxLineDiagramWithCoordinates(
+      new bld.BoxLineDiagram(
+        new bld.Box(
+          200,  // width
+          150,  // height
+          50,   // padding
+          // texts
+          [
+            'dZ^[l]'
+          ]
+        ),
+        [
+          new bld.Line(bld.PLACEMENT_LEFT  , bld.ARROWHEAD_START, 'dA^[l - 1]'),
+          new bld.Line(bld.PLACEMENT_RIGHT , bld.ARROWHEAD_START, 'dA^[l]'),
+          new bld.Line(bld.PLACEMENT_BOTTOM, bld.ARROWHEAD_END  , 'dW^[l]'),
+          new bld.Line(bld.PLACEMENT_BOTTOM, bld.ARROWHEAD_END  , 'db^[l]')
+        ]
+      ),
+      480,  // width
+      255   // height
+    );
+
+  var bldTextOptions = new bld.TextOptions(
+    69,  // width
+    30   // height
+  );
+
+  var bldArrowheadOptions = new bld.ArrowheadOptions(
+    10,        // width
+    10,        // height
+    '#3f3f3f'  // fill
+  );
+
+  bld.drawBoxLineDiagram(
+    'bld-forward-propagation',  // svgId
+    'bld',                      // cssPrefix
+    bldForwardPropagation,      // boxLineDiagramWithCoordinates
+    bldTextOptions,             // textOptions
+    bldArrowheadOptions         // arrowheadOptions
+  );
+
+  bld.drawBoxLineDiagram(
+    'bld-backward-propagation',  // svgId
+    'bld',                       // cssPrefix
+    bldBackwardPropagation,      // boxLineDiagramWithCoordinates
+    bldTextOptions,              // textOptions
+    bldArrowheadOptions          // arrowheadOptions
+  );
+</script>
+
+
+  </div><a class="u-url" href="/2021/12/10/feedforward-neural-networks-part-1/" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="https://jonaslalin.com/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+        <ul class="contact-list">
+          <li class="p-name">Jonas Lalin</li>
+          <li><a class="u-email" href="mailto:"></a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <p>Yet another blog about deep learning.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li>
+  <a rel="me" href="https://github.com/jonaslalin" target="_blank" title="github">
+    <svg class="svg-icon grey">
+      <use xlink:href="/assets/minima-social-icons.svg#github"></use>
+    </svg>
+  </a>
+</li>
+<li>
+  <a rel="me" href="https://www.linkedin.com/in/jonaslalin/" target="_blank" title="linkedin">
+    <svg class="svg-icon grey">
+      <use xlink:href="/assets/minima-social-icons.svg#linkedin"></use>
+    </svg>
+  </a>
+</li>
+</ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

@@ -1,0 +1,1286 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.1">Jekyll</generator><link href="https://jonaslalin.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://jonaslalin.com/" rel="alternate" type="text/html" /><updated>2022-12-29T12:04:51+00:00</updated><id>https://jonaslalin.com/feed.xml</id><title type="html">I, Deep Learning</title><subtitle>Yet another blog about deep learning.</subtitle><author><name>Jonas Lalin</name><email></email></author><entry><title type="html">Feedforward Neural Networks in Depth, Part 3: Cost Functions</title><link href="https://jonaslalin.com/2021/12/22/feedforward-neural-networks-part-3/" rel="alternate" type="text/html" title="Feedforward Neural Networks in Depth, Part 3: Cost Functions" /><published>2021-12-22T00:00:00+00:00</published><updated>2021-12-22T00:00:00+00:00</updated><id>https://jonaslalin.com/2021/12/22/feedforward-neural-networks-part-3</id><content type="html" xml:base="https://jonaslalin.com/2021/12/22/feedforward-neural-networks-part-3/"><![CDATA[<p>This post is the last of a three-part series in which we set out to derive the mathematics behind feedforward neural networks. In short, we covered forward and backward propagations in <a href="/2021/12/10/feedforward-neural-networks-part-1/" target="_blank">the first post</a>, and we worked on activation functions in <a href="/2021/12/21/feedforward-neural-networks-part-2/" target="_blank">the second post</a>. Moreover, we have not yet addressed cost functions and the backpropagation seed \(\pdv{J}{\vec{A}^{[L]}} = \pdv{J}{\vec{\hat{Y}}}\). It is time we do that.</p>
+
+<h2 id="binary-classification">Binary Classification</h2>
+
+<p>In binary classification, the cost function is given by</p>
+
+\[\begin{equation*}
+\begin{split}
+J &amp;= f(\vec{\hat{Y}}, \vec{Y}) = f(\vec{A}^{[L]}, \vec{Y}) \\
+&amp;= -\frac{1}{m} \sum_i (y_i \log(\hat{y}_i) + (1 - y_i) \log(1 - \hat{y}_i)) \\
+&amp;= -\frac{1}{m} \sum_i (y_i \log(a_i^{[L]}) + (1 - y_i) \log(1 - a_i^{[L]})),
+\end{split}
+\end{equation*}\]
+
+<p>which we can write as</p>
+
+\[\begin{equation}
+J = -\frac{1}{m} \underbrace{\sum_{\text{axis} = 1} (\vec{Y} \odot \log(\vec{A}^{[L]}) + (1 - \vec{Y}) \odot \log(1 - \vec{A}^{[L]}))}_\text{scalar}.
+\end{equation}\]
+
+<p>Next, we construct a computation graph:</p>
+
+\[\begin{align*}
+u_{0, i} &amp;= a_i^{[L]}, \\
+u_{1, i} &amp;= 1 - u_{0, i}, \\
+u_{2, i} &amp;= \log(u_{0, i}), \\
+u_{3, i} &amp;= \log(u_{1, i}), \\
+u_{4, i} &amp;= y_i u_{2, i} + (1 - y_i) u_{3, i}, \\
+u_5 &amp;= -\frac{1}{m} \sum_i u_{4, i} = J.
+\end{align*}\]
+
+<p>Derivative computations are now as simple as they get:</p>
+
+\[\begin{align*}
+\pdv{J}{u_5} &amp;= 1, \\
+\pdv{J}{u_{4, i}} &amp;= \pdv{J}{u_5} \pdv{u_5}{u_{4, i}} = -\frac{1}{m}, \\
+\pdv{J}{u_{3, i}} &amp;= \pdv{J}{u_{4, i}} \pdv{u_{4, i}}{u_{3, i}} = -\frac{1}{m} (1 - y_i), \\
+\pdv{J}{u_{2, i}} &amp;= \pdv{J}{u_{4, i}} \pdv{u_{4, i}}{u_{2, i}} = -\frac{1}{m} y_i, \\
+\pdv{J}{u_{1, i}} &amp;= \pdv{J}{u_{3, i}} \pdv{u_{3, i}}{u_{1, i}} = -\frac{1}{m} (1 - y_i) \frac{1}{u_{1, i}} = -\frac{1}{m} \frac{1 - y_i}{1 - a_i^{[L]}}, \\
+\pdv{J}{u_{0, i}} &amp;= \pdv{J}{u_{1, i}} \pdv{u_{1, i}}{u_{0, i}} + \pdv{J}{u_{2, i}} \pdv{u_{2, i}}{u_{0, i}} \\
+&amp;= \frac{1}{m} (1 - y_i) \frac{1}{u_{1, i}} - \frac{1}{m} y_i \frac{1}{u_{0, i}} \notag \\
+&amp;= \frac{1}{m} \Bigl(\frac{1 - y_i}{1 - a_i^{[L]}} - \frac{y_i}{a_i^{[L]}}\Bigr). \notag
+\end{align*}\]
+
+<p>Thus,</p>
+
+\[\begin{equation*}
+\pdv{J}{a_i^{[L]}} = \frac{1}{m} \Bigl(\frac{1 - y_i}{1 - a_i^{[L]}} - \frac{y_i}{a_i^{[L]}}\Bigr),
+\end{equation*}\]
+
+<p>which implies that</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{A}^{[L]}} = \frac{1}{m} \Bigl(\frac{1}{1 - \vec{A}^{[L]}} \odot (1 - \vec{Y}) - \frac{1}{\vec{A}^{[L]}} \odot \vec{Y}\Bigr).
+\end{equation}\]
+
+<p>In addition, since the sigmoid activation function is used in the output layer, we get</p>
+
+\[\begin{equation*}
+\begin{split}
+\pdv{J}{z_i^{[L]}} &amp;= \pdv{J}{a_i^{[L]}} a_i^{[L]} (1 - a_i^{[L]}) \\
+&amp;= \frac{1}{m} \Bigl(\frac{1 - y_i}{1 - a_i^{[L]}} - \frac{y_i}{a_i^{[L]}}\Bigr) a_i^{[L]} (1 - a_i^{[L]}) \\
+&amp;= \frac{1}{m} ((1 - y_i) a_i^{[L]} - y_i (1 - a_i^{[L]})) \\
+&amp;= \frac{1}{m} (a_i^{[L]} - y_i).
+\end{split}
+\end{equation*}\]
+
+<p>In other words,</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{Z}^{[L]}} = \frac{1}{m} (\vec{A}^{[L]} - \vec{Y}).
+\end{equation}\]
+
+<p>Note that both \(\pdv{J}{\vec{Z}^{[L]}} \in \R^{1 \times m}\) and \(\pdv{J}{\vec{A}^{[L]}} \in \R^{1 \times m}\), because \(n^{[L]} = 1\) in this case.</p>
+
+<h2 id="multiclass-classification">Multiclass Classification</h2>
+
+<p>In multiclass classification, the cost function is instead given by</p>
+
+\[\begin{equation*}
+\begin{split}
+J &amp;= f(\vec{\hat{Y}}, \vec{Y}) = f(\vec{A}^{[L]}, \vec{Y}) \\
+&amp;= -\frac{1}{m} \sum_i \sum_j y_{j, i} \log(\hat{y}_{j, i}) \\
+&amp;= -\frac{1}{m} \sum_i \sum_j y_{j, i} \log(a_{j, i}^{[L]}),
+\end{split}
+\end{equation*}\]
+
+<p>where \(j = 1, \dots, n^{[L]}\).</p>
+
+<p>We can vectorize the cost expression:</p>
+
+\[\begin{equation}
+J = -\frac{1}{m} \underbrace{\sum_{\substack{\text{axis} = 0 \\ \text{axis} = 1}} \vec{Y} \odot \log(\vec{A}^{[L]})}_\text{scalar}.
+\end{equation}\]
+
+<p>Next, let us introduce intermediate variables:</p>
+
+\[\begin{align*}
+u_{0, j, i} &amp;= a_{j, i}^{[L]}, \\
+u_{1, j, i} &amp;= \log(u_{0, j, i}), \\
+u_{2, j, i} &amp;= y_{j, i} u_{1, j, i}, \\
+u_{3, i} &amp;= \sum_j u_{2, j, i}, \\
+u_4 &amp;= -\frac{1}{m} \sum_i u_{3, i} = J.
+\end{align*}\]
+
+<p>With the computation graph in place, we can perform backward propagation:</p>
+
+\[\begin{align*}
+\pdv{J}{u_4} &amp;= 1, \\
+\pdv{J}{u_{3, i}} &amp;= \pdv{J}{u_4} \pdv{u_4}{u_{3, i}} = -\frac{1}{m}, \\
+\pdv{J}{u_{2, j, i}} &amp;= \pdv{J}{u_{3, i}} \pdv{u_{3, i}}{u_{2, j, i}} = -\frac{1}{m}, \\
+\pdv{J}{u_{1, j, i}} &amp;= \pdv{J}{u_{2, j, i}} \pdv{u_{2, j, i}}{u_{1, j, i}} = -\frac{1}{m} y_{j, i}, \\
+\pdv{J}{u_{0, j, i}} &amp;= \pdv{J}{u_{1, j, i}} \pdv{u_{1, j, i}}{u_{0, j, i}} = -\frac{1}{m} y_{j, i} \frac{1}{u_{0, j, i}} = -\frac{1}{m} \frac{y_{j, i}}{a_{j, i}^{[L]}}.
+\end{align*}\]
+
+<p>Hence,</p>
+
+\[\begin{equation*}
+\pdv{J}{a_{j, i}^{[L]}} = -\frac{1}{m} \frac{y_{j, i}}{a_{j, i}^{[L]}}.
+\end{equation*}\]
+
+<p>Vectorization is trivial:</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{A}^{[L]}} = -\frac{1}{m} \frac{1}{\vec{A}^{[L]}} \odot \vec{Y}.
+\end{equation}\]
+
+<p>Furthermore, since the output layer uses the softmax activation function, we get</p>
+
+\[\begin{equation*}
+\begin{split}
+\pdv{J}{z_{j, i}^{[L]}} &amp;= a_{j, i}^{[L]} \Bigl(\pdv{J}{a_{j, i}^{[L]}} - \sum_p \pdv{J}{a_{p, i}^{[L]}} a_{p, i}^{[L]}\Bigr) \\
+&amp;= a_{j, i}^{[L]} \Bigl(-\frac{1}{m} \frac{y_{j, i}}{a_{j, i}^{[L]}} + \sum_p \frac{1}{m} \frac{y_{p, i}}{a_{p, i}^{[L]}} a_{p, i}^{[L]}\Bigr) \\
+&amp;= \frac{1}{m} \Bigl(-y_{j, i} + a_{j, i}^{[L]} \underbrace{\sum_p y_{p, i}}_{\mathclap{\sum \text{probabilities} = 1}}\Bigr) \\
+&amp;= \frac{1}{m} (a_{j, i}^{[L]} - y_{j, i}).
+\end{split}
+\end{equation*}\]
+
+<p>Note that \(p = 1, \dots, n^{[L]}\).</p>
+
+<p>To conclude,</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{Z}^{[L]}} = \frac{1}{m} (\vec{A}^{[L]} - \vec{Y}).
+\end{equation}\]
+
+<h2 id="multi-label-classification">Multi-Label Classification</h2>
+
+<p>We can view multi-label classification as \(j\) binary classification problems:</p>
+
+\[\begin{equation*}
+\begin{split}
+J &amp;= f(\vec{\hat{Y}}, \vec{Y}) = f(\vec{A}^{[L]}, \vec{Y}) \\
+&amp;= \sum_j \Bigl(-\frac{1}{m} \sum_i (y_{j, i} \log(\hat{y}_{j, i}) + (1 - y_{j, i}) \log(1 - \hat{y}_{j, i}))\Bigr) \\
+&amp;= \sum_j \Bigl(-\frac{1}{m} \sum_i (y_{j, i} \log(a_{j, i}^{[L]}) + (1 - y_{j, i}) \log(1 - a_{j, i}^{[L]}))\Bigr),
+\end{split}
+\end{equation*}\]
+
+<p>where once again \(j = 1, \dots, n^{[L]}\).</p>
+
+<p>Vectorization gives</p>
+
+\[\begin{equation}
+J = -\frac{1}{m} \underbrace{\sum_{\substack{\text{axis} = 1 \\ \text{axis} = 0}} (\vec{Y} \odot \log(\vec{A}^{[L]}) + (1 - \vec{Y}) \odot \log(1 - \vec{A}^{[L]}))}_\text{scalar}.
+\end{equation}\]
+
+<p>It is no coincidence that the following computation graph resembles the one we constructed for binary classification:</p>
+
+\[\begin{align*}
+u_{0, j, i} &amp;= a_{j, i}^{[L]}, \\
+u_{1, j, i} &amp;= 1 - u_{0, j, i}, \\
+u_{2, j, i} &amp;= \log(u_{0, j, i}), \\
+u_{3, j, i} &amp;= \log(u_{1, j, i}), \\
+u_{4, j, i} &amp;= y_{j, i} u_{2, j, i} + (1 - y_{j, i}) u_{3, j, i}, \\
+u_{5, j} &amp;= -\frac{1}{m} \sum_i u_{4, j, i}, \\
+u_6 &amp;= \sum_j u_{5, j} = J.
+\end{align*}\]
+
+<p>Next, we compute the partial derivatives:</p>
+
+\[\begin{align*}
+\pdv{J}{u_6} &amp;= 1, \\
+\pdv{J}{u_{5, j}} &amp;= \pdv{J}{u_6} \pdv{u_6}{u_{5, j}} = 1, \\
+\pdv{J}{u_{4, j, i}} &amp;= \pdv{J}{u_{5, j}} \pdv{u_{5, j}}{u_{4, j, i}} = -\frac{1}{m}, \\
+\pdv{J}{u_{3, j, i}} &amp;= \pdv{J}{u_{4, j, i}} \pdv{u_{4, j, i}}{u_{3, j, i}} = -\frac{1}{m} (1 - y_{j, i}), \\
+\pdv{J}{u_{2, j, i}} &amp;= \pdv{J}{u_{4, j, i}} \pdv{u_{4, j, i}}{u_{2, j, i}} = -\frac{1}{m} y_{j, i}, \\
+\pdv{J}{u_{1, j, i}} &amp;= \pdv{J}{u_{3, j, i}} \pdv{u_{3, j, i}}{u_{1, j, i}} = -\frac{1}{m} (1 - y_{j, i}) \frac{1}{u_{1, j, i}} = -\frac{1}{m} \frac{1 - y_{j, i}}{1 - a_{j, i}^{[L]}}, \\
+\pdv{J}{u_{0, j, i}} &amp;= \pdv{J}{u_{1, j, i}} \pdv{u_{1, j, i}}{u_{0, j, i}} + \pdv{J}{u_{2, j, i}} \pdv{u_{2, j, i}}{u_{0, j, i}} \\
+&amp;= \frac{1}{m} (1 - y_{j, i}) \frac{1}{u_{1, j, i}} - \frac{1}{m} y_{j, i} \frac{1}{u_{0, j, i}} \notag \\
+&amp;= \frac{1}{m} \Bigl(\frac{1 - y_{j, i}}{1 - a_{j, i}^{[L]}} - \frac{y_{j, i}}{a_{j, i}^{[L]}}\Bigr). \notag
+\end{align*}\]
+
+<p>Simply put, we have</p>
+
+\[\begin{equation*}
+\pdv{J}{a_{j, i}^{[L]}} = \frac{1}{m} \Bigl(\frac{1 - y_{j, i}}{1 - a_{j, i}^{[L]}} - \frac{y_{j, i}}{a_{j, i}^{[L]}}\Bigr),
+\end{equation*}\]
+
+<p>and</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{A}^{[L]}} = \frac{1}{m} \Bigl(\frac{1}{1 - \vec{A}^{[L]}} \odot (1 - \vec{Y}) - \frac{1}{\vec{A}^{[L]}} \odot \vec{Y}\Bigr).
+\end{equation}\]
+
+<p>Bearing in mind that we view multi-label classification as \(j\) binary classification problems, we also know that the output layer uses the sigmoid activation function. As a result,</p>
+
+\[\begin{equation*}
+\begin{split}
+\pdv{J}{z_{j, i}^{[L]}} &amp;= \pdv{J}{a_{j, i}^{[L]}} a_{j, i}^{[L]} (1 - a_{j, i}^{[L]}) \\
+&amp;= \frac{1}{m} \Bigl(\frac{1 - y_{j, i}}{1 - a_{j, i}^{[L]}} - \frac{y_{j, i}}{a_{j, i}^{[L]}}\Bigr) a_{j, i}^{[L]} (1 - a_{j, i}^{[L]}) \\
+&amp;= \frac{1}{m} ((1 - y_{j, i}) a_{j, i}^{[L]} - y_{j, i} (1 - a_{j, i}^{[L]})) \\
+&amp;= \frac{1}{m} (a_{j, i}^{[L]} - y_{j, i}),
+\end{split}
+\end{equation*}\]
+
+<p>which we can vectorize as</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{Z}^{[L]}} = \frac{1}{m} (\vec{A}^{[L]} - \vec{Y}).
+\end{equation}\]]]></content><author><name>Jonas Lalin</name></author><summary type="html"><![CDATA[This post is the last of a three-part series in which we set out to derive the mathematics behind feedforward neural networks. In short, we covered forward and backward propagations in the first post, and we worked on activation functions in the second post. Moreover, we have not yet addressed cost functions and the backpropagation seed \(\pdv{J}{\vec{A}^{[L]}} = \pdv{J}{\vec{\hat{Y}}}\). It is time we do that.]]></summary></entry><entry><title type="html">Feedforward Neural Networks in Depth, Part 2: Activation Functions</title><link href="https://jonaslalin.com/2021/12/21/feedforward-neural-networks-part-2/" rel="alternate" type="text/html" title="Feedforward Neural Networks in Depth, Part 2: Activation Functions" /><published>2021-12-21T00:00:00+00:00</published><updated>2021-12-21T00:00:00+00:00</updated><id>https://jonaslalin.com/2021/12/21/feedforward-neural-networks-part-2</id><content type="html" xml:base="https://jonaslalin.com/2021/12/21/feedforward-neural-networks-part-2/"><![CDATA[<p>This is the second post of a three-part series in which we derive the mathematics behind feedforward neural networks. We worked our way through forward and backward propagations in <a href="/2021/12/10/feedforward-neural-networks-part-1/" target="_blank">the first post</a>, but if you remember, we only mentioned activation functions in passing. In particular, we did not derive an analytic expression for \(\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}}\) or, by extension, \(\pdv{J}{z_{j, i}^{[l]}}\). So let us pick up the derivations where we left off.</p>
+
+<h2 id="relu">ReLU</h2>
+
+<p>The rectified linear unit, or ReLU for short, is given by</p>
+
+\[\begin{equation*}
+\begin{split}
+a_{j, i}^{[l]} &amp;= g_j^{[l]}(z_{1, i}^{[l]}, \dots, z_{j, i}^{[l]}, \dots, z_{n^{[l]}, i}^{[l]}) \\
+&amp;= \max(0, z_{j, i}^{[l]}) \\
+&amp;=
+\begin{cases}
+z_{j, i}^{[l]} &amp;\text{if } z_{j, i}^{[l]} &gt; 0, \\
+0 &amp;\text{otherwise.}
+\end{cases}
+\end{split}
+\end{equation*}\]
+
+<p>In other words,</p>
+
+\[\begin{equation}
+\vec{A}^{[l]} = \max(0, \vec{Z}^{[l]}).
+\end{equation}\]
+
+<p>Next, we compute the partial derivatives of the activations in the current layer:</p>
+
+\[\begin{align*}
+\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} &amp;\coloneqq
+\begin{cases}
+1 &amp;\text{if } z_{j, i}^{[l]} &gt; 0, \\
+0 &amp;\text{otherwise,}
+\end{cases} \\
+&amp;= I(z_{j, i}^{[l]} &gt; 0), \notag \\
+\pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} &amp;= 0, \quad \forall p \ne j.
+\end{align*}\]
+
+<p>It follows that</p>
+
+\[\begin{equation*}
+\begin{split}
+\pdv{J}{z_{j, i}^{[l]}} &amp;= \sum_p \pdv{J}{a_{p, i}^{[l]}} \pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} \\
+&amp;= \pdv{J}{a_{j, i}^{[l]}} \pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} + \sum_{p \ne j} \pdv{J}{a_{p, i}^{[l]}} \pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} \\
+&amp;= \pdv{J}{a_{j, i}^{[l]}} I(z_{j, i}^{[l]} &gt; 0),
+\end{split}
+\end{equation*}\]
+
+<p>which we can vectorize as</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{Z}^{[l]}} = \pdv{J}{\vec{A}^{[l]}} \odot I(\vec{Z}^{[l]} &gt; 0),
+\end{equation}\]
+
+<p>where \(\odot\) denotes element-wise multiplication.</p>
+
+<h2 id="sigmoid">Sigmoid</h2>
+
+<p>The sigmoid activation function is given by</p>
+
+\[\begin{equation*}
+\begin{split}
+a_{j, i}^{[l]} &amp;= g_j^{[l]}(z_{1, i}^{[l]}, \dots, z_{j, i}^{[l]}, \dots, z_{n^{[l]}, i}^{[l]}) \\
+&amp;= \sigma(z_{j, i}^{[l]}) \\
+&amp;= \frac{1}{1 + \exp(-z_{j, i}^{[l]})}.
+\end{split}
+\end{equation*}\]
+
+<p>Vectorization yields</p>
+
+\[\begin{equation}
+\vec{A}^{[l]} = \frac{1}{1 + \exp(-\vec{Z}^{[l]})}.
+\end{equation}\]
+
+<p>To practice backward propagation, first, we construct a computation graph:</p>
+
+\[\begin{align*}
+u_0 &amp;= z_{j, i}^{[l]}, \\
+u_1 &amp;= -u_0, \\
+u_2 &amp;= \exp(u_1), \\
+u_3 &amp;= 1 + u_2, \\
+u_4 &amp;= \frac{1}{u_3} = a_{j, i}^{[l]}.
+\end{align*}\]
+
+<p>Then, we perform an outside first traversal of the chain rule:</p>
+
+\[\begin{align*}
+\pdv{a_{j, i}^{[l]}}{u_4} &amp;= 1, \\
+\pdv{a_{j, i}^{[l]}}{u_3} &amp;= \pdv{a_{j, i}^{[l]}}{u_4} \pdv{u_4}{u_3} = -\frac{1}{u_3^2} = -\frac{1}{(1 + \exp(-z_{j, i}^{[l]}))^2}, \\
+\pdv{a_{j, i}^{[l]}}{u_2} &amp;= \pdv{a_{j, i}^{[l]}}{u_3} \pdv{u_3}{u_2} = -\frac{1}{u_3^2} = -\frac{1}{(1 + \exp(-z_{j, i}^{[l]}))^2}, \\
+\pdv{a_{j, i}^{[l]}}{u_1} &amp;= \pdv{a_{j, i}^{[l]}}{u_2} \pdv{u_2}{u_1} = -\frac{1}{u_3^2} \exp(u_1) = -\frac{\exp(-z_{j, i}^{[l]})}{(1 + \exp(-z_{j, i}^{[l]}))^2}, \\
+\pdv{a_{j, i}^{[l]}}{u_0} &amp;= \pdv{a_{j, i}^{[l]}}{u_1} \pdv{u_1}{u_0} = \frac{1}{u_3^2} \exp(u_1) = \frac{\exp(-z_{j, i}^{[l]})}{(1 + \exp(-z_{j, i}^{[l]}))^2}.
+\end{align*}\]
+
+<p>Let us simplify:</p>
+
+\[\begin{equation*}
+\begin{split}
+\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} &amp;= \frac{\exp(-z_{j, i}^{[l]})}{(1 + \exp(-z_{j, i}^{[l]}))^2} \\
+&amp;= \frac{1 + \exp(-z_{j, i}^{[l]}) - 1}{(1 + \exp(-z_{j, i}^{[l]}))^2} \notag \\
+&amp;= \frac{1}{1 + \exp(-z_{j, i}^{[l]})} - \frac{1}{(1 + \exp(-z_{j, i}^{[l]}))^2} \notag \\
+&amp;= a_{j, i}^{[l]} (1 - a_{j, i}^{[l]}).
+\end{split}
+\end{equation*}\]
+
+<p>We also note that</p>
+
+\[\begin{equation*}
+\pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} = 0, \quad \forall p \ne j.
+\end{equation*}\]
+
+<p>Consequently,</p>
+
+\[\begin{equation*}
+\begin{split}
+\pdv{J}{z_{j, i}^{[l]}} &amp;= \sum_p \pdv{J}{a_{p, i}^{[l]}} \pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} \\
+&amp;= \pdv{J}{a_{j, i}^{[l]}} \pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} + \sum_{p \ne j} \pdv{J}{a_{p, i}^{[l]}} \pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} \\
+&amp;= \pdv{J}{a_{j, i}^{[l]}} a_{j, i}^{[l]} (1 - a_{j, i}^{[l]}).
+\end{split}
+\end{equation*}\]
+
+<p>Lastly, no summations mean trivial vectorization:</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{Z}^{[l]}} = \pdv{J}{\vec{A}^{[l]}} \odot \vec{A}^{[l]} \odot (1 - \vec{A}^{[l]}).
+\end{equation}\]
+
+<h2 id="tanh">Tanh</h2>
+
+<p>The hyperbolic tangent function, i.e., the tanh activation function, is given by</p>
+
+\[\begin{equation*}
+\begin{split}
+a_{j, i}^{[l]} &amp;= g_j^{[l]}(z_{1, i}^{[l]}, \dots, z_{j, i}^{[l]}, \dots, z_{n^{[l]}, i}^{[l]}) \\
+&amp;= \tanh(z_{j, i}^{[l]}) \\
+&amp;= \frac{\exp(z_{j, i}^{[l]}) - \exp(-z_{j, i}^{[l]})}{\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]})}.
+\end{split}
+\end{equation*}\]
+
+<p>By utilizing element-wise multiplication, we get</p>
+
+\[\begin{equation}
+\vec{A}^{[l]} = \frac{1}{\exp(\vec{Z}^{[l]}) + \exp(-\vec{Z}^{[l]})} \odot (\exp(\vec{Z}^{[l]}) - \exp(-\vec{Z}^{[l]})).
+\end{equation}\]
+
+<p>Once again, let us introduce intermediate variables to practice backward propagation:</p>
+
+\[\begin{align*}
+u_0 &amp;= z_{j, i}^{[l]}, \\
+u_1 &amp;= -u_0, \\
+u_2 &amp;= \exp(u_0), \\
+u_3 &amp;= \exp(u_1), \\
+u_4 &amp;= u_2 - u_3, \\
+u_5 &amp;= u_2 + u_3, \\
+u_6 &amp;= \frac{1}{u_5}, \\
+u_7 &amp;= u_4 u_6 = a_{j, i}^{[l]}.
+\end{align*}\]
+
+<p>Next, we compute the partial derivatives:</p>
+
+\[\begin{align*}
+\pdv{a_{j, i}^{[l]}}{u_7} &amp;= 1, \\
+\pdv{a_{j, i}^{[l]}}{u_6} &amp;= \pdv{a_{j, i}^{[l]}}{u_7} \pdv{u_7}{u_6} = u_4 = \exp(z_{j, i}^{[l]}) - \exp(-z_{j, i}^{[l]}), \\
+\pdv{a_{j, i}^{[l]}}{u_5} &amp;= \pdv{a_{j, i}^{[l]}}{u_6} \pdv{u_6}{u_5} = -u_4 \frac{1}{u_5^2} = -\frac{\exp(z_{j, i}^{[l]}) - \exp(-z_{j, i}^{[l]})}{(\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]}))^2}, \\
+\pdv{a_{j, i}^{[l]}}{u_4} &amp;= \pdv{a_{j, i}^{[l]}}{u_7} \pdv{u_7}{u_4} = u_6 = \frac{1}{\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]})}, \\
+\pdv{a_{j, i}^{[l]}}{u_3} &amp;= \pdv{a_{j, i}^{[l]}}{u_4} \pdv{u_4}{u_3} + \pdv{a_{j, i}^{[l]}}{u_5} \pdv{u_5}{u_3} \\
+&amp;= -u_6 - u_4 \frac{1}{u_5^2} \notag \\
+&amp;= -\frac{1}{\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]})} - \frac{\exp(z_{j, i}^{[l]}) - \exp(-z_{j, i}^{[l]})}{(\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]}))^2} \notag \\
+&amp;= -\frac{2 \exp(z_{j, i}^{[l]})}{(\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]}))^2}, \notag \\
+\pdv{a_{j, i}^{[l]}}{u_2} &amp;= \pdv{a_{j, i}^{[l]}}{u_4} \pdv{u_4}{u_2} + \pdv{a_{j, i}^{[l]}}{u_5} \pdv{u_5}{u_2} \\
+&amp;= u_6 - u_4 \frac{1}{u_5^2} \notag \\
+&amp;= \frac{1}{\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]})} - \frac{\exp(z_{j, i}^{[l]}) - \exp(-z_{j, i}^{[l]})}{(\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]}))^2} \notag \\
+&amp;= \frac{2 \exp(-z_{j, i}^{[l]})}{(\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]}))^2}, \notag \\
+\pdv{a_{j, i}^{[l]}}{u_1} &amp;= \pdv{a_{j, i}^{[l]}}{u_3} \pdv{u_3}{u_1} \\
+&amp;= \Bigl(-u_6 - u_4 \frac{1}{u_5^2}\Bigr) \exp(u_1) \notag \\
+&amp;= -\frac{2 \exp(z_{j, i}^{[l]}) \exp(-z_{j, i}^{[l]})}{(\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]}))^2}, \notag \\
+\pdv{a_{j, i}^{[l]}}{u_0} &amp;= \pdv{a_{j, i}^{[l]}}{u_1} \pdv{u_1}{u_0} + \pdv{a_{j, i}^{[l]}}{u_2} \pdv{u_2}{u_0} \\
+&amp;= -\Bigl(-u_6 - u_4 \frac{1}{u_5^2}\Bigr) \exp(u_1) + \Bigl(u_6 - u_4 \frac{1}{u_5^2}\Bigr) \exp(u_0) \notag \\
+&amp;= \frac{2 \exp(z_{j, i}^{[l]}) \exp(-z_{j, i}^{[l]})}{(\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]}))^2} + \frac{2 \exp(z_{j, i}^{[l]}) \exp(-z_{j, i}^{[l]})}{(\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]}))^2} \notag \\
+&amp;= \frac{4 \exp(z_{j, i}^{[l]}) \exp(-z_{j, i}^{[l]})}{(\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]}))^2}. \notag
+\end{align*}\]
+
+<p>It follows that</p>
+
+\[\begin{equation*}
+\begin{split}
+\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} &amp;= \frac{4 \exp(z_{j, i}^{[l]}) \exp(-z_{j, i}^{[l]})}{(\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]}))^2} \\
+&amp;= \frac{\exp(z_{j, i}^{[l]})^2 + 2 \exp(z_{j, i}^{[l]}) \exp(-z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]})^2}{(\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]}))^2} \\
+&amp;\peq\negmedspace{} - \frac{\exp(z_{j, i}^{[l]})^2 - 2 \exp(z_{j, i}^{[l]}) \exp(-z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]})^2}{(\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]}))^2} \\
+&amp;= 1 - \frac{(\exp(z_{j, i}^{[l]}) - \exp(-z_{j, i}^{[l]}))^2}{(\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]}))^2} \\
+&amp;= 1 - a_{j, i}^{[l]} a_{j, i}^{[l]}.
+\end{split}
+\end{equation*}\]
+
+<p>Similiar to the sigmoid activation function, we also have</p>
+
+\[\begin{equation*}
+\pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} = 0, \quad \forall p \ne j.
+\end{equation*}\]
+
+<p>Thus,</p>
+
+\[\begin{equation*}
+\begin{split}
+\pdv{J}{z_{j, i}^{[l]}} &amp;= \sum_p \pdv{J}{a_{p, i}^{[l]}} \pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} \\
+&amp;= \pdv{J}{a_{j, i}^{[l]}} \pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} + \sum_{p \ne j} \pdv{J}{a_{p, i}^{[l]}} \pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} \\
+&amp;= \pdv{J}{a_{j, i}^{[l]}} (1 - a_{j, i}^{[l]} a_{j, i}^{[l]}),
+\end{split}
+\end{equation*}\]
+
+<p>which implies that</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{Z}^{[l]}} = \pdv{J}{\vec{A}^{[l]}} \odot (1 - \vec{A}^{[l]} \odot \vec{A}^{[l]}).
+\end{equation}\]
+
+<h2 id="softmax">Softmax</h2>
+
+<p>The softmax activation function is given by</p>
+
+\[\begin{equation*}
+\begin{split}
+a_{j, i}^{[l]} &amp;= g_j^{[l]}(z_{1, i}^{[l]}, \dots, z_{j, i}^{[l]}, \dots, z_{n^{[l]}, i}^{[l]}) \\
+&amp;= \frac{\exp(z_{j, i}^{[l]})}{\sum_p \exp(z_{p, i}^{[l]})}.
+\end{split}
+\end{equation*}\]
+
+<p>Vectorization results in</p>
+
+\[\begin{equation}
+\vec{A}^{[l]} = \frac{1}{\broadcast(\underbrace{\sum_{\text{axis} = 0} \exp(\vec{Z}^{[l]})}_\text{row vector})} \odot \exp(\vec{Z}^{[l]}).
+\end{equation}\]
+
+<p>To begin with, we construct a computation graph for the \(j\)th activation of the current layer:</p>
+
+\[\begin{align*}
+u_{-1} &amp;= z_{j, i}^{[l]}, \\
+u_{0, p} &amp;= z_{p, i}^{[l]}, &amp;&amp;\forall p \ne j, \\
+u_1 &amp;= \exp(u_{-1}), \\
+u_{2, p} &amp;= \exp(u_{0, p}), &amp;&amp;\forall p \ne j, \\
+u_3 &amp;= u_1 + \sum_{p \ne j} u_{2, p}, \\
+u_4 &amp;= \frac{1}{u_3}, \\
+u_5 &amp;= u_1 u_4 = a_{j, i}^{[l]}.
+\end{align*}\]
+
+<p>By applying the chain rule, we get</p>
+
+\[\begin{align*}
+\pdv{a_{j, i}^{[l]}}{u_5} &amp;= 1, \\
+\pdv{a_{j, i}^{[l]}}{u_4} &amp;= \pdv{a_{j, i}^{[l]}}{u_5} \pdv{u_5}{u_4} = u_1 = \exp(z_{j, i}^{[l]}), \\
+\pdv{a_{j, i}^{[l]}}{u_3} &amp;= \pdv{a_{j, i}^{[l]}}{u_4} \pdv{u_4}{u_3} = -u_1 \frac{1}{u_3^2} = -\frac{\exp(z_{j, i}^{[l]})}{(\sum_p \exp(z_{p, i}^{[l]}))^2}, \\
+\pdv{a_{j, i}^{[l]}}{u_1} &amp;= \pdv{a_{j, i}^{[l]}}{u_3} \pdv{u_3}{u_1} + \pdv{a_{j, i}^{[l]}}{u_5} \pdv{u_5}{u_1} \\
+&amp;= -u_1 \frac{1}{u_3^2} + u_4 \notag \\
+&amp;= -\frac{\exp(z_{j, i}^{[l]})}{(\sum_p \exp(z_{p, i}^{[l]}))^2} + \frac{1}{\sum_p \exp(z_{p, i}^{[l]})}, \notag \\
+\pdv{a_{j, i}^{[l]}}{u_{-1}} &amp;= \pdv{a_{j, i}^{[l]}}{u_1} \pdv{u_1}{u_{-1}} \\
+&amp;= \Bigl(-u_1 \frac{1}{u_3^2} + u_4\Bigr) \exp(u_{-1}) \notag \\
+&amp;= -\frac{\exp(z_{j, i}^{[l]})^2}{(\sum_p \exp(z_{p, i}^{[l]}))^2} + \frac{\exp(z_{j, i}^{[l]})}{\sum_p \exp(z_{p, i}^{[l]})}. \notag
+\end{align*}\]
+
+<p>Next, we need to take into account that \(z_{j, i}^{[l]}\) also affects other activations in the same layer:</p>
+
+\[\begin{align*}
+u_{-1} &amp;= z_{j, i}^{[l]}, \\
+u_{0, p} &amp;= z_{p, i}^{[l]}, &amp;&amp;\forall p \ne j, \\
+u_1 &amp;= \exp(u_{-1}), \\
+u_{2, p} &amp;= \exp(u_{0, p}), &amp;&amp;\forall p \ne j, \\
+u_3 &amp;= u_1 + \sum_{p \ne j} u_{2, p}, \\
+u_4 &amp;= \frac{1}{u_3}, \\
+u_5 &amp;= u_{2, p} u_4 = a_{p, i}^{[l]}, &amp;&amp;\forall p \ne j.
+\end{align*}\]
+
+<p>Backward propagation gives us the remaining partial derivatives:</p>
+
+\[\begin{align*}
+\pdv{a_{p, i}^{[l]}}{u_5} &amp;= 1, \\
+\pdv{a_{p, i}^{[l]}}{u_4} &amp;= \pdv{a_{p, i}^{[l]}}{u_5} \pdv{u_5}{u_4} = u_{2, p} = \exp(z_{p, i}^{[l]}), \\
+\pdv{a_{p, i}^{[l]}}{u_3} &amp;= \pdv{a_{p, i}^{[l]}}{u_4} \pdv{u_4}{u_3} = -u_{2, p} \frac{1}{u_3^2} = -\frac{\exp(z_{p, i}^{[l]})}{(\sum_p \exp(z_{p, i}^{[l]}))^2}, \\
+\pdv{a_{p, i}^{[l]}}{u_1} &amp;= \pdv{a_{p, i}^{[l]}}{u_3} \pdv{u_3}{u_1} = -u_{2, p} \frac{1}{u_3^2} = -\frac{\exp(z_{p, i}^{[l]})}{(\sum_p \exp(z_{p, i}^{[l]}))^2}, \\
+\pdv{a_{p, i}^{[l]}}{u_{-1}} &amp;= \pdv{a_{p, i}^{[l]}}{u_1} \pdv{u_1}{u_{-1}} = -u_{2, p} \frac{1}{u_3^2} \exp(u_{-1}) = -\frac{\exp(z_{p, i}^{[l]}) \exp(z_{j, i}^{[l]})}{(\sum_p \exp(z_{p, i}^{[l]}))^2}.
+\end{align*}\]
+
+<p>We now know that</p>
+
+\[\begin{align*}
+\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} &amp;= -\frac{\exp(z_{j, i}^{[l]})^2}{(\sum_p \exp(z_{p, i}^{[l]}))^2} + \frac{\exp(z_{j, i}^{[l]})}{\sum_p \exp(z_{p, i}^{[l]})} \\
+&amp;= a_{j, i}^{[l]} (1 - a_{j, i}^{[l]}), \notag \\
+\pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} &amp;= -\frac{\exp(z_{p, i}^{[l]}) \exp(z_{j, i}^{[l]})}{(\sum_p \exp(z_{p, i}^{[l]}))^2} \\
+&amp;= -a_{p, i}^{[l]} a_{j, i}^{[l]}, \quad \forall p \ne j. \notag
+\end{align*}\]
+
+<p>Hence,</p>
+
+\[\begin{equation*}
+\begin{split}
+\pdv{J}{z_{j, i}^{[l]}} &amp;= \sum_p \pdv{J}{a_{p, i}^{[l]}} \pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} \\
+&amp;= \pdv{J}{a_{j, i}^{[l]}} \pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} + \sum_{p \ne j} \pdv{J}{a_{p, i}^{[l]}} \pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} \\
+&amp;= \pdv{J}{a_{j, i}^{[l]}} a_{j, i}^{[l]} (1 - a_{j, i}^{[l]}) - \sum_{p \ne j} \pdv{J}{a_{p, i}^{[l]}} a_{p, i}^{[l]} a_{j, i}^{[l]} \\
+&amp;= a_{j, i}^{[l]} \Bigl(\pdv{J}{a_{j, i}^{[l]}} (1 - a_{j, i}^{[l]}) - \sum_{p \ne j} \pdv{J}{a_{p, i}^{[l]}} a_{p, i}^{[l]}\Bigr) \\
+&amp;= a_{j, i}^{[l]} \Bigl(\pdv{J}{a_{j, i}^{[l]}} (1 - a_{j, i}^{[l]}) - \sum_p \pdv{J}{a_{p, i}^{[l]}} a_{p, i}^{[l]} + \pdv{J}{a_{j, i}^{[l]}} a_{j, i}^{[l]}\Bigr) \\
+&amp;= a_{j, i}^{[l]} \Bigl(\pdv{J}{a_{j, i}^{[l]}} - \sum_p \pdv{J}{a_{p, i}^{[l]}} a_{p, i}^{[l]}\Bigr),
+\end{split}
+\end{equation*}\]
+
+<p>which we can vectorize as</p>
+
+\[\begin{equation*}
+\pdv{J}{\vec{z}_{:, i}^{[l]}} = \vec{a}_{:, i}^{[l]} \odot \Bigl(\pdv{J}{\vec{a}_{:, i}^{[l]}} - \underbrace{{\vec{a}_{:, i}^{[l]}}^\T \pdv{J}{\vec{a}_{:, i}^{[l]}}}_{\text{scalar}}\Bigr).
+\end{equation*}\]
+
+<p>Let us not stop with the vectorization just yet:</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{Z}^{[l]}} = \vec{A}^{[l]} \odot \Bigl(\pdv{J}{\vec{A}^{[l]}} - \broadcast\bigl(\underbrace{\sum_{\text{axis} = 0} \pdv{J}{\vec{A}^{[l]}} \odot \vec{A}^{[l]}}_\text{row vector}\bigr)\Bigr).
+\end{equation}\]]]></content><author><name>Jonas Lalin</name></author><summary type="html"><![CDATA[This is the second post of a three-part series in which we derive the mathematics behind feedforward neural networks. We worked our way through forward and backward propagations in the first post, but if you remember, we only mentioned activation functions in passing. In particular, we did not derive an analytic expression for \(\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}}\) or, by extension, \(\pdv{J}{z_{j, i}^{[l]}}\). So let us pick up the derivations where we left off.]]></summary></entry><entry><title type="html">Feedforward Neural Networks in Depth, Part 1: Forward and Backward Propagations</title><link href="https://jonaslalin.com/2021/12/10/feedforward-neural-networks-part-1/" rel="alternate" type="text/html" title="Feedforward Neural Networks in Depth, Part 1: Forward and Backward Propagations" /><published>2021-12-10T00:00:00+00:00</published><updated>2021-12-10T00:00:00+00:00</updated><id>https://jonaslalin.com/2021/12/10/feedforward-neural-networks-part-1</id><content type="html" xml:base="https://jonaslalin.com/2021/12/10/feedforward-neural-networks-part-1/"><![CDATA[<p>This post is the first of a three-part series in which we set out to derive the mathematics behind feedforward neural networks. They have</p>
+
+<ul>
+  <li>an input and an output layer with at least one hidden layer in between,</li>
+  <li>fully-connected layers, which means that each node in one layer connects to every node in the following layer, and</li>
+  <li>ways to introduce nonlinearity by means of activation functions.</li>
+</ul>
+
+<p>We start with forward propagation, which involves computing predictions and the associated cost of these predictions.</p>
+
+<h2 id="forward-propagation">Forward Propagation</h2>
+
+<p>Settling on what notations to use is tricky since we only have so many letters in the Roman alphabet. As you browse the Internet, you will likely find derivations that have used different notations than the ones we are about to introduce. However, and fortunately, there is no right or wrong here; it is just a matter of taste. In particular, the notations used in this series take inspiration from Andrew Ng’s <a href="/assets/deep-learning-notation.pdf" target="_blank">Standard notations for Deep Learning</a>. If you make a comparison, you will find that we only change a couple of the details.</p>
+
+<p>Now, whatever we come up with, we have to support</p>
+
+<ul>
+  <li>multiple layers,</li>
+  <li>several nodes in each layer,</li>
+  <li>various activation functions,</li>
+  <li>various types of cost functions, and</li>
+  <li>mini-batches of training examples.</li>
+</ul>
+
+<p>As a result, our definition of a node ends up introducing a fairly large number of notations:</p>
+
+\[\begin{align}
+z_{j, i}^{[l]} &amp;= \sum_k w_{j, k}^{[l]} a_{k, i}^{[l - 1]} + b_j^{[l]}, \label{eq:z_scalar} \\
+a_{j, i}^{[l]} &amp;= g_j^{[l]}(z_{1, i}^{[l]}, \dots, z_{j, i}^{[l]}, \dots, z_{n^{[l]}, i}^{[l]}). \label{eq:a_scalar}
+\end{align}\]
+
+<p>Does the node definition look intimidating to you at first glance? Do not worry. Hopefully, it will make more sense once we have explained the notations, which we shall do next:</p>
+
+<div class="overflow-wrapper">
+  <table>
+    <thead>
+      <tr>
+        <th>Entity</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>\(l\)</td>
+        <td>The current layer \(l = 1, \dots, L\), where \(L\) is the number of layers that have weights and biases. We use \(l = 0\) and \(l = L\) to denote the input and output layers.</td>
+      </tr>
+      <tr>
+        <td>\(n^{[l]}\)</td>
+        <td>The number of nodes in the current layer.</td>
+      </tr>
+      <tr>
+        <td>\(n^{[l - 1]}\)</td>
+        <td>The number of nodes in the previous layer.</td>
+      </tr>
+      <tr>
+        <td>\(j\)</td>
+        <td>The \(j\)th node of the current layer, \(j = 1, \dots, n^{[l]}\).</td>
+      </tr>
+      <tr>
+        <td>\(k\)</td>
+        <td>The \(k\)th node of the previous layer, \(k = 1, \dots, n^{[l - 1]}\).</td>
+      </tr>
+      <tr>
+        <td>\(i\)</td>
+        <td>The current training example \(i = 1, \dots, m\), where \(m\) is the number of training examples.</td>
+      </tr>
+      <tr>
+        <td>\(z_{j, i}^{[l]}\)</td>
+        <td>A weighted sum of the activations of the previous layer, shifted by a bias.</td>
+      </tr>
+      <tr>
+        <td>\(w_{j, k}^{[l]}\)</td>
+        <td>A weight that scales the \(k\)th activation of the previous layer.</td>
+      </tr>
+      <tr>
+        <td>\(b_j^{[l]}\)</td>
+        <td>A bias in the current layer.</td>
+      </tr>
+      <tr>
+        <td>\(a_{j, i}^{[l]}\)</td>
+        <td>An activation in the current layer.</td>
+      </tr>
+      <tr>
+        <td>\(a_{k, i}^{[l - 1]}\)</td>
+        <td>An activation in the previous layer.</td>
+      </tr>
+      <tr>
+        <td>\(g_j^{[l]}\)</td>
+        <td>An activation function \(g_j^{[l]} \colon \R^{n^{[l]}} \to \R\) used in the current layer.</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<p>To put it concisely, a node in the current layer depends on every node in the previous layer, and the following visualization can help us see that more clearly:</p>
+
+<figure class="overflow-wrapper">
+  <svg id="nn-node-current-layer" class="nn" width="480" height="360" viewBox="240 0 480 360"></svg>
+  <figcaption>Figure 1: A node in the current layer.</figcaption>
+</figure>
+
+<p>Moreover, a node in the previous layer affects every node in the current layer, and with a change in highlighting, we will also be able to see that more clearly:</p>
+
+<figure class="overflow-wrapper">
+  <svg id="nn-node-previous-layer" class="nn" width="480" height="360" viewBox="240 0 480 360"></svg>
+  <figcaption>Figure 2: A node in the previous layer.</figcaption>
+</figure>
+
+<p>In the future, we might want to write an implement from scratch in, for example, Python. To take advantage of the heavily optimized versions of vector and matrix operations that come bundled with libraries such as NumPy, we need to vectorize \(\eqref{eq:z_scalar}\) and \(\eqref{eq:a_scalar}\).</p>
+
+<p>To begin with, we vectorize the nodes:</p>
+
+\[\begin{align*}
+\begin{bmatrix}
+z_{1, i}^{[l]} \\
+\vdots \\
+z_{j, i}^{[l]} \\
+\vdots \\
+z_{n^{[l]}, i}^{[l]}
+\end{bmatrix} &amp;=
+\begin{bmatrix}
+w_{1, 1}^{[l]} &amp; \dots &amp; w_{1, k}^{[l]} &amp; \dots &amp; w_{1, n^{[l - 1]}}^{[l]} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+w_{j, 1}^{[l]} &amp; \dots &amp; w_{j, k}^{[l]} &amp; \dots &amp; w_{j, n^{[l - 1]}}^{[l]} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+w_{n^{[l]}, 1}^{[l]} &amp; \dots &amp; w_{n^{[l]}, k}^{[l]} &amp; \dots &amp; w_{n^{[l]}, n^{[l - 1]}}^{[l]}
+\end{bmatrix}
+\begin{bmatrix}
+a_{1, i}^{[l - 1]} \\
+\vdots \\
+a_{k, i}^{[l - 1]} \\
+\vdots \\
+a_{n^{[l - 1]}, i}^{[l - 1]}
+\end{bmatrix} +
+\begin{bmatrix}
+b_1^{[l]} \\
+\vdots \\
+b_j^{[l]} \\
+\vdots \\
+b_{n^{[l]}}^{[l]}
+\end{bmatrix}, \\
+\begin{bmatrix}
+a_{1, i}^{[l]} \\
+\vdots \\
+a_{j, i}^{[l]} \\
+\vdots \\
+a_{n^{[l]}, i}^{[l]}
+\end{bmatrix} &amp;=
+\begin{bmatrix}
+g_1^{[l]}(z_{1, i}^{[l]}, \dots, z_{j, i}^{[l]}, \dots, z_{n^{[l]}, i}^{[l]}) \\
+\vdots \\
+g_j^{[l]}(z_{1, i}^{[l]}, \dots, z_{j, i}^{[l]}, \dots, z_{n^{[l]}, i}^{[l]}) \\
+\vdots \\
+g_{n^{[l]}}^{[l]}(z_{1, i}^{[l]}, \dots, z_{j, i}^{[l]}, \dots, z_{n^{[l]}, i}^{[l]}) \\
+\end{bmatrix},
+\end{align*}\]
+
+<p>which we can write as</p>
+
+\[\begin{align}
+\vec{z}_{:, i}^{[l]} &amp;= \vec{W}^{[l]} \vec{a}_{:, i}^{[l - 1]} + \vec{b}^{[l]}, \label{eq:z} \\
+\vec{a}_{:, i}^{[l]} &amp;= \vec{g}^{[l]}(\vec{z}_{:, i}^{[l]}), \label{eq:a}
+\end{align}\]
+
+<p>where \(\vec{z}_{:, i}^{[l]} \in \R^{n^{[l]}}\), \(\vec{W}^{[l]} \in \R^{n^{[l]} \times n^{[l - 1]}}\), \(\vec{b}^{[l]} \in \R^{n^{[l]}}\), \(\vec{a}_{:, i}^{[l]} \in \R^{n^{[l]}}\), \(\vec{a}_{:, i}^{[l - 1]} \in \R^{n^{[l - 1]}}\), and lastly, \(\vec{g}^{[l]} \colon \R^{n^{[l]}} \to \R^{n^{[l]}}\). We have used a colon to clarify that \(\vec{z}_{:, i}^{[l]}\) is the \(i\)th column of \(\vec{Z}^{[l]}\), and so on.</p>
+
+<p>Next, we vectorize the training examples:</p>
+
+\[\begin{align}
+\vec{Z}^{[l]} &amp;=
+\begin{bmatrix}
+\vec{z}_{:, 1}^{[l]} &amp; \dots &amp; \vec{z}_{:, i}^{[l]} &amp; \dots &amp; \vec{z}_{:, m}^{[l]}
+\end{bmatrix} \label{eq:Z} \\
+&amp;= \vec{W}^{[l]}
+\begin{bmatrix}
+\vec{a}_{:, 1}^{[l - 1]} &amp; \dots &amp; \vec{a}_{:, i}^{[l - 1]} &amp; \dots &amp; \vec{a}_{:, m}^{[l - 1]}
+\end{bmatrix} +
+\begin{bmatrix}
+\vec{b}^{[l]} &amp; \dots &amp; \vec{b}^{[l]} &amp; \dots &amp; \vec{b}^{[l]}
+\end{bmatrix} \notag \\
+&amp;= \vec{W}^{[l]} \vec{A}^{[l - 1]} + \broadcast(\vec{b}^{[l]}), \notag \\
+\vec{A}^{[l]} &amp;=
+\begin{bmatrix}
+\vec{a}_{:, 1}^{[l]} &amp; \dots &amp; \vec{a}_{:, i}^{[l]} &amp; \dots &amp; \vec{a}_{:, m}^{[l]}
+\end{bmatrix}, \label{eq:A}
+\end{align}\]
+
+<p>where \(\vec{Z}^{[l]} \in \R^{n^{[l]} \times m}\), \(\vec{A}^{[l]} \in \R^{n^{[l]} \times m}\), and \(\vec{A}^{[l - 1]} \in \R^{n^{[l - 1]} \times m}\). In addition, have a look at <a href="https://numpy.org/doc/stable/user/basics.broadcasting.html" target="_blank">the NumPy documentation</a> if you want to read a well-written explanation of broadcasting.</p>
+
+<p>We would also like to establish two additional notations:</p>
+
+\[\begin{align}
+\vec{A}^{[0]} &amp;= \vec{X}, \label{eq:A_zero} \\
+\vec{A}^{[L]} &amp;= \vec{\hat{Y}}, \label{eq:A_L}
+\end{align}\]
+
+<p>where \(\vec{X} \in \R^{n^{[0]} \times m}\) denotes the inputs and \(\vec{\hat{Y}} \in \R^{n^{[L]} \times m}\) denotes the predictions/outputs.</p>
+
+<p>Finally, we are ready to define the cost function:</p>
+
+\[\begin{equation}
+J = f(\vec{\hat{Y}}, \vec{Y}) = f(\vec{A}^{[L]}, \vec{Y}), \label{eq:J}
+\end{equation}\]
+
+<p>where \(\vec{Y} \in \R^{n^{[L]} \times m}\) denotes the targets and \(f \colon \R^{2 n^{[L]}} \to \R\) can be tailored to our needs.</p>
+
+<p>We are done with forward propagation! Next up: backward propagation, also known as backpropagation, which involves computing the gradient of the cost function with respect to the weights and biases.</p>
+
+<h2 id="backward-propagation">Backward Propagation</h2>
+
+<p>We will make heavy use of the chain rule in this section, and to understand better how it works, we first apply the chain rule to the following example:</p>
+
+\[\begin{align}
+u_i &amp;= g_i(x_1, \dots, x_j, \dots, x_n), \label{eq:example_u_scalar} \\
+y_k &amp;= f_k(u_1, \dots, u_i, \dots, u_m). \label{eq:example_y_scalar}
+\end{align}\]
+
+<p>Note that \(x_j\) may affect \(u_1, \dots, u_i, \dots, u_m\), and \(y_k\) may depend on \(u_1, \dots, u_i, \dots, u_m\); thus,</p>
+
+\[\begin{equation}
+\pdv{y_k}{x_j} = \sum_i \pdv{y_k}{u_i} \pdv{u_i}{x_j}. \label{eq:chain_rule}
+\end{equation}\]
+
+<p>Great! If we ever get stuck trying to compute or understand some partial derivative, we can always go back to \(\eqref{eq:example_u_scalar}\), \(\eqref{eq:example_y_scalar}\), and \(\eqref{eq:chain_rule}\). Hopefully, these equations will provide the clues necessary to move forward. However, be extra careful not to confuse the notation used for the chain rule example with the notation we use elsewhere in this series. The overlap is unintentional.</p>
+
+<p>Now, let us concentrate on the task at hand:</p>
+
+\[\begin{align}
+\pdv{J}{w_{j, k}^{[l]}} &amp;= \sum_i \pdv{J}{z_{j, i}^{[l]}} \pdv{z_{j, i}^{[l]}}{w_{j, k}^{[l]}} = \sum_i \pdv{J}{z_{j, i}^{[l]}} a_{k, i}^{[l - 1]}, \label{eq:dw_scalar} \\
+\pdv{J}{b_j^{[l]}} &amp;= \sum_i \pdv{J}{z_{j, i}^{[l]}} \pdv{z_{j, i}^{[l]}}{b_j^{[l]}} = \sum_i \pdv{J}{z_{j, i}^{[l]}}. \label{eq:db_scalar}
+\end{align}\]
+
+<p>Vectorization results in</p>
+
+\[\begin{align*}
+&amp;
+\begin{bmatrix}
+\dpdv{J}{w_{1, 1}^{[l]}} &amp; \dots &amp; \dpdv{J}{w_{1, k}^{[l]}} &amp; \dots &amp; \dpdv{J}{w_{1, n^{[l - 1]}}^{[l]}} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+\dpdv{J}{w_{j, 1}^{[l]}} &amp; \dots &amp; \dpdv{J}{w_{j, k}^{[l]}} &amp; \dots &amp; \dpdv{J}{w_{j, n^{[l - 1]}}^{[l]}} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+\dpdv{J}{w_{n^{[l]}, 1}^{[l]}} &amp; \dots &amp; \dpdv{J}{w_{n^{[l]}, k}^{[l]}} &amp; \dots &amp; \dpdv{J}{w_{n^{[l]}, n^{[l - 1]}}^{[l]}}
+\end{bmatrix} \\
+&amp;=
+\begin{bmatrix}
+\dpdv{J}{z_{1, 1}^{[l]}} &amp; \dots &amp; \dpdv{J}{z_{1, i}^{[l]}} &amp; \dots &amp; \dpdv{J}{z_{1, m}^{[l]}} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+\dpdv{J}{z_{j, 1}^{[l]}} &amp; \dots &amp; \dpdv{J}{z_{j, i}^{[l]}} &amp; \dots &amp; \dpdv{J}{z_{j, m}^{[l]}} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+\dpdv{J}{z_{n^{[l]}, 1}^{[l]}} &amp; \dots &amp; \dpdv{J}{z_{n^{[l]}, i}^{[l]}} &amp; \dots &amp; \dpdv{J}{z_{n^{[l]}, m}^{[l]}}
+\end{bmatrix} \notag \\
+&amp;\peq{} \cdot
+\begin{bmatrix}
+a_{1, 1}^{[l - 1]} &amp; \dots &amp; a_{k, 1}^{[l - 1]} &amp; \dots &amp; a_{n^{[l - 1]}, 1}^{[l - 1]} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+a_{1, i}^{[l - 1]} &amp; \dots &amp; a_{k, i}^{[l - 1]} &amp; \dots &amp; a_{n^{[l - 1]}, i}^{[l - 1]} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+a_{1, m}^{[l - 1]} &amp; \dots &amp; a_{k, m}^{[l - 1]} &amp; \dots &amp; a_{n^{[l - 1]}, m}^{[l - 1]}
+\end{bmatrix}, \notag \\
+&amp;
+\begin{bmatrix}
+\dpdv{J}{b_1^{[l]}} \\
+\vdots \\
+\dpdv{J}{b_j^{[l]}} \\
+\vdots \\
+\dpdv{J}{b_{n^{[l]}}^{[l]}}
+\end{bmatrix} =
+\begin{bmatrix}
+\dpdv{J}{z_{1, 1}^{[l]}} \\
+\vdots \\
+\dpdv{J}{z_{j, 1}^{[l]}} \\
+\vdots \\
+\dpdv{J}{z_{n^{[l]}, 1}^{[l]}}
+\end{bmatrix} + \dots +
+\begin{bmatrix}
+\dpdv{J}{z_{1, i}^{[l]}} \\
+\vdots \\
+\dpdv{J}{z_{j, i}^{[l]}} \\
+\vdots \\
+\dpdv{J}{z_{n^{[l]}, i}^{[l]}}
+\end{bmatrix} + \dots +
+\begin{bmatrix}
+\dpdv{J}{z_{1, m}^{[l]}} \\
+\vdots \\
+\dpdv{J}{z_{j, m}^{[l]}} \\
+\vdots \\
+\dpdv{J}{z_{n^{[l]}, m}^{[l]}}
+\end{bmatrix},
+\end{align*}\]
+
+<p>which we can write as</p>
+
+\[\begin{align}
+\pdv{J}{\vec{W}^{[l]}} &amp;= \sum_i \pdv{J}{\vec{z}_{:, i}^{[l]}} {\vec{a}_{:, i}^{[l - 1]}}^\T = \pdv{J}{\vec{Z}^{[l]}} {\vec{A}^{[l - 1]}}^\T, \label{eq:dW} \\
+\pdv{J}{\vec{b}^{[l]}} &amp;= \sum_i \pdv{J}{\vec{z}_{:, i}^{[l]}} = \underbrace{\sum_{\text{axis} = 1} \pdv{J}{\vec{Z}^{[l]}}}_\text{column vector}, \label{eq:db}
+\end{align}\]
+
+<p>where \(\pdv{J}{\vec{z}_{:, i}^{[l]}} \in \R^{n^{[l]}}\), \(\pdv{J}{\vec{Z}^{[l]}} \in \R^{n^{[l]} \times m}\), \(\pdv{J}{\vec{W}^{[l]}} \in \R^{n^{[l]} \times n^{[l - 1]}}\), and \(\pdv{J}{\vec{b}^{[l]}} \in \R^{n^{[l]}}\).</p>
+
+<p>Looking back at \(\eqref{eq:dw_scalar}\) and \(\eqref{eq:db_scalar}\), we see that the only unknown entity is \(\pdv{J}{z_{j, i}^{[l]}}\). By applying the chain rule once again, we get</p>
+
+\[\begin{equation}
+\pdv{J}{z_{j, i}^{[l]}} = \sum_p \pdv{J}{a_{p, i}^{[l]}} \pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}}, \label{eq:dz_scalar}
+\end{equation}\]
+
+<p>where \(p = 1, \dots, n^{[l]}\).</p>
+
+<p>Next, we present the vectorized version:</p>
+
+\[\begin{equation*}
+\begin{bmatrix}
+\dpdv{J}{z_{1, i}^{[l]}} \\
+\vdots \\
+\dpdv{J}{z_{j, i}^{[l]}} \\
+\vdots \\
+\dpdv{J}{z_{n^{[l]}, i}^{[l]}}
+\end{bmatrix} =
+\begin{bmatrix}
+\dpdv{a_{1, i}^{[l]}}{z_{1, i}^{[l]}} &amp; \dots &amp; \dpdv{a_{j, i}^{[l]}}{z_{1, i}^{[l]}} &amp; \dots &amp; \dpdv{a_{n^{[l]}, i}^{[l]}}{z_{1, i}^{[l]}} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+\dpdv{a_{1, i}^{[l]}}{z_{j, i}^{[l]}} &amp; \dots &amp; \dpdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} &amp; \dots &amp; \dpdv{a_{n^{[l]}, i}^{[l]}}{z_{j, i}^{[l]}} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+\dpdv{a_{1, i}^{[l]}}{z_{n^{[l]}, i}^{[l]}} &amp; \dots &amp; \dpdv{a_{j, i}^{[l]}}{z_{n^{[l]}, i}^{[l]}} &amp; \dots &amp; \dpdv{a_{n^{[l]}, i}^{[l]}}{z_{n^{[l]}, i}^{[l]}}
+\end{bmatrix}
+\begin{bmatrix}
+\dpdv{J}{a_{1, i}^{[l]}} \\
+\vdots \\
+\dpdv{J}{a_{j, i}^{[l]}} \\
+\vdots \\
+\dpdv{J}{a_{n^{[l]}, i}^{[l]}}
+\end{bmatrix},
+\end{equation*}\]
+
+<p>which compresses into</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{z}_{:, i}^{[l]}} = \pdv{\vec{a}_{:, i}^{[l]}}{\vec{z}_{:, i}^{[l]}} \pdv{J}{\vec{a}_{:, i}^{[l]}}, \label{eq:dz}
+\end{equation}\]
+
+<p>where \(\pdv{J}{\vec{a}_{:, i}^{[l]}} \in \R^{n^{[l]}}\) and \(\pdv{\vec{a}_{:, i}^{[l]}}{\vec{z}_{:, i}^{[l]}} \in \R^{n^{[l]} \times n^{[l]}}\).</p>
+
+<p>We have already encountered</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{Z}^{[l]}} =
+\begin{bmatrix}
+\dpdv{J}{\vec{z}_{:, 1}^{[l]}} &amp; \dots &amp; \dpdv{J}{\vec{z}_{:, i}^{[l]}} &amp; \dots &amp; \dpdv{J}{\vec{z}_{:, m}^{[l]}}
+\end{bmatrix}, \label{eq:dZ}
+\end{equation}\]
+
+<p>and for the sake of completeness, we also clarify that</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{A}^{[l]}} =
+\begin{bmatrix}
+\dpdv{J}{\vec{a}_{:, 1}^{[l]}} &amp; \dots &amp; \dpdv{J}{\vec{a}_{:, i}^{[l]}} &amp; \dots &amp; \dpdv{J}{\vec{a}_{:, m}^{[l]}}
+\end{bmatrix}, \label{eq:dA}
+\end{equation}\]
+
+<p>where \(\pdv{J}{\vec{A}^{[l]}} \in \R^{n^{[l]} \times m}\).</p>
+
+<p>On purpose, we have omitted the details of \(g_j^{[l]}(z_{1, i}^{[l]}, \dots, z_{j, i}^{[l]}, \dots, z_{n^{[l]}, i}^{[l]})\); consequently, we cannot derive an analytic expression for \(\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}}\), which we depend on in \(\eqref{eq:dz_scalar}\). However, since <a href="/2021/12/21/feedforward-neural-networks-part-2/" target="_blank">the second post</a> of this series will be dedicated to activation functions, we will instead derive \(\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}}\) there.</p>
+
+<p>Furthermore, according to \(\eqref{eq:dz_scalar}\), we see that \(\pdv{J}{z_{j, i}^{[l]}}\) also depends on \(\pdv{J}{a_{j, i}^{[l]}}\). Now, it might come as a surprise, but \(\pdv{J}{a_{j, i}^{[l]}}\) has already been computed when we reach the \(l\)th layer during backward propagation. How did that happen, you may ask. The answer is that every layer paves the way for the previous layer by also computing \(\pdv{J}{a_{k, i}^{[l - 1]}}\), which we shall do now:</p>
+
+\[\begin{equation}
+\pdv{J}{a_{k, i}^{[l - 1]}} = \sum_j \pdv{J}{z_{j, i}^{[l]}} \pdv{z_{j, i}^{[l]}}{a_{k, i}^{[l - 1]}} = \sum_j \pdv{J}{z_{j, i}^{[l]}} w_{j, k}^{[l]}. \label{eq:da_prev_scalar}
+\end{equation}\]
+
+<p>As usual, our next step is vectorization:</p>
+
+\[\begin{equation*}
+\begin{split}
+&amp;
+\begin{bmatrix}
+\dpdv{J}{a_{1, 1}^{[l - 1]}} &amp; \dots &amp; \dpdv{J}{a_{1, i}^{[l - 1]}} &amp; \dots &amp; \dpdv{J}{a_{1, m}^{[l - 1]}} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+\dpdv{J}{a_{k, 1}^{[l - 1]}} &amp; \dots &amp; \dpdv{J}{a_{k, i}^{[l - 1]}} &amp; \dots &amp; \dpdv{J}{a_{k, m}^{[l - 1]}} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+\dpdv{J}{a_{n^{[l - 1]}, 1}^{[l - 1]}} &amp; \dots &amp; \dpdv{J}{a_{n^{[l - 1]}, i}^{[l - 1]}} &amp; \dots &amp; \dpdv{J}{a_{n^{[l - 1]}, m}^{[l - 1]}}
+\end{bmatrix} \\
+&amp;=
+\begin{bmatrix}
+w_{1, 1}^{[l]} &amp; \dots &amp; w_{j, 1}^{[l]} &amp; \dots &amp; w_{n^{[l]}, 1}^{[l]} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+w_{1, k}^{[l]} &amp; \dots &amp; w_{j, k}^{[l]} &amp; \dots &amp; w_{n^{[l]}, k}^{[l]} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+w_{1, n^{[l - 1]}}^{[l]} &amp; \dots &amp; w_{j, n^{[l - 1]}}^{[l]} &amp; \dots &amp; w_{n^{[l]}, n^{[l - 1]}}^{[l]}
+\end{bmatrix} \\
+&amp;\peq{} \cdot
+\begin{bmatrix}
+\dpdv{J}{z_{1, 1}^{[l]}} &amp; \dots &amp; \dpdv{J}{z_{1, i}^{[l]}} &amp; \dots &amp; \dpdv{J}{z_{1, m}^{[l]}} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+\dpdv{J}{z_{j, 1}^{[l]}} &amp; \dots &amp; \dpdv{J}{z_{j, i}^{[l]}} &amp; \dots &amp; \dpdv{J}{z_{j, m}^{[l]}} \\
+\vdots &amp; \ddots &amp; \vdots &amp; \ddots &amp; \vdots \\
+\dpdv{J}{z_{n^{[l]}, 1}^{[l]}} &amp; \dots &amp; \dpdv{J}{z_{n^{[l]}, i}^{[l]}} &amp; \dots &amp; \dpdv{J}{z_{n^{[l]}, m}^{[l]}}
+\end{bmatrix},
+\end{split}
+\end{equation*}\]
+
+<p>which we can write as</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{A}^{[l - 1]}} = {\vec{W}^{[l]}}^\T \pdv{J}{\vec{Z}^{[l]}}, \label{eq:dA_prev}
+\end{equation}\]
+
+<p>where \(\pdv{J}{\vec{A}^{[l - 1]}} \in \R^{n^{[l - 1]} \times m}\).</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>Forward propagation is seeded with \(\vec{A}^{[0]} = \vec{X}\) and evaluates a set of recurrence relations to compute the predictions \(\vec{A}^{[L]} = {\vec{\hat{Y}}}\). We also compute the cost \(J = f(\vec{\hat{Y}}, \vec{Y}) = f(\vec{A}^{[L]}, \vec{Y})\).</p>
+
+<p>Backward propagation, on the other hand, is seeded with \(\pdv{J}{\vec{A}^{[L]}} = \pdv{J}{\vec{\hat{Y}}}\) and evaluates a different set of recurrence relations to compute \(\pdv{J}{\vec{W}^{[l]}}\) and \(\pdv{J}{\vec{b}^{[l]}}\). If not stopped prematurely, it eventually computes \(\pdv{J}{\vec{A}^{[0]}} = \pdv{J}{\vec{X}}\), a partial derivative we usually ignore.</p>
+
+<p>Moreover, let us visualize the inputs we use and the outputs we produce during the forward and backward propagations:</p>
+
+<figure class="overflow-wrapper">
+  <svg id="bld-forward-propagation" class="bld" width="480" height="360"></svg>
+  <svg id="bld-backward-propagation" class="bld" width="480" height="255"></svg>
+  <figcaption>Figure 3: An overview of inputs and outputs.</figcaption>
+</figure>
+
+<p>Now, you might have noticed that we have yet to derive an analytic expression for the backpropagation seed \(\pdv{J}{\vec{A}^{[L]}} = \pdv{J}{\vec{\hat{Y}}}\). To recap, we have deferred the derivations that concern activation functions to <a href="/2021/12/21/feedforward-neural-networks-part-2/" target="_blank">the second post</a> of this series. Similarly, since <a href="/2021/12/22/feedforward-neural-networks-part-3/" target="_blank">the third post</a> will be dedicated to cost functions, we will instead address the derivation of the backpropagation seed there.</p>
+
+<p>Last but not least: congratulations! You have made it to the end (of the first post). 🏅<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/neural-network-svg@2/neural-network.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/neural-network-svg@2/neural-network-d3.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/box-line-diagram-svg@1/box-line-diagram.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/box-line-diagram-svg@1/box-line-diagram-d3.js"></script></p>
+<link rel="stylesheet" href="/assets/css/neural-network.css" />
+
+<link rel="stylesheet" href="/assets/css/box-line-diagram.css" />
+
+<script>
+  var nnThreeToThree =
+    nn.buildNeuralNetworkWithCoordinates(
+      [3, 3, 3, 3],  // nNodesPerLayer
+      960,           // width
+      360,           // height
+      30             // nodeRadius
+    );
+
+  nn.drawNeuralNetwork(
+    'nn-node-current-layer',  // svgId
+    'nn',                     // cssPrefix
+    nnThreeToThree            // neuralNetworkWithCoordinates
+  );
+
+  nn.drawNeuralNetwork(
+    'nn-node-previous-layer',  // svgId
+    'nn',                      // cssPrefix
+    nnThreeToThree             // neuralNetworkWithCoordinates
+  );
+
+  var nnTextOptions = new nn.TextOptions(
+    108,  // width
+    30,   // height
+    0.5   // position
+  );
+
+  var nnNodeTexts = [
+    new nn.NodeText(1, 0, 'a_{k - 2, i}^[l - 1]'),
+    new nn.NodeText(1, 1, 'a_{k - 1, i}^[l - 1]'),
+    new nn.NodeText(1, 2, 'a_{k, i}^[l - 1]'),
+    new nn.NodeText(2, 0, 'a_{j, i}^[l]'),
+    new nn.NodeText(2, 1, 'a_{j + 1, i}^[l]'),
+    new nn.NodeText(2, 2, 'a_{j + 2, i}^[l]')
+  ];
+
+  nn.annotateNeuralNetwork(
+    'nn-node-current-layer',  // svgId
+    'nn',                     // cssPrefix
+    nnThreeToThree,           // neuralNetworkWithCoordinates
+    nnNodeTexts,              // nodeTexts
+    // linkTexts
+    [
+      new nn.LinkText(1, 0, 2, 0, 'w_{j, k - 2}^[l]'),
+      new nn.LinkText(1, 1, 2, 0, 'w_{j, k - 1}^[l]'),
+      new nn.LinkText(1, 2, 2, 0, 'w_{j, k}^[l]')
+    ],
+    nnTextOptions  // textOptions
+  );
+
+  nn.annotateNeuralNetwork(
+    'nn-node-previous-layer',  // svgId
+    'nn',                      // cssPrefix
+    nnThreeToThree,            // neuralNetworkWithCoordinates
+    nnNodeTexts,               // nodeTexts
+    // linkTexts
+    [
+      new nn.LinkText(1, 2, 2, 0, 'w_{j, k}^[l]'),
+      new nn.LinkText(1, 2, 2, 1, 'w_{j + 1, k}^[l]'),
+      new nn.LinkText(1, 2, 2, 2, 'w_{j + 2, k}^[l]')
+    ],
+    nnTextOptions  // textOptions
+  );
+</script>
+
+<script>
+  var bldForwardPropagation =
+    bld.buildBoxLineDiagramWithCoordinates(
+      new bld.BoxLineDiagram(
+        new bld.Box(
+          200,  // width
+          150,  // height
+          50,   // padding
+          // texts
+          [
+            'Z^[l]'
+          ]
+        ),
+        [
+          new bld.Line(bld.PLACEMENT_LEFT  , bld.ARROWHEAD_END, 'A^[l - 1]'),
+          new bld.Line(bld.PLACEMENT_RIGHT , bld.ARROWHEAD_END, 'A^[l]'),
+          new bld.Line(bld.PLACEMENT_TOP   , bld.ARROWHEAD_END, 'W^[l]'),
+          new bld.Line(bld.PLACEMENT_TOP   , bld.ARROWHEAD_END, 'b^[l]'),
+          new bld.Line(bld.PLACEMENT_BOTTOM, bld.ARROWHEAD_END, 'cache^[l]')
+        ]
+      ),
+      480,  // width
+      360   // height
+    );
+
+  var bldBackwardPropagation =
+    bld.buildBoxLineDiagramWithCoordinates(
+      new bld.BoxLineDiagram(
+        new bld.Box(
+          200,  // width
+          150,  // height
+          50,   // padding
+          // texts
+          [
+            'dZ^[l]'
+          ]
+        ),
+        [
+          new bld.Line(bld.PLACEMENT_LEFT  , bld.ARROWHEAD_START, 'dA^[l - 1]'),
+          new bld.Line(bld.PLACEMENT_RIGHT , bld.ARROWHEAD_START, 'dA^[l]'),
+          new bld.Line(bld.PLACEMENT_BOTTOM, bld.ARROWHEAD_END  , 'dW^[l]'),
+          new bld.Line(bld.PLACEMENT_BOTTOM, bld.ARROWHEAD_END  , 'db^[l]')
+        ]
+      ),
+      480,  // width
+      255   // height
+    );
+
+  var bldTextOptions = new bld.TextOptions(
+    69,  // width
+    30   // height
+  );
+
+  var bldArrowheadOptions = new bld.ArrowheadOptions(
+    10,        // width
+    10,        // height
+    '#3f3f3f'  // fill
+  );
+
+  bld.drawBoxLineDiagram(
+    'bld-forward-propagation',  // svgId
+    'bld',                      // cssPrefix
+    bldForwardPropagation,      // boxLineDiagramWithCoordinates
+    bldTextOptions,             // textOptions
+    bldArrowheadOptions         // arrowheadOptions
+  );
+
+  bld.drawBoxLineDiagram(
+    'bld-backward-propagation',  // svgId
+    'bld',                       // cssPrefix
+    bldBackwardPropagation,      // boxLineDiagramWithCoordinates
+    bldTextOptions,              // textOptions
+    bldArrowheadOptions          // arrowheadOptions
+  );
+</script>]]></content><author><name>Jonas Lalin</name></author><summary type="html"><![CDATA[This post is the first of a three-part series in which we set out to derive the mathematics behind feedforward neural networks. They have]]></summary></entry><entry><title type="html">How Backpropagation Is Able To Reduce the Time Spent on Computing Gradients</title><link href="https://jonaslalin.com/2021/10/12/forward-vs-reverse-accumulation-mode/" rel="alternate" type="text/html" title="How Backpropagation Is Able To Reduce the Time Spent on Computing Gradients" /><published>2021-10-12T00:00:00+00:00</published><updated>2021-10-12T00:00:00+00:00</updated><id>https://jonaslalin.com/2021/10/12/forward-vs-reverse-accumulation-mode</id><content type="html" xml:base="https://jonaslalin.com/2021/10/12/forward-vs-reverse-accumulation-mode/"><![CDATA[<p>Backpropagation was initially introduced in the 1970s, but its importance was not fully appreciated until <a href="https://www.nature.com/articles/323533a0" target="_blank">Learning representations by back-propagating errors</a> was published in 1986. With backpropagation, it became possible to use neural networks to solve problems that had previously been insoluble. Today, backpropagation is the workhorse of learning in neural networks. Without it, we would waste both time and energy. So how is backpropagation able to reduce the time spent on computing gradients? It all boils down to the computational complexity between applying the chain rule in forward versus reverse accumulation mode.</p>
+
+<h2 id="forward-and-reverse-accumulation-modes">Forward and Reverse Accumulation Modes</h2>
+
+<p>Suppose we have a function</p>
+
+\[\begin{equation*}
+y = f(g(h(x))).
+\end{equation*}\]
+
+<p>Let us decompose the function with the help of intermediate variables:</p>
+
+\[\begin{align*}
+u_0 &amp;= x, \\
+u_1 &amp;= h(u_0), \\
+u_2 &amp;= g(u_1), \\
+u_3 &amp;= f(u_2) = y.
+\end{align*}\]
+
+<p>To compute the derivative \(\dv{y}{x}\), we can traverse the chain rule</p>
+
+<ol>
+  <li>from inside to outside, or</li>
+  <li>from outside to inside.</li>
+</ol>
+
+<p>We start with an inside first traversal of the chain rule, i.e., the forward accumulation mode:</p>
+
+\[\begin{align*}
+\dv{u_0}{x} &amp;= 1, \\
+\dv{u_1}{x} &amp;= \dv{u_1}{u_0} \dv{u_0}{x} = \dv{h(u_0)}{u_0}, \\
+\dv{u_2}{x} &amp;= \dv{u_2}{u_1} \dv{u_1}{x} = \dv{g(u_1)}{u_1} \dv{h(u_0)}{u_0}, \\
+\dv{u_3}{x} &amp;= \dv{u_3}{u_2} \dv{u_2}{x} = \dv{f(u_2)}{u_2} \dv{g(u_1)}{u_1} \dv{h(u_0)}{u_0}.
+\end{align*}\]
+
+<p>On the other hand, the reverse accumulation mode performs an outside first traversal of the chain rule, which more commonly is known as backpropagation:</p>
+
+\[\begin{align*}
+\dv{y}{u_3} &amp;= 1, \\
+\dv{y}{u_2} &amp;= \dv{y}{u_3} \dv{u_3}{u_2} = \dv{f(u_2)}{u_2}, \\
+\dv{y}{u_1} &amp;= \dv{y}{u_2} \dv{u_2}{u_1} = \dv{f(u_2)}{u_2} \dv{g(u_1)}{u_1}, \\
+\dv{y}{u_0} &amp;= \dv{y}{u_1} \dv{u_1}{u_0} = \dv{f(u_2)}{u_2} \dv{g(u_1)}{u_1} \dv{h(u_0)}{u_0}.
+\end{align*}\]
+
+<p>Both methods reach</p>
+
+\[\begin{equation*}
+\dv{y}{x} = \dv{u_3}{x} = \dv{y}{u_0} = \dv{f(u_2)}{u_2} \dv{g(u_1)}{u_1} \dv{h(u_0)}{u_0},
+\end{equation*}\]
+
+<p>using the same number of computations; however, this is not always the case, as we soon will find out.</p>
+
+<p>Note that the forward accumulation mode computes the recurrence relation</p>
+
+\[\begin{equation*}
+\dv{u_i}{x} = \dv{u_i}{u_{i - 1}} \dv{u_{i - 1}}{x}.
+\end{equation*}\]
+
+<p>In contrast, the reverse accumulation mode computes the recurrence relation</p>
+
+\[\begin{equation*}
+\dv{y}{u_i} = \dv{y}{u_{i + 1}} \dv{u_{i + 1}}{u_i}.
+\end{equation*}\]
+
+<p>Now, let us move on to a function \(f \colon \R^3 \to \R^2\), where it will be easier to analyze the computational complexity of the forward and reverse accumulation modes.</p>
+
+<h2 id="example">Example</h2>
+
+<p>To make a good comparison, we need an example with a different number of dependent variables than independent variables. The following function fulfills that requirement:</p>
+
+\[\begin{align*}
+y_1 &amp;= x_1 (x_2 - x_3), \\
+y_2 &amp;= x_3 \log(1 - x_1).
+\end{align*}\]
+
+<p>Next, to make gradient computations as simple as possible, after decomposition, we make sure we are left with only straightforward arithmetic operations and elementary functions:</p>
+
+\[\begin{align*}
+u_{-2} &amp;= x_1, \\
+u_{-1} &amp;= x_2, \\
+u_0 &amp;= x_3, \\
+u_1 &amp;= u_{-1} - u_0, \\
+u_2 &amp;= 1 - u_{-2}, \\
+u_3 &amp;= \log(u_2), \\
+u_4 &amp;= u_{-2} u_1 = y_1, \\
+u_5 &amp;= u_0 u_3 = y_2.
+\end{align*}\]
+
+<p>Now, we are ready to compute the partial derivatives \(\pdv{y_1}{x_1}\), \(\pdv{y_1}{x_2}\), \(\pdv{y_1}{x_3}\), \(\pdv{y_2}{x_1}\), \(\pdv{y_2}{x_2}\), and \(\pdv{y_2}{x_3}\). Once again, we start with an inside first traversal of the chain rule.</p>
+
+<h3 id="the-forward-accumulation-mode">The Forward Accumulation Mode</h3>
+
+<p><strong>Iteration 1:</strong></p>
+
+\[\begin{align*}
+\pdv{u_{-2}}{x_1} &amp;= 1, \\
+\pdv{u_{-1}}{x_1} &amp;= 0, \\
+\pdv{u_0}{x_1} &amp;= 0, \\
+\pdv{u_1}{x_1} &amp;= \pdv{u_1}{u_{-1}} \pdv{u_{-1}}{x_1} + \pdv{u_1}{u_0} \pdv{u_0}{x_1} = 0, \\
+\pdv{u_2}{x_1} &amp;= \pdv{u_2}{u_{-2}} \pdv{u_{-2}}{x_1} = -1, \\
+\pdv{u_3}{x_1} &amp;= \pdv{u_3}{u_2} \pdv{u_2}{x_1} = -\frac{1}{u_2} = -\frac{1}{1 - x_1}, \\
+\pdv{u_4}{x_1} &amp;= \pdv{u_4}{u_{-2}} \pdv{u_{-2}}{x_1} + \pdv{u_4}{u_1} \pdv{u_1}{x_1} = u_1 = x_2 - x_3, \\
+\pdv{u_5}{x_1} &amp;= \pdv{u_5}{u_0} \pdv{u_0}{x_1} + \pdv{u_5}{u_3} \pdv{u_3}{x_1} = -u_0 \frac{1}{u_2} = -\frac{x_3}{1 - x_1}.
+\end{align*}\]
+
+<p>Computing the partial derivative of every intermediate variable once gives us \(\pdv{y_1}{x_1} = x_2 - x_3\) and \(\pdv{y_2}{x_1} = -x_3 / (1 - x_1)\).</p>
+
+<p><strong>Iteration 2:</strong></p>
+
+\[\begin{align*}
+\pdv{u_{-2}}{x_2} &amp;= 0, \\
+\pdv{u_{-1}}{x_2} &amp;= 1, \\
+\pdv{u_0}{x_2} &amp;= 0, \\
+\pdv{u_1}{x_2} &amp;= \pdv{u_1}{u_{-1}} \pdv{u_{-1}}{x_2} + \pdv{u_1}{u_0} \pdv{u_0}{x_2} = 1, \\
+\pdv{u_2}{x_2} &amp;= \pdv{u_2}{u_{-2}} \pdv{u_{-2}}{x_2} = 0, \\
+\pdv{u_3}{x_2} &amp;= \pdv{u_3}{u_2} \pdv{u_2}{x_2} = 0, \\
+\pdv{u_4}{x_2} &amp;= \pdv{u_4}{u_{-2}} \pdv{u_{-2}}{x_2} + \pdv{u_4}{u_1} \pdv{u_1}{x_2} = u_{-2} = x_1, \\
+\pdv{u_5}{x_2} &amp;= \pdv{u_5}{u_0} \pdv{u_0}{x_2} + \pdv{u_5}{u_3} \pdv{u_3}{x_2} = 0.
+\end{align*}\]
+
+<p>After a second iteration, we also know that \(\pdv{y_1}{x_2} = x_1\) and \(\pdv{y_2}{x_2} = 0\).</p>
+
+<p><strong>Iteraton 3:</strong></p>
+
+\[\begin{align*}
+\pdv{u_{-2}}{x_3} &amp;= 0, \\
+\pdv{u_{-1}}{x_3} &amp;= 0, \\
+\pdv{u_0}{x_3} &amp;= 1, \\
+\pdv{u_1}{x_3} &amp;= \pdv{u_1}{u_{-1}} \pdv{u_{-1}}{x_3} + \pdv{u_1}{u_0} \pdv{u_0}{x_3} = -1, \\
+\pdv{u_2}{x_3} &amp;= \pdv{u_2}{u_{-2}} \pdv{u_{-2}}{x_3} = 0, \\
+\pdv{u_3}{x_3} &amp;= \pdv{u_3}{u_2} \pdv{u_2}{x_3} = 0, \\
+\pdv{u_4}{x_3} &amp;= \pdv{u_4}{u_{-2}} \pdv{u_{-2}}{x_3} + \pdv{u_4}{u_1} \pdv{u_1}{x_3} = -u_{-2} = -x_1, \\
+\pdv{u_5}{x_3} &amp;= \pdv{u_5}{u_0} \pdv{u_0}{x_3} + \pdv{u_5}{u_3} \pdv{u_3}{x_3} = u_3 = \log(1 - x_1).
+\end{align*}\]
+
+<p>A third and final iteration yields the remaining \(\pdv{y_1}{x_3} = -x_1\) and \(\pdv{y_2}{x_3} = \log(1 - x_1)\).</p>
+
+<p>Before drawing any conclusions, let us work through the same example again. This time around, we will perform an outside first traversal of the chain rule.</p>
+
+<h3 id="the-reverse-accumulation-mode">The Reverse Accumulation Mode</h3>
+
+<p><strong>Iteration 1:</strong></p>
+
+\[\begin{align*}
+\pdv{y_1}{u_5} &amp;= 0, \\
+\pdv{y_1}{u_4} &amp;= 1, \\
+\pdv{y_1}{u_3} &amp;= \pdv{y_1}{u_5} \pdv{u_5}{u_3} = 0, \\
+\pdv{y_1}{u_2} &amp;= \pdv{y_1}{u_3} \pdv{u_3}{u_2} = 0, \\
+\pdv{y_1}{u_1} &amp;= \pdv{y_1}{u_4} \pdv{u_4}{u_1} = u_{-2} = x_1, \\
+\pdv{y_1}{u_0} &amp;= \pdv{y_1}{u_1} \pdv{u_1}{u_0} + \pdv{y_1}{u_5} \pdv{u_5}{u_0} = -u_{-2} = -x_1, \\
+\pdv{y_1}{u_{-1}} &amp;= \pdv{y_1}{u_1} \pdv{u_1}{u_{-1}} = u_{-2} = x_1, \\
+\pdv{y_1}{u_{-2}} &amp;= \pdv{y_1}{u_2} \pdv{u_2}{u_{-2}} + \pdv{y_1}{u_4} \pdv{u_4}{u_{-2}} = u_1 = x_2 - x_3.
+\end{align*}\]
+
+<p>Behold the power of backpropagation! Computing the partial derivative with respect to every intermediate variable once gives us \(\pdv{y_1}{x_1} = x_2 - x_3\), \(\pdv{y_1}{x_2} = x_1\), and \(\pdv{y_1}{x_3} = -x_1\).</p>
+
+<p><strong>Iteration 2:</strong></p>
+
+\[\begin{align*}
+\pdv{y_2}{u_5} &amp;= 1, \\
+\pdv{y_2}{u_4} &amp;= 0, \\
+\pdv{y_2}{u_3} &amp;= \pdv{y_2}{u_5} \pdv{u_5}{u_3} = u_0 = x_3, \\
+\pdv{y_2}{u_2} &amp;= \pdv{y_2}{u_3} \pdv{u_3}{u_2} = u_0 \frac{1}{u_2} = x_3 \frac{1}{1 - x_1}, \\
+\pdv{y_2}{u_1} &amp;= \pdv{y_2}{u_4} \pdv{u_4}{u_1} = 0, \\
+\pdv{y_2}{u_0} &amp;= \pdv{y_2}{u_1} \pdv{u_1}{u_0} + \pdv{y_2}{u_5} \pdv{u_5}{u_0} = u_3 = \log(1 - x_1), \\
+\pdv{y_2}{u_{-1}} &amp;= \pdv{y_2}{u_1} \pdv{u_1}{u_{-1}} = 0, \\
+\pdv{y_2}{u_{-2}} &amp;= \pdv{y_2}{u_2} \pdv{u_2}{u_{-2}} + \pdv{y_2}{u_4} \pdv{u_4}{u_{-2}} = -u_0 \frac{1}{u_2} = -\frac{x_3}{1 - x_1}.
+\end{align*}\]
+
+<p>A second and final iteration concludes with \(\pdv{y_2}{x_1} = -x_3 / (1 - x_1)\), \(\pdv{y_2}{x_2} = 0\), and \(\pdv{y_2}{x_3} = \log(1 - x_1)\). Do you start to recognize any patterns?</p>
+
+<h2 id="computational-complexity">Computational Complexity</h2>
+
+<p>Analyzing the pen-and-paper example, in the forward accumulation mode, we needed <em>three iterations</em> because we had <em>three independent variables</em>. On the other hand, in the reverse accumulation mode, we only needed <em>two iterations</em> because we had <em>two dependent variables</em>.</p>
+
+<p>As a matter of fact, we can generalize the comparison of computational complexity to a generic function \(f \colon \R^n \to \R^m\), where we would be able to draw the following conclusions:</p>
+
+<ol>
+  <li>In the forward accumulation mode, we would need \(n\) iterations to compute the partial derivatives of the \(m\) dependent variables with respect to the \(n\) independent variables.</li>
+  <li>In the reverse accumulation mode, we would need \(m\) iterations to compute the partial derivatives of the \(m\) dependent variables with respect to the \(n\) independent variables.</li>
+</ol>
+
+<p>In closing, deep learning models may very well have trainable parameters in the millions but always only one cost function; hence, we always work with problems where \(n \gg m = 1\), which is where backpropagation excels. Now, do you understand how backpropagation is able to reduce the time spent on computing gradients? 🏎</p>]]></content><author><name>Jonas Lalin</name></author><summary type="html"><![CDATA[Backpropagation was initially introduced in the 1970s, but its importance was not fully appreciated until Learning representations by back-propagating errors was published in 1986. With backpropagation, it became possible to use neural networks to solve problems that had previously been insoluble. Today, backpropagation is the workhorse of learning in neural networks. Without it, we would waste both time and energy. So how is backpropagation able to reduce the time spent on computing gradients? It all boils down to the computational complexity between applying the chain rule in forward versus reverse accumulation mode.]]></summary></entry></feed>

@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Feedforward Neural Networks in Depth, Part 2: Activation Functions | I, Deep Learning</title>
+<meta name="generator" content="Jekyll v4.3.1" />
+<meta property="og:title" content="Feedforward Neural Networks in Depth, Part 2: Activation Functions" />
+<meta name="author" content="Jonas Lalin" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="This is the second post of a three-part series in which we derive the mathematics behind feedforward neural networks. We worked our way through forward and backward propagations in the first post, but if you remember, we only mentioned activation functions in passing. In particular, we did not derive an analytic expression for \(\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}}\) or, by extension, \(\pdv{J}{z_{j, i}^{[l]}}\). So let us pick up the derivations where we left off." />
+<meta property="og:description" content="This is the second post of a three-part series in which we derive the mathematics behind feedforward neural networks. We worked our way through forward and backward propagations in the first post, but if you remember, we only mentioned activation functions in passing. In particular, we did not derive an analytic expression for \(\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}}\) or, by extension, \(\pdv{J}{z_{j, i}^{[l]}}\). So let us pick up the derivations where we left off." />
+<link rel="canonical" href="https://jonaslalin.com/2021/12/21/feedforward-neural-networks-part-2/" />
+<meta property="og:url" content="https://jonaslalin.com/2021/12/21/feedforward-neural-networks-part-2/" />
+<meta property="og:site_name" content="I, Deep Learning" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-12-21T00:00:00+00:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Feedforward Neural Networks in Depth, Part 2: Activation Functions" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Jonas Lalin"},"dateModified":"2021-12-21T00:00:00+00:00","datePublished":"2021-12-21T00:00:00+00:00","description":"This is the second post of a three-part series in which we derive the mathematics behind feedforward neural networks. We worked our way through forward and backward propagations in the first post, but if you remember, we only mentioned activation functions in passing. In particular, we did not derive an analytic expression for \\(\\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}}\\) or, by extension, \\(\\pdv{J}{z_{j, i}^{[l]}}\\). So let us pick up the derivations where we left off.","headline":"Feedforward Neural Networks in Depth, Part 2: Activation Functions","mainEntityOfPage":{"@type":"WebPage","@id":"https://jonaslalin.com/2021/12/21/feedforward-neural-networks-part-2/"},"url":"https://jonaslalin.com/2021/12/21/feedforward-neural-networks-part-2/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://jonaslalin.com/feed.xml" title="I, Deep Learning" /><script async src="https://www.googletagmanager.com/gtag/js?id=G-XY9F18W0CY"></script>
+<script>
+  window['ga-disable-G-XY9F18W0CY'] = window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1";
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){window.dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-XY9F18W0CY');
+</script>
+<script>
+  MathJax = {
+    loader: {
+      load: [
+        '[tex]/mathtools'
+      ]
+    },
+    svg: {
+      fontCache: 'global'
+    },
+    tex: {
+      macros: {
+        bernoulli: '\\operatorname{Bernoulli}',
+        broadcast: '\\operatorname{broadcast}',
+        ddv: ['\\displaystyle \\dv{#1}{#2}', 2],
+        dpdv: ['\\displaystyle \\pdv{#1}{#2}', 2],
+        dv: [
+          '\\mathchoice'
+          + '{\\frac{\\mathrm{d} #1}{\\mathrm{d} #2}}'
+          + '{\\mathrm{d} #1 / \\mathrm{d} #2}'
+          + '{\\mathrm{d} #1 / \\mathrm{d} #2}'
+          + '{\\mathrm{d} #1 / \\mathrm{d} #2}',
+          2
+        ],
+        J: '\\mathcal{J}',
+        jj: '\\tilde{\\jmath}',
+        pdv: [
+          '\\mathchoice'
+          + '{\\frac{\\partial #1}{\\partial #2}}'
+          + '{\\partial #1 / \\partial #2}'
+          + '{\\partial #1 / \\partial #2}'
+          + '{\\partial #1 / \\partial #2}',
+          2
+        ],
+        peq: '\\mathrel{\\phantom{=}}',
+        pplus: '\\mathbin{\\phantom{+}}',
+        R: '\\mathbb{R}',
+        T: '\\intercal',
+        vec: ['\\mathbf{#1}', 1]
+      },
+      packages: {
+        '[+]': [
+          'mathtools'
+        ]
+      },
+      tags: 'ams'
+    }
+  };
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">I, Deep Learning</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Feedforward Neural Networks in Depth, Part 2: Activation Functions</h1>
+    <p class="post-meta"><time class="dt-published" datetime="2021-12-21T00:00:00+00:00" itemprop="datePublished">
+        Dec 21, 2021
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>This is the second post of a three-part series in which we derive the mathematics behind feedforward neural networks. We worked our way through forward and backward propagations in <a href="/2021/12/10/feedforward-neural-networks-part-1/" target="_blank">the first post</a>, but if you remember, we only mentioned activation functions in passing. In particular, we did not derive an analytic expression for \(\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}}\) or, by extension, \(\pdv{J}{z_{j, i}^{[l]}}\). So let us pick up the derivations where we left off.</p>
+
+<h2 id="relu">ReLU</h2>
+
+<p>The rectified linear unit, or ReLU for short, is given by</p>
+
+\[\begin{equation*}
+\begin{split}
+a_{j, i}^{[l]} &amp;= g_j^{[l]}(z_{1, i}^{[l]}, \dots, z_{j, i}^{[l]}, \dots, z_{n^{[l]}, i}^{[l]}) \\
+&amp;= \max(0, z_{j, i}^{[l]}) \\
+&amp;=
+\begin{cases}
+z_{j, i}^{[l]} &amp;\text{if } z_{j, i}^{[l]} &gt; 0, \\
+0 &amp;\text{otherwise.}
+\end{cases}
+\end{split}
+\end{equation*}\]
+
+<p>In other words,</p>
+
+\[\begin{equation}
+\vec{A}^{[l]} = \max(0, \vec{Z}^{[l]}).
+\end{equation}\]
+
+<p>Next, we compute the partial derivatives of the activations in the current layer:</p>
+
+\[\begin{align*}
+\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} &amp;\coloneqq
+\begin{cases}
+1 &amp;\text{if } z_{j, i}^{[l]} &gt; 0, \\
+0 &amp;\text{otherwise,}
+\end{cases} \\
+&amp;= I(z_{j, i}^{[l]} &gt; 0), \notag \\
+\pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} &amp;= 0, \quad \forall p \ne j.
+\end{align*}\]
+
+<p>It follows that</p>
+
+\[\begin{equation*}
+\begin{split}
+\pdv{J}{z_{j, i}^{[l]}} &amp;= \sum_p \pdv{J}{a_{p, i}^{[l]}} \pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} \\
+&amp;= \pdv{J}{a_{j, i}^{[l]}} \pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} + \sum_{p \ne j} \pdv{J}{a_{p, i}^{[l]}} \pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} \\
+&amp;= \pdv{J}{a_{j, i}^{[l]}} I(z_{j, i}^{[l]} &gt; 0),
+\end{split}
+\end{equation*}\]
+
+<p>which we can vectorize as</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{Z}^{[l]}} = \pdv{J}{\vec{A}^{[l]}} \odot I(\vec{Z}^{[l]} &gt; 0),
+\end{equation}\]
+
+<p>where \(\odot\) denotes element-wise multiplication.</p>
+
+<h2 id="sigmoid">Sigmoid</h2>
+
+<p>The sigmoid activation function is given by</p>
+
+\[\begin{equation*}
+\begin{split}
+a_{j, i}^{[l]} &amp;= g_j^{[l]}(z_{1, i}^{[l]}, \dots, z_{j, i}^{[l]}, \dots, z_{n^{[l]}, i}^{[l]}) \\
+&amp;= \sigma(z_{j, i}^{[l]}) \\
+&amp;= \frac{1}{1 + \exp(-z_{j, i}^{[l]})}.
+\end{split}
+\end{equation*}\]
+
+<p>Vectorization yields</p>
+
+\[\begin{equation}
+\vec{A}^{[l]} = \frac{1}{1 + \exp(-\vec{Z}^{[l]})}.
+\end{equation}\]
+
+<p>To practice backward propagation, first, we construct a computation graph:</p>
+
+\[\begin{align*}
+u_0 &amp;= z_{j, i}^{[l]}, \\
+u_1 &amp;= -u_0, \\
+u_2 &amp;= \exp(u_1), \\
+u_3 &amp;= 1 + u_2, \\
+u_4 &amp;= \frac{1}{u_3} = a_{j, i}^{[l]}.
+\end{align*}\]
+
+<p>Then, we perform an outside first traversal of the chain rule:</p>
+
+\[\begin{align*}
+\pdv{a_{j, i}^{[l]}}{u_4} &amp;= 1, \\
+\pdv{a_{j, i}^{[l]}}{u_3} &amp;= \pdv{a_{j, i}^{[l]}}{u_4} \pdv{u_4}{u_3} = -\frac{1}{u_3^2} = -\frac{1}{(1 + \exp(-z_{j, i}^{[l]}))^2}, \\
+\pdv{a_{j, i}^{[l]}}{u_2} &amp;= \pdv{a_{j, i}^{[l]}}{u_3} \pdv{u_3}{u_2} = -\frac{1}{u_3^2} = -\frac{1}{(1 + \exp(-z_{j, i}^{[l]}))^2}, \\
+\pdv{a_{j, i}^{[l]}}{u_1} &amp;= \pdv{a_{j, i}^{[l]}}{u_2} \pdv{u_2}{u_1} = -\frac{1}{u_3^2} \exp(u_1) = -\frac{\exp(-z_{j, i}^{[l]})}{(1 + \exp(-z_{j, i}^{[l]}))^2}, \\
+\pdv{a_{j, i}^{[l]}}{u_0} &amp;= \pdv{a_{j, i}^{[l]}}{u_1} \pdv{u_1}{u_0} = \frac{1}{u_3^2} \exp(u_1) = \frac{\exp(-z_{j, i}^{[l]})}{(1 + \exp(-z_{j, i}^{[l]}))^2}.
+\end{align*}\]
+
+<p>Let us simplify:</p>
+
+\[\begin{equation*}
+\begin{split}
+\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} &amp;= \frac{\exp(-z_{j, i}^{[l]})}{(1 + \exp(-z_{j, i}^{[l]}))^2} \\
+&amp;= \frac{1 + \exp(-z_{j, i}^{[l]}) - 1}{(1 + \exp(-z_{j, i}^{[l]}))^2} \notag \\
+&amp;= \frac{1}{1 + \exp(-z_{j, i}^{[l]})} - \frac{1}{(1 + \exp(-z_{j, i}^{[l]}))^2} \notag \\
+&amp;= a_{j, i}^{[l]} (1 - a_{j, i}^{[l]}).
+\end{split}
+\end{equation*}\]
+
+<p>We also note that</p>
+
+\[\begin{equation*}
+\pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} = 0, \quad \forall p \ne j.
+\end{equation*}\]
+
+<p>Consequently,</p>
+
+\[\begin{equation*}
+\begin{split}
+\pdv{J}{z_{j, i}^{[l]}} &amp;= \sum_p \pdv{J}{a_{p, i}^{[l]}} \pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} \\
+&amp;= \pdv{J}{a_{j, i}^{[l]}} \pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} + \sum_{p \ne j} \pdv{J}{a_{p, i}^{[l]}} \pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} \\
+&amp;= \pdv{J}{a_{j, i}^{[l]}} a_{j, i}^{[l]} (1 - a_{j, i}^{[l]}).
+\end{split}
+\end{equation*}\]
+
+<p>Lastly, no summations mean trivial vectorization:</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{Z}^{[l]}} = \pdv{J}{\vec{A}^{[l]}} \odot \vec{A}^{[l]} \odot (1 - \vec{A}^{[l]}).
+\end{equation}\]
+
+<h2 id="tanh">Tanh</h2>
+
+<p>The hyperbolic tangent function, i.e., the tanh activation function, is given by</p>
+
+\[\begin{equation*}
+\begin{split}
+a_{j, i}^{[l]} &amp;= g_j^{[l]}(z_{1, i}^{[l]}, \dots, z_{j, i}^{[l]}, \dots, z_{n^{[l]}, i}^{[l]}) \\
+&amp;= \tanh(z_{j, i}^{[l]}) \\
+&amp;= \frac{\exp(z_{j, i}^{[l]}) - \exp(-z_{j, i}^{[l]})}{\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]})}.
+\end{split}
+\end{equation*}\]
+
+<p>By utilizing element-wise multiplication, we get</p>
+
+\[\begin{equation}
+\vec{A}^{[l]} = \frac{1}{\exp(\vec{Z}^{[l]}) + \exp(-\vec{Z}^{[l]})} \odot (\exp(\vec{Z}^{[l]}) - \exp(-\vec{Z}^{[l]})).
+\end{equation}\]
+
+<p>Once again, let us introduce intermediate variables to practice backward propagation:</p>
+
+\[\begin{align*}
+u_0 &amp;= z_{j, i}^{[l]}, \\
+u_1 &amp;= -u_0, \\
+u_2 &amp;= \exp(u_0), \\
+u_3 &amp;= \exp(u_1), \\
+u_4 &amp;= u_2 - u_3, \\
+u_5 &amp;= u_2 + u_3, \\
+u_6 &amp;= \frac{1}{u_5}, \\
+u_7 &amp;= u_4 u_6 = a_{j, i}^{[l]}.
+\end{align*}\]
+
+<p>Next, we compute the partial derivatives:</p>
+
+\[\begin{align*}
+\pdv{a_{j, i}^{[l]}}{u_7} &amp;= 1, \\
+\pdv{a_{j, i}^{[l]}}{u_6} &amp;= \pdv{a_{j, i}^{[l]}}{u_7} \pdv{u_7}{u_6} = u_4 = \exp(z_{j, i}^{[l]}) - \exp(-z_{j, i}^{[l]}), \\
+\pdv{a_{j, i}^{[l]}}{u_5} &amp;= \pdv{a_{j, i}^{[l]}}{u_6} \pdv{u_6}{u_5} = -u_4 \frac{1}{u_5^2} = -\frac{\exp(z_{j, i}^{[l]}) - \exp(-z_{j, i}^{[l]})}{(\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]}))^2}, \\
+\pdv{a_{j, i}^{[l]}}{u_4} &amp;= \pdv{a_{j, i}^{[l]}}{u_7} \pdv{u_7}{u_4} = u_6 = \frac{1}{\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]})}, \\
+\pdv{a_{j, i}^{[l]}}{u_3} &amp;= \pdv{a_{j, i}^{[l]}}{u_4} \pdv{u_4}{u_3} + \pdv{a_{j, i}^{[l]}}{u_5} \pdv{u_5}{u_3} \\
+&amp;= -u_6 - u_4 \frac{1}{u_5^2} \notag \\
+&amp;= -\frac{1}{\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]})} - \frac{\exp(z_{j, i}^{[l]}) - \exp(-z_{j, i}^{[l]})}{(\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]}))^2} \notag \\
+&amp;= -\frac{2 \exp(z_{j, i}^{[l]})}{(\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]}))^2}, \notag \\
+\pdv{a_{j, i}^{[l]}}{u_2} &amp;= \pdv{a_{j, i}^{[l]}}{u_4} \pdv{u_4}{u_2} + \pdv{a_{j, i}^{[l]}}{u_5} \pdv{u_5}{u_2} \\
+&amp;= u_6 - u_4 \frac{1}{u_5^2} \notag \\
+&amp;= \frac{1}{\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]})} - \frac{\exp(z_{j, i}^{[l]}) - \exp(-z_{j, i}^{[l]})}{(\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]}))^2} \notag \\
+&amp;= \frac{2 \exp(-z_{j, i}^{[l]})}{(\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]}))^2}, \notag \\
+\pdv{a_{j, i}^{[l]}}{u_1} &amp;= \pdv{a_{j, i}^{[l]}}{u_3} \pdv{u_3}{u_1} \\
+&amp;= \Bigl(-u_6 - u_4 \frac{1}{u_5^2}\Bigr) \exp(u_1) \notag \\
+&amp;= -\frac{2 \exp(z_{j, i}^{[l]}) \exp(-z_{j, i}^{[l]})}{(\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]}))^2}, \notag \\
+\pdv{a_{j, i}^{[l]}}{u_0} &amp;= \pdv{a_{j, i}^{[l]}}{u_1} \pdv{u_1}{u_0} + \pdv{a_{j, i}^{[l]}}{u_2} \pdv{u_2}{u_0} \\
+&amp;= -\Bigl(-u_6 - u_4 \frac{1}{u_5^2}\Bigr) \exp(u_1) + \Bigl(u_6 - u_4 \frac{1}{u_5^2}\Bigr) \exp(u_0) \notag \\
+&amp;= \frac{2 \exp(z_{j, i}^{[l]}) \exp(-z_{j, i}^{[l]})}{(\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]}))^2} + \frac{2 \exp(z_{j, i}^{[l]}) \exp(-z_{j, i}^{[l]})}{(\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]}))^2} \notag \\
+&amp;= \frac{4 \exp(z_{j, i}^{[l]}) \exp(-z_{j, i}^{[l]})}{(\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]}))^2}. \notag
+\end{align*}\]
+
+<p>It follows that</p>
+
+\[\begin{equation*}
+\begin{split}
+\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} &amp;= \frac{4 \exp(z_{j, i}^{[l]}) \exp(-z_{j, i}^{[l]})}{(\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]}))^2} \\
+&amp;= \frac{\exp(z_{j, i}^{[l]})^2 + 2 \exp(z_{j, i}^{[l]}) \exp(-z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]})^2}{(\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]}))^2} \\
+&amp;\peq\negmedspace{} - \frac{\exp(z_{j, i}^{[l]})^2 - 2 \exp(z_{j, i}^{[l]}) \exp(-z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]})^2}{(\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]}))^2} \\
+&amp;= 1 - \frac{(\exp(z_{j, i}^{[l]}) - \exp(-z_{j, i}^{[l]}))^2}{(\exp(z_{j, i}^{[l]}) + \exp(-z_{j, i}^{[l]}))^2} \\
+&amp;= 1 - a_{j, i}^{[l]} a_{j, i}^{[l]}.
+\end{split}
+\end{equation*}\]
+
+<p>Similiar to the sigmoid activation function, we also have</p>
+
+\[\begin{equation*}
+\pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} = 0, \quad \forall p \ne j.
+\end{equation*}\]
+
+<p>Thus,</p>
+
+\[\begin{equation*}
+\begin{split}
+\pdv{J}{z_{j, i}^{[l]}} &amp;= \sum_p \pdv{J}{a_{p, i}^{[l]}} \pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} \\
+&amp;= \pdv{J}{a_{j, i}^{[l]}} \pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} + \sum_{p \ne j} \pdv{J}{a_{p, i}^{[l]}} \pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} \\
+&amp;= \pdv{J}{a_{j, i}^{[l]}} (1 - a_{j, i}^{[l]} a_{j, i}^{[l]}),
+\end{split}
+\end{equation*}\]
+
+<p>which implies that</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{Z}^{[l]}} = \pdv{J}{\vec{A}^{[l]}} \odot (1 - \vec{A}^{[l]} \odot \vec{A}^{[l]}).
+\end{equation}\]
+
+<h2 id="softmax">Softmax</h2>
+
+<p>The softmax activation function is given by</p>
+
+\[\begin{equation*}
+\begin{split}
+a_{j, i}^{[l]} &amp;= g_j^{[l]}(z_{1, i}^{[l]}, \dots, z_{j, i}^{[l]}, \dots, z_{n^{[l]}, i}^{[l]}) \\
+&amp;= \frac{\exp(z_{j, i}^{[l]})}{\sum_p \exp(z_{p, i}^{[l]})}.
+\end{split}
+\end{equation*}\]
+
+<p>Vectorization results in</p>
+
+\[\begin{equation}
+\vec{A}^{[l]} = \frac{1}{\broadcast(\underbrace{\sum_{\text{axis} = 0} \exp(\vec{Z}^{[l]})}_\text{row vector})} \odot \exp(\vec{Z}^{[l]}).
+\end{equation}\]
+
+<p>To begin with, we construct a computation graph for the \(j\)th activation of the current layer:</p>
+
+\[\begin{align*}
+u_{-1} &amp;= z_{j, i}^{[l]}, \\
+u_{0, p} &amp;= z_{p, i}^{[l]}, &amp;&amp;\forall p \ne j, \\
+u_1 &amp;= \exp(u_{-1}), \\
+u_{2, p} &amp;= \exp(u_{0, p}), &amp;&amp;\forall p \ne j, \\
+u_3 &amp;= u_1 + \sum_{p \ne j} u_{2, p}, \\
+u_4 &amp;= \frac{1}{u_3}, \\
+u_5 &amp;= u_1 u_4 = a_{j, i}^{[l]}.
+\end{align*}\]
+
+<p>By applying the chain rule, we get</p>
+
+\[\begin{align*}
+\pdv{a_{j, i}^{[l]}}{u_5} &amp;= 1, \\
+\pdv{a_{j, i}^{[l]}}{u_4} &amp;= \pdv{a_{j, i}^{[l]}}{u_5} \pdv{u_5}{u_4} = u_1 = \exp(z_{j, i}^{[l]}), \\
+\pdv{a_{j, i}^{[l]}}{u_3} &amp;= \pdv{a_{j, i}^{[l]}}{u_4} \pdv{u_4}{u_3} = -u_1 \frac{1}{u_3^2} = -\frac{\exp(z_{j, i}^{[l]})}{(\sum_p \exp(z_{p, i}^{[l]}))^2}, \\
+\pdv{a_{j, i}^{[l]}}{u_1} &amp;= \pdv{a_{j, i}^{[l]}}{u_3} \pdv{u_3}{u_1} + \pdv{a_{j, i}^{[l]}}{u_5} \pdv{u_5}{u_1} \\
+&amp;= -u_1 \frac{1}{u_3^2} + u_4 \notag \\
+&amp;= -\frac{\exp(z_{j, i}^{[l]})}{(\sum_p \exp(z_{p, i}^{[l]}))^2} + \frac{1}{\sum_p \exp(z_{p, i}^{[l]})}, \notag \\
+\pdv{a_{j, i}^{[l]}}{u_{-1}} &amp;= \pdv{a_{j, i}^{[l]}}{u_1} \pdv{u_1}{u_{-1}} \\
+&amp;= \Bigl(-u_1 \frac{1}{u_3^2} + u_4\Bigr) \exp(u_{-1}) \notag \\
+&amp;= -\frac{\exp(z_{j, i}^{[l]})^2}{(\sum_p \exp(z_{p, i}^{[l]}))^2} + \frac{\exp(z_{j, i}^{[l]})}{\sum_p \exp(z_{p, i}^{[l]})}. \notag
+\end{align*}\]
+
+<p>Next, we need to take into account that \(z_{j, i}^{[l]}\) also affects other activations in the same layer:</p>
+
+\[\begin{align*}
+u_{-1} &amp;= z_{j, i}^{[l]}, \\
+u_{0, p} &amp;= z_{p, i}^{[l]}, &amp;&amp;\forall p \ne j, \\
+u_1 &amp;= \exp(u_{-1}), \\
+u_{2, p} &amp;= \exp(u_{0, p}), &amp;&amp;\forall p \ne j, \\
+u_3 &amp;= u_1 + \sum_{p \ne j} u_{2, p}, \\
+u_4 &amp;= \frac{1}{u_3}, \\
+u_5 &amp;= u_{2, p} u_4 = a_{p, i}^{[l]}, &amp;&amp;\forall p \ne j.
+\end{align*}\]
+
+<p>Backward propagation gives us the remaining partial derivatives:</p>
+
+\[\begin{align*}
+\pdv{a_{p, i}^{[l]}}{u_5} &amp;= 1, \\
+\pdv{a_{p, i}^{[l]}}{u_4} &amp;= \pdv{a_{p, i}^{[l]}}{u_5} \pdv{u_5}{u_4} = u_{2, p} = \exp(z_{p, i}^{[l]}), \\
+\pdv{a_{p, i}^{[l]}}{u_3} &amp;= \pdv{a_{p, i}^{[l]}}{u_4} \pdv{u_4}{u_3} = -u_{2, p} \frac{1}{u_3^2} = -\frac{\exp(z_{p, i}^{[l]})}{(\sum_p \exp(z_{p, i}^{[l]}))^2}, \\
+\pdv{a_{p, i}^{[l]}}{u_1} &amp;= \pdv{a_{p, i}^{[l]}}{u_3} \pdv{u_3}{u_1} = -u_{2, p} \frac{1}{u_3^2} = -\frac{\exp(z_{p, i}^{[l]})}{(\sum_p \exp(z_{p, i}^{[l]}))^2}, \\
+\pdv{a_{p, i}^{[l]}}{u_{-1}} &amp;= \pdv{a_{p, i}^{[l]}}{u_1} \pdv{u_1}{u_{-1}} = -u_{2, p} \frac{1}{u_3^2} \exp(u_{-1}) = -\frac{\exp(z_{p, i}^{[l]}) \exp(z_{j, i}^{[l]})}{(\sum_p \exp(z_{p, i}^{[l]}))^2}.
+\end{align*}\]
+
+<p>We now know that</p>
+
+\[\begin{align*}
+\pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} &amp;= -\frac{\exp(z_{j, i}^{[l]})^2}{(\sum_p \exp(z_{p, i}^{[l]}))^2} + \frac{\exp(z_{j, i}^{[l]})}{\sum_p \exp(z_{p, i}^{[l]})} \\
+&amp;= a_{j, i}^{[l]} (1 - a_{j, i}^{[l]}), \notag \\
+\pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} &amp;= -\frac{\exp(z_{p, i}^{[l]}) \exp(z_{j, i}^{[l]})}{(\sum_p \exp(z_{p, i}^{[l]}))^2} \\
+&amp;= -a_{p, i}^{[l]} a_{j, i}^{[l]}, \quad \forall p \ne j. \notag
+\end{align*}\]
+
+<p>Hence,</p>
+
+\[\begin{equation*}
+\begin{split}
+\pdv{J}{z_{j, i}^{[l]}} &amp;= \sum_p \pdv{J}{a_{p, i}^{[l]}} \pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} \\
+&amp;= \pdv{J}{a_{j, i}^{[l]}} \pdv{a_{j, i}^{[l]}}{z_{j, i}^{[l]}} + \sum_{p \ne j} \pdv{J}{a_{p, i}^{[l]}} \pdv{a_{p, i}^{[l]}}{z_{j, i}^{[l]}} \\
+&amp;= \pdv{J}{a_{j, i}^{[l]}} a_{j, i}^{[l]} (1 - a_{j, i}^{[l]}) - \sum_{p \ne j} \pdv{J}{a_{p, i}^{[l]}} a_{p, i}^{[l]} a_{j, i}^{[l]} \\
+&amp;= a_{j, i}^{[l]} \Bigl(\pdv{J}{a_{j, i}^{[l]}} (1 - a_{j, i}^{[l]}) - \sum_{p \ne j} \pdv{J}{a_{p, i}^{[l]}} a_{p, i}^{[l]}\Bigr) \\
+&amp;= a_{j, i}^{[l]} \Bigl(\pdv{J}{a_{j, i}^{[l]}} (1 - a_{j, i}^{[l]}) - \sum_p \pdv{J}{a_{p, i}^{[l]}} a_{p, i}^{[l]} + \pdv{J}{a_{j, i}^{[l]}} a_{j, i}^{[l]}\Bigr) \\
+&amp;= a_{j, i}^{[l]} \Bigl(\pdv{J}{a_{j, i}^{[l]}} - \sum_p \pdv{J}{a_{p, i}^{[l]}} a_{p, i}^{[l]}\Bigr),
+\end{split}
+\end{equation*}\]
+
+<p>which we can vectorize as</p>
+
+\[\begin{equation*}
+\pdv{J}{\vec{z}_{:, i}^{[l]}} = \vec{a}_{:, i}^{[l]} \odot \Bigl(\pdv{J}{\vec{a}_{:, i}^{[l]}} - \underbrace{{\vec{a}_{:, i}^{[l]}}^\T \pdv{J}{\vec{a}_{:, i}^{[l]}}}_{\text{scalar}}\Bigr).
+\end{equation*}\]
+
+<p>Let us not stop with the vectorization just yet:</p>
+
+\[\begin{equation}
+\pdv{J}{\vec{Z}^{[l]}} = \vec{A}^{[l]} \odot \Bigl(\pdv{J}{\vec{A}^{[l]}} - \broadcast\bigl(\underbrace{\sum_{\text{axis} = 0} \pdv{J}{\vec{A}^{[l]}} \odot \vec{A}^{[l]}}_\text{row vector}\bigr)\Bigr).
+\end{equation}\]
+
+  </div><a class="u-url" href="/2021/12/21/feedforward-neural-networks-part-2/" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="https://jonaslalin.com/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+        <ul class="contact-list">
+          <li class="p-name">Jonas Lalin</li>
+          <li><a class="u-email" href="mailto:"></a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <p>Yet another blog about deep learning.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li>
+  <a rel="me" href="https://github.com/jonaslalin" target="_blank" title="github">
+    <svg class="svg-icon grey">
+      <use xlink:href="/assets/minima-social-icons.svg#github"></use>
+    </svg>
+  </a>
+</li>
+<li>
+  <a rel="me" href="https://www.linkedin.com/in/jonaslalin/" target="_blank" title="linkedin">
+    <svg class="svg-icon grey">
+      <use xlink:href="/assets/minima-social-icons.svg#linkedin"></use>
+    </svg>
+  </a>
+</li>
+</ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
