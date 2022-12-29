@@ -1,5 +1,5 @@
 ---
-title: Dropout
+title: Dropout with L2 Regularization
 ---
 
 ## Forward Propagation
@@ -16,6 +16,35 @@ r_{i, k}^{[l]} &\sim \bernoulli(p_k^{[l]}) =
 z_{i, j}^{[l + 1]} &= \sum_{k = 1}^{n^{[l]}} w_{k, j}^{[l + 1]} \tilde{a}_{i, k}^{[l]} + b_j^{[l + 1]}, \\
 a_{i, j}^{[l + 1]} &= g_j^{[l + 1]}(z_{i, 1}^{[l + 1]}, \dots, z_{i, j}^{[l + 1]}, \dots, z_{i, n^{[l + 1]}}^{[l + 1]}).
 \end{align}
+$$
+
+$$
+\begin{equation}
+\begin{split}
+\J &= f_{\text{error}}(y_{1, 1}, a_{1, 1}^{[L]}, \dots, y_{1, j}, a_{1, j}^{[L]}, \dots, y_{1, n^{[L]}}, a_{1, n^{[L]}}^{[L]}, \\
+&\peq{} \phantom{f_{\text{error}}(}y_{i, 1}, a_{i, 1}^{[L]}, \dots, y_{i, j}, a_{i, j}^{[L]}, \dots, y_{i, n^{[L]}}, a_{i, n^{[L]}}^{[L]}, \\
+&\peq{} \phantom{f_{\text{error}}(}y_{m, 1}, a_{m, 1}^{[L]}, \dots, y_{m, j}, a_{m, j}^{[L]}, \dots, y_{m, n^{[L]}}, a_{m, n^{[L]}}^{[L]}) \\
+&\peq{} + f_{\text{complexity}}(w_{1, 1}^{[1]}, \dots, w_{1, j}^{[1]}, \dots, w_{1, n^{[1]}}^{[1]}, \\
+&\peq{} \pplus \phantom{f_{\text{complexity}}(}w_{k, 1}^{[1]}, \dots, w_{k, j}^{[1]}, \dots, w_{k, n^{[1]}}^{[1]}, \\
+&\peq{} \pplus \phantom{f_{\text{complexity}}(}w_{n^{[0]}, 1}^{[1]}, \dots, w_{n^{[0]}, j}^{[1]}, \dots, w_{n^{[0]}, n^{[1]}}^{[1]}, \\
+&\peq{} \pplus \phantom{f_{\text{complexity}}(}\dots, \\
+&\peq{} \pplus \phantom{f_{\text{complexity}}(}w_{1, 1}^{[l + 1]}, \dots, w_{1, j}^{[l + 1]}, \dots, w_{1, n^{[l + 1]}}^{[l + 1]}, \\
+&\peq{} \pplus \phantom{f_{\text{complexity}}(}w_{k, 1}^{[l + 1]}, \dots, w_{k, j}^{[l + 1]}, \dots, w_{k, n^{[l + 1]}}^{[l + 1]}, \\
+&\peq{} \pplus \phantom{f_{\text{complexity}}(}w_{n^{[l]}, 1}^{[l + 1]}, \dots, w_{n^{[l]}, j}^{[l + 1]}, \dots, w_{n^{[l]}, n^{[l + 1]}}^{[l + 1]}, \\
+&\peq{} \pplus \phantom{f_{\text{complexity}}(}\dots, \\
+&\peq{} \pplus \phantom{f_{\text{complexity}}(}w_{1, 1}^{[L]}, \dots, w_{1, j}^{[L]}, \dots, w_{1, n^{[L]}}^{[L]}, \\
+&\peq{} \pplus \phantom{f_{\text{complexity}}(}w_{k, 1}^{[L]}, \dots, w_{k, j}^{[L]}, \dots, w_{k, n^{[L]}}^{[L]}, \\
+&\peq{} \pplus \phantom{f_{\text{complexity}}(}w_{n^{[L - 1]}, 1}^{[L]}, \dots, w_{n^{[L - 1]}, j}^{[L]}, \dots, w_{n^{[L - 1]}, n^{[L]}}^{[L]}),
+\end{split}
+\end{equation}
+$$
+
+where
+
+$$
+\begin{equation}
+f_{\text{complexity}} = \frac{\lambda}{2} \sum_{l = 0}^{L - 1} \sum_{k = 1}^{n^{[l]}} \sum_{j = 1}^{n^{[l + 1]}} (w_{k, j}^{[l + 1]})^2.
+\end{equation}
 $$
 
 $$
@@ -113,7 +142,7 @@ $$
 \end{align}
 $$
 
-## Backpropagation
+## Backward Propagation
 
 Assume
 
@@ -299,7 +328,7 @@ $$
 \begin{bmatrix}
 \dpdv{\J}{a_{i, 1}^{[l + 1]}} &\dots &\dpdv{\J}{a_{i, j}^{[l + 1]}} &\dots &\dpdv{\J}{a_{i, n^{[l + 1]}}^{[l + 1]}}
 \end{bmatrix} \\
-&\peq {} \cdot
+&\peq{} \cdot
 \begin{bmatrix}
 \dpdv{a_{i, 1}^{[l + 1]}}{z_{i, 1}^{[l + 1]}} &\dots &\dpdv{a_{i, 1}^{[l + 1]}}{z_{i, j}^{[l + 1]}} &\dots &\dpdv{a_{i, 1}^{[l + 1]}}{z_{i, n^{[l + 1]}}^{[l + 1]}} \\
 \vdots &\ddots &\vdots &\ddots &\vdots \\

@@ -225,7 +225,7 @@ $$
 \vdots & \ddots & \vdots & \ddots & \vdots \\
 \dpdv{J}{z_{n^{[l]}, 1}^{[l]}} & \dots & \dpdv{J}{z_{n^{[l]}, i}^{[l]}} & \dots & \dpdv{J}{z_{n^{[l]}, m}^{[l]}}
 \end{bmatrix} \notag \\
-&\peq {} \cdot
+&\peq{} \cdot
 \begin{bmatrix}
 a_{1, 1}^{[l - 1]} & \dots & a_{k, 1}^{[l - 1]} & \dots & a_{n^{[l - 1]}, 1}^{[l - 1]} \\
 \vdots & \ddots & \vdots & \ddots & \vdots \\
@@ -379,7 +379,7 @@ w_{1, k}^{[l]} & \dots & w_{j, k}^{[l]} & \dots & w_{n^{[l]}, k}^{[l]} \\
 \vdots & \ddots & \vdots & \ddots & \vdots \\
 w_{1, n^{[l - 1]}}^{[l]} & \dots & w_{j, n^{[l - 1]}}^{[l]} & \dots & w_{n^{[l]}, n^{[l - 1]}}^{[l]}
 \end{bmatrix} \\
-&\peq {} \cdot
+&\peq{} \cdot
 \begin{bmatrix}
 \dpdv{J}{z_{1, 1}^{[l]}} & \dots & \dpdv{J}{z_{1, i}^{[l]}} & \dots & \dpdv{J}{z_{1, m}^{[l]}} \\
 \vdots & \ddots & \vdots & \ddots & \vdots \\
