@@ -12,7 +12,7 @@ r_{i, k}^{[l]} &\sim \bernoulli(p_k^{[l]}) =
 1 &\text{with probability } p_k^{[l]}, \\
 0 &\text{with probability } 1 - p_k^{[l]},
 \end{cases} \\
-\tilde{a}_{i, k}^{[l]} &= r_{i, k}^{[l]} \frac{1}{p_k^{[l]}} a_{i, k}^{[l]}, \\
+\tilde{a}_{i, k}^{[l]} &= \frac{1}{p_k^{[l]}} r_{i, k}^{[l]} a_{i, k}^{[l]}, \\
 z_{i, j}^{[l + 1]} &= \sum_{k = 1}^{n^{[l]}} w_{k, j}^{[l + 1]} \tilde{a}_{i, k}^{[l]} + b_j^{[l + 1]}, \\
 a_{i, j}^{[l + 1]} &= g_j^{[l + 1]}(z_{i, 1}^{[l + 1]}, \dots, z_{i, j}^{[l + 1]}, \dots, z_{i, n^{[l + 1]}}^{[l + 1]}).
 \end{align}
@@ -136,7 +136,7 @@ $$
 $$
 \begin{align}
 \vec{A}^{[l]} &= \text{?}, \\
-\vec{\tilde{A}}^{[l]} &= \vec{R}^{[l]} \odot \frac{1}{\broadcast(\vec{p}^{[l]})} \odot \vec{A}^{[l]}, \\
+\vec{\tilde{A}}^{[l]} &= \frac{1}{\broadcast(\vec{p}^{[l]})} \odot \vec{R}^{[l]} \odot \vec{A}^{[l]}, \\
 \vec{Z}^{[l + 1]} &= \vec{\tilde{A}}^{[l]} \vec{W}^{[l + 1]} + \broadcast(\vec{b}^{[l + 1]}), \\
 \vec{A}^{[l + 1]} &= \vec{g}^{[l + 1]}(\vec{Z}^{[l + 1]}).
 \end{align}
@@ -228,7 +228,7 @@ $$a_{i, k}^{[l]}$$ only affects $$\tilde{a}_{i, k}^{[l]}$$, since
 
 $$
 \begin{equation}
-\tilde{a}_{i, k}^{[l]} = r_{i, k}^{[l]} \frac{1}{p_k^{[l]}} a_{i, k}^{[l]};
+\tilde{a}_{i, k}^{[l]} = \frac{1}{p_k^{[l]}} r_{i, k}^{[l]} a_{i, k}^{[l]};
 \end{equation}
 $$
 
@@ -236,7 +236,7 @@ hence,
 
 $$
 \begin{equation}
-\pdv{\J}{a_{i, k}^{[l]}} = \pdv{\J}{\tilde{a}_{i, k}^{[l]}} \pdv{\tilde{a}_{i, k}^{[l]}}{a_{i, k}^{[l]}} = \pdv{\J}{\tilde{a}_{i, k}^{[l]}} r_{i, k}^{[l]} \frac{1}{p_k^{[l]}}.
+\pdv{\J}{a_{i, k}^{[l]}} = \pdv{\J}{\tilde{a}_{i, k}^{[l]}} \pdv{\tilde{a}_{i, k}^{[l]}}{a_{i, k}^{[l]}} = \pdv{\J}{\tilde{a}_{i, k}^{[l]}} \frac{1}{p_k^{[l]}} r_{i, k}^{[l]}.
 \end{equation}
 $$
 
@@ -249,7 +249,7 @@ $$
 \pdv{\J}{w_{k, j}^{[l + 1]}} &= \sum_{i = 1}^m \pdv{\J}{z_{i, j}^{[l + 1]}} \tilde{a}_{i, k}^{[l]} + \frac{1}{m} \lambda w_{k, j}^{[l + 1]}, \\
 \pdv{\J}{b_j^{[l + 1]}} &= \sum_{i = 1}^m \pdv{\J}{z_{i, j}^{[l + 1]}}, \\
 \pdv{\J}{\tilde{a}_{i, k}^{[l]}} &= \sum_{j = 1}^{n^{[l + 1]}} \pdv{\J}{z_{i, j}^{[l + 1]}} w_{k, j}^{[l + 1]}, \\
-\pdv{\J}{a_{i, k}^{[l]}} &= \pdv{\J}{\tilde{a}_{i, k}^{[l]}} r_{i, k}^{[l]} \frac{1}{p_k^{[l]}}.
+\pdv{\J}{a_{i, k}^{[l]}} &= \pdv{\J}{\tilde{a}_{i, k}^{[l]}} \frac{1}{p_k^{[l]}} r_{i, k}^{[l]}.
 \end{align}
 $$
 
@@ -367,6 +367,6 @@ $$
 \pdv{\J}{\vec{W}^{[l + 1]}} &= {\vec{\tilde{A}}^{[l]}}^\T \pdv{\J}{\vec{Z}^{[l + 1]}} + \frac{1}{m} \lambda \vec{W}^{[l + 1]}, \\
 \pdv{\J}{\vec{b}^{[l + 1]}} &= \sum_{i = 1}^m \pdv{\J}{\vec{z}_i^{[l + 1]}}, \\
 \pdv{\J}{\vec{\tilde{A}}^{[l]}} &= \pdv{\J}{\vec{Z}^{[l + 1]}} {\vec{W}^{[l + 1]}}^\T, \\
-\pdv{\J}{\vec{A}^{[l]}} &= \pdv{\J}{\vec{\tilde{A}}^{[l]}} \odot \vec{R}^{[l]} \odot \frac{1}{\broadcast(\vec{p}^{[l]})}.
+\pdv{\J}{\vec{A}^{[l]}} &= \pdv{\J}{\vec{\tilde{A}}^{[l]}} \odot \frac{1}{\broadcast(\vec{p}^{[l]})} \odot \vec{R}^{[l]}.
 \end{align}
 $$
